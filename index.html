@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="BASELINE Athletic Club - Dein neues Fitnessstudio in der Stadt.">
+  <title>BASELINE — Athletic Club</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #111313;
+      --ink-soft: #191c1b;
+      --paper: #f0efe9;
+      --lime: #d8ff38;
+      --muted: #9b9f96;
+      --line: rgba(240, 239, 233, .16);
+      --display: "Barlow Condensed", Impact, sans-serif;
+      --body: "DM Sans", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; color: var(--paper); background: var(--ink); font-family: var(--body); }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; width: 100%; object-fit: cover; }
+    button { font: inherit; }
+    .wrap { width: min(1240px, calc(100% - 48px)); margin: 0 auto; }
+    .eyebrow { display: flex; align-items: center; gap: 10px; margin: 0 0 18px; color: var(--lime); font: 700 .74rem var(--body); letter-spacing: .12em; text-transform: uppercase; }
+    .eyebrow::before { content: ""; width: 30px; height: 2px; background: var(--lime); }
+    .display { margin: 0; font: 800 clamp(4.3rem, 11vw, 10.5rem)/.8 var(--display); letter-spacing: -.035em; text-transform: uppercase; }
+    .button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 21px; border: 1px solid var(--lime); background: var(--lime); color: var(--ink); font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; transition: transform .2s, background .2s; }
+    .button:hover { transform: translateY(-3px); background: #e5ff75; }
+    .button--ghost { border-color: var(--line); background: transparent; color: var(--paper); }
+    .button--ghost:hover { border-color: var(--lime); background: transparent; }
+
+    header { position: absolute; z-index: 5; top: 0; left: 0; right: 0; }
+    .nav { display: flex; align-items: center; justify-content: space-between; height: 88px; border-bottom: 1px solid var(--line); }
+    .logo { font: 800 1.7rem var(--display); letter-spacing: .02em; }
+    .logo span { color: var(--lime); }
+    .nav-links { display: flex; gap: 30px; color: #d1d3cd; font-size: .77rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
+    .nav-links a:hover { color: var(--lime); }
+    .menu-button { display: none; padding: 9px; border: 1px solid var(--line); background: transparent; color: var(--paper); font-weight: 700; }
+
+    .hero { position: relative; min-height: 820px; overflow: hidden; background: #202522; }
+    .hero::before { position: absolute; inset: 0; content: ""; background: linear-gradient(90deg, rgba(10, 12, 11, .9) 0%, rgba(10, 12, 11, .52) 48%, rgba(10, 12, 11, .2) 100%), url("https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=2000&q=85") center 35%/cover; filter: saturate(.78); }
+    .hero::after { position: absolute; right: 8%; bottom: 11%; width: 170px; height: 170px; content: ""; border: 1px solid rgba(216, 255, 56, .65); border-radius: 50%; }
+    .hero-content { position: relative; z-index: 1; display: flex; min-height: 820px; flex-direction: column; justify-content: flex-end; padding-bottom: 100px; }
+    .hero-title { max-width: 820px; }
+    .hero-title em { color: var(--lime); font-style: normal; }
+    .hero-bottom { display: flex; align-items: end; justify-content: space-between; gap: 30px; margin-top: 32px; }
+    .hero-copy { max-width: 330px; margin: 0; color: #c2c5bd; font-size: .96rem; line-height: 1.55; }
+    .scroll-note { display: flex; align-items: center; gap: 10px; color: #b4b8ad; font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; }
+    .scroll-note i { display: block; width: 42px; height: 1px; background: var(--lime); }
+
+    .ticker { overflow: hidden; border-bottom: 1px solid var(--line); background: var(--lime); color: var(--ink); white-space: nowrap; }
+    .ticker-track { display: flex; width: max-content; padding: 14px 0; animation: marquee 22s linear infinite; font: 700 1.02rem var(--display); letter-spacing: .09em; text-transform: uppercase; }
+    .ticker-track span { padding: 0 28px; }
+    @keyframes marquee { to { transform: translateX(-50%); } }
+
+    section { padding: 118px 0; }
+    .intro-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 90px; align-items: end; }
+    .intro-title { max-width: 720px; font-size: clamp(3.4rem, 7vw, 7.1rem); }
+    .intro-title span { color: var(--lime); }
+    .intro-text { margin: 0 0 4px; color: var(--muted); font-size: 1rem; line-height: 1.65; }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 90px; background: var(--line); }
+    .stat { padding: 28px; background: var(--ink); }
+    .stat strong { display: block; margin-bottom: 6px; color: var(--lime); font: 700 3rem var(--display); }
+    .stat span { color: var(--muted); font-size: .75rem; text-transform: uppercase; }
+
+    .light-section { background: var(--paper); color: var(--ink); }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 30px; margin-bottom: 55px; }
+    .section-head .eyebrow { color: #627300; }
+    .section-head .eyebrow::before { background: #627300; }
+    .section-title { font-size: clamp(3.5rem, 7vw, 7rem); }
+    .section-lead { max-width: 270px; margin: 0; color: #73766e; font-size: .9rem; line-height: 1.5; }
+    .programs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .program { position: relative; min-height: 480px; overflow: hidden; background: var(--ink); }
+    .program-link { display: block; height: 100%; min-height: 480px; color: inherit; }
+    .program img { height: 100%; min-height: 480px; transition: transform .5s; }
+    .program:hover img { transform: scale(1.06); }
+    .program::after { position: absolute; inset: 0; content: ""; background: linear-gradient(0deg, rgba(12, 15, 14, .9), transparent 60%); }
+    .program-content { position: absolute; z-index: 1; right: 25px; bottom: 23px; left: 25px; }
+    .program-number { color: var(--lime); font: 700 1rem var(--display); }
+    .program h3 { margin: 6px 0; color: var(--lime); font: 700 2.6rem var(--display); text-transform: uppercase; }
+    .program p { max-width: 230px; margin: 0; color: #c8cbc2; font-size: .82rem; line-height: 1.45; }
+
+    .quote-layout { display: grid; grid-template-columns: .75fr 1.25fr; gap: 90px; align-items: center; }
+    .quote-image { aspect-ratio: 4 / 5; object-fit: cover; }
+    blockquote { margin: 0; font: 500 clamp(2.5rem, 5.2vw, 5.4rem)/.95 var(--display); text-transform: uppercase; }
+    blockquote span { color: var(--lime); }
+    .quote-by { display: block; margin-top: 32px; color: var(--muted); font: .75rem var(--body); letter-spacing: .1em; text-transform: uppercase; }
+
+    .join { position: relative; overflow: hidden; background: var(--lime); color: var(--ink); }
+    .join::before { position: absolute; top: -90px; right: -30px; width: 370px; height: 370px; content: ""; border: 1px solid rgba(17, 19, 19, .2); border-radius: 50%; }
+    .join-inner { position: relative; display: flex; align-items: end; justify-content: space-between; gap: 40px; }
+    .join .eyebrow { color: var(--ink); }
+    .join .eyebrow::before { background: var(--ink); }
+    .join-title { max-width: 760px; font-size: clamp(4.5rem, 10vw, 10rem); }
+    .join-info { max-width: 250px; padding-bottom: 9px; font-size: .9rem; line-height: 1.5; }
+    .join .button { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+
+    footer { padding: 38px 0; color: var(--muted); }
+    .footer-inner { display: flex; justify-content: space-between; gap: 20px; font-size: .75rem; }
+    .footer-logo { color: var(--paper); font: 700 1.3rem var(--display); }
+
+    .modal { position: fixed; z-index: 10; inset: 0; display: none; place-items: center; padding: 24px; background: rgba(0, 0, 0, .7); }
+    .modal.open { display: grid; }
+    .modal-card { position: relative; width: min(490px, 100%); padding: 38px; background: var(--paper); color: var(--ink); }
+    .modal-card h2 { margin: 0 0 10px; font: 700 3rem var(--display); text-transform: uppercase; }
+    .modal-card p { margin: 0 0 25px; color: #6d7169; font-size: .9rem; line-height: 1.5; }
+    .close { position: absolute; top: 13px; right: 15px; padding: 6px; border: 0; background: transparent; color: var(--ink); font-size: 1.5rem; cursor: pointer; }
+    .signup-form { display: grid; gap: 11px; }
+    .signup-form label { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .signup-form input { width: 100%; padding: 13px; border: 1px solid #d3d4cc; background: white; font: .9rem var(--body); }
+    .signup-form .button { margin-top: 7px; }
+    .success { display: none; padding: 15px; background: var(--lime); font-weight: 700; }
+    .success.show { display: block; }
+
+    @media (max-width: 800px) {
+      .wrap { width: min(100% - 32px, 620px); }
+      .nav { height: 74px; }
+      .nav-links { position: absolute; top: 74px; right: 0; left: 0; display: none; flex-direction: column; gap: 0; padding: 8px 16px 20px; background: var(--ink); border-bottom: 1px solid var(--line); }
+      .nav-links.open { display: flex; }
+      .nav-links a { padding: 14px 0; }
+      .menu-button { display: block; }
+      .nav .button { display: none; }
+      .hero, .hero-content { min-height: 720px; }
+      .hero-content { padding-bottom: 65px; }
+      .hero::before { background-position: 62% center; }
+      .hero-bottom, .join-inner { align-items: start; flex-direction: column; }
+      .scroll-note { display: none; }
+      section { padding: 78px 0; }
+      .intro-grid, .quote-layout { grid-template-columns: 1fr; gap: 34px; }
+      .stats { margin-top: 55px; }
+      .programs { grid-template-columns: 1fr; }
+      .program, .program img { min-height: 390px; }
+      .section-head { display: block; margin-bottom: 32px; }
+      .section-lead { margin-top: 22px; }
+      .quote-image { max-height: 490px; }
+      .join-info { padding: 0; }
+      .footer-inner { flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .ticker-track { animation: none; }
+      .program img, .button { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="nav wrap" aria-label="Hauptnavigation">
+      <a class="logo" href="#top">BASE<span>/</span>LINE</a>
+      <div class="nav-links" id="nav-links">
+        <a href="#studio">Studio</a>
+        <a href="#programme">Programme</a>
+        <a href="#philosophie">Philosophie</a>
+      </div>
+      <a class="button" href="#mitgliedschaft">Probetraining</a>
+      <button class="menu-button" id="menu-button" aria-label="Menü öffnen" aria-expanded="false">MENU</button>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-content wrap">
+        <p class="eyebrow">Eröffnung Frühjahr 2025 · Köln</p>
+        <h1 class="display hero-title">Trainiere<br><em>deine</em><br>Basis.</h1>
+        <div class="hero-bottom">
+          <p class="hero-copy">Ein neuer Athletic Club für alle, die stärker werden wollen. Ohne Show. Mit System. Jeden Tag.</p>
+          <span class="scroll-note"><i></i> Entdecke deinen Club</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="ticker" aria-label="Studio-Highlights">
+      <div class="ticker-track"><span>Strength</span><span>Conditioning</span><span>Community</span><span>Recovery</span><span>Strength</span><span>Conditioning</span><span>Community</span><span>Recovery</span></div>
+    </div>
+
+    <section id="studio">
+      <div class="wrap">
+        <div class="intro-grid">
+          <div>
+            <p class="eyebrow">Dein neues Zuhause</p>
+            <h2 class="display intro-title">Mehr als ein<br><span>Fitnessstudio.</span></h2>
+          </div>
+          <p class="intro-text">BASELINE verbindet durchdachtes Training, starke Coaches und eine Community, die dich wirklich weiterbringt. 1.200 m² für deinen nächsten Schritt.</p>
+        </div>
+        <div class="stats">
+          <div class="stat"><strong>1.200</strong><span>Quadratmeter Trainingsfläche</span></div>
+          <div class="stat"><strong>24/7</strong><span>Zugang für Mitglieder</span></div>
+          <div class="stat"><strong>04</strong><span>Trainingszonen für jedes Ziel</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="light-section" id="programme">
+      <div class="wrap">
+        <div class="section-head">
+          <div><p class="eyebrow">Finde deinen Fokus</p><h2 class="display section-title">Dein<br>Programm.</h2></div>
+          <p class="section-lead">Drei Wege, ein Ziel: dich in deiner besten Form zu erleben.</p>
+        </div>
+        <div class="programs">
+          <article class="program"><a class="program-link" href="strength.html"><img src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=85" alt="Athlet beim Krafttraining" loading="lazy"><div class="program-content"><span class="program-number">01</span><h3>Strength</h3><p>Grundlagen aufbauen, Grenzen verschieben, Kraft spüren.</p></div></a></article>
+          <article class="program"><a class="program-link" href="move.html"><img src="https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=85" alt="Frau beim funktionellen Training" loading="lazy"><div class="program-content"><span class="program-number">02</span><h3>Move</h3><p>Funktionelle Workouts für mehr Energie und Beweglichkeit.</p></div></a></article>
+          <article class="program"><a class="program-link" href="fight.html"><img src="https://images.unsplash.com/photo-1549060279-7e168fcee0c2?auto=format&fit=crop&w=900&q=85" alt="Mann beim Boxtraining" loading="lazy"><div class="program-content"><span class="program-number">03</span><h3>Fight</h3><p>Intensiv, fokussiert, gemeinsam. Dein Ausgleich mit Punch.</p></div></a></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="philosophie">
+      <div class="wrap quote-layout">
+        <img class="quote-image" src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=1000&q=85" alt="Athlet mit Langhantel im Studio" loading="lazy">
+        <div><p class="eyebrow">Unsere Philosophie</p><blockquote>Stärke ist kein Ziel.<br>Sie ist eine <span>Gewohnheit.</span></blockquote><span class="quote-by">— Das BASELINE Prinzip</span></div>
+      </div>
+    </section>
+
+    <section class="join" id="mitgliedschaft">
+      <div class="wrap join-inner">
+        <div><p class="eyebrow">Ready when you are</p><h2 class="display join-title">Komm<br>rein.</h2></div>
+        <div class="join-info"><p>Die ersten 100 Mitglieder trainieren im ersten Monat zum Eröffnungspreis.</p><button class="button" id="open-modal">Jetzt Platz sichern</button></div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="wrap footer-inner"><span class="footer-logo">BASE/LINE</span><span>Venloer Straße 213 · 50823 Köln</span><span>Mo–So · 24/7 für Mitglieder</span><span>© 2025 BASELINE Athletic Club</span></div></footer>
+
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-card">
+      <button class="close" id="close-modal" aria-label="Fenster schließen">×</button>
+      <h2 id="modal-title">Dein Platz.</h2>
+      <p>Trag dich ein und wir melden uns mit allen Infos zum Eröffnungspreis bei dir.</p>
+      <form class="signup-form" id="signup-form">
+        <label for="name">Dein Name</label><input id="name" name="name" required autocomplete="name" placeholder="Vor- und Nachname">
+        <label for="email">E-Mail</label><input id="email" name="email" type="email" required autocomplete="email" placeholder="du@beispiel.de">
+        <button class="button" type="submit">Interesse anmelden</button>
+      </form>
+      <div class="success" id="success">Danke! Wir melden uns bald bei dir.</div>
+    </div>
+  </div>
+
+  <script>
+    const menuButton = document.getElementById('menu-button');
+    const navLinks = document.getElementById('nav-links');
+    const modal = document.getElementById('modal');
+    const signupForm = document.getElementById('signup-form');
+    const success = document.getElementById('success');
+
+    menuButton.addEventListener('click', () => {
+      const isOpen = navLinks.classList.toggle('open');
+      menuButton.setAttribute('aria-expanded', isOpen);
+      menuButton.textContent = isOpen ? 'CLOSE' : 'MENU';
+    });
+    navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => navLinks.classList.remove('open')));
+    document.getElementById('open-modal').addEventListener('click', () => { modal.classList.add('open'); document.getElementById('name').focus(); });
+    document.getElementById('close-modal').addEventListener('click', () => modal.classList.remove('open'));
+    modal.addEventListener('click', event => { if (event.target === modal) modal.classList.remove('open'); });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') modal.classList.remove('open'); });
+    signupForm.addEventListener('submit', event => { event.preventDefault(); signupForm.style.display = 'none'; success.classList.add('show'); });
+  </script>
+</body>
+</html>
