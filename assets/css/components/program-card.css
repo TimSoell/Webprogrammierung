@@ -1,0 +1,96 @@
+/**
+ * @file        assets/css/components/program-card.css
+ * @layer       Komponente
+ * @description Die drei anklickbaren Programmkacheln auf der Startseite
+ *              (Strength, Move, Fight).
+ *
+ *              Der gesamte Kachelbereich ist ein einziger Link (.program-link),
+ *              nicht nur die Überschrift. Das ist bewusst so: eine größere
+ *              Klickfläche ist auf dem Handy deutlich leichter zu treffen.
+ * @see         index.php
+ * @see         programme/
+ */
+
+.programs {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.program {
+  position: relative;
+  min-height: 480px;
+  background: var(--ink);
+  overflow: hidden;
+}
+
+.program-link {
+  display: block;
+  height: 100%;
+  min-height: 480px;
+  color: inherit;
+}
+
+.program img {
+  height: 100%;
+  min-height: 480px;
+  transition: transform .5s;
+}
+
+.program:hover img {
+  transform: scale(1.06);
+}
+
+/* Abdunklung nach unten, damit der weiße Text auf jedem Bild lesbar bleibt. */
+.program::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(0deg, rgba(12, 15, 14, .9), transparent 60%);
+}
+
+.program-content {
+  position: absolute;
+  z-index: 1;
+  right: 25px;
+  bottom: 23px;
+  left: 25px;
+}
+
+.program-number {
+  color: var(--lime);
+  font: 700 1rem var(--display);
+}
+
+.program-content h3 {
+  margin: 6px 0;
+  color: var(--lime);
+  font: 700 2.6rem var(--display);
+  text-transform: uppercase;
+}
+
+.program-content p {
+  max-width: 230px;
+  margin: 0;
+  color: #c8cbc2;
+  font-size: .82rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 800px) {
+  .programs {
+    grid-template-columns: 1fr;
+  }
+
+  .program,
+  .program img,
+  .program-link {
+    min-height: 390px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .program img {
+    transition: none;
+  }
+}

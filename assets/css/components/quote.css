@@ -1,0 +1,52 @@
+/**
+ * @file        assets/css/components/quote.css
+ * @layer       Komponente
+ * @description Der Philosophie-Abschnitt: Bild links, großes Zitat rechts.
+ *
+ *              Das blockquote ist bewusst innerhalb von .quote-layout
+ *              angesprochen und nicht als nacktes Element. Sonst würde jedes
+ *              künftige blockquote auf anderen Seiten diese Riesenschrift erben.
+ * @see         index.php
+ */
+
+.quote-layout {
+  display: grid;
+  align-items: center;
+  gap: 90px;
+  grid-template-columns: .75fr 1.25fr;
+}
+
+.quote-image {
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+
+.quote-layout blockquote {
+  margin: 0;
+  font: 500 clamp(2.5rem, 5.2vw, 5.4rem)/.95 var(--display);
+  text-transform: uppercase;
+}
+
+.quote-layout blockquote span {
+  color: var(--lime);
+}
+
+.quote-by {
+  display: block;
+  margin-top: 32px;
+  color: var(--muted);
+  font: .75rem var(--body);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 800px) {
+  .quote-layout {
+    gap: 34px;
+    grid-template-columns: 1fr;
+  }
+
+  .quote-image {
+    max-height: 490px;
+  }
+}

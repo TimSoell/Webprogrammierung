@@ -1,0 +1,63 @@
+/**
+ * @file        assets/css/components/button.css
+ * @layer       Komponente
+ * @description Der Standardbutton der Seite, plus zwei Varianten.
+ *
+ *              Varianten werden mit einer zweiten Klasse ergänzt, nicht mit
+ *              einer neuen Basisklasse:
+ *                  <a class="button">              lime, Standard
+ *                  <a class="button button--ghost">  transparent mit Rand
+ *                  <a class="button button--dark">   dunkel, für limefarbenen Grund
+ *
+ *              Diese Schreibweise heißt Modifier. Neue Varianten bitte genauso
+ *              anlegen, damit die Basisregeln nicht doppelt geschrieben werden.
+ */
+
+.button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 21px;
+  border: 1px solid var(--lime);
+  background: var(--lime);
+  color: var(--ink);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  transition: transform .2s, background .2s;
+}
+
+.button:hover {
+  background: var(--lime-hover);
+  transform: translateY(-3px);
+}
+
+.button--ghost {
+  border-color: var(--line);
+  background: transparent;
+  color: var(--paper);
+}
+
+.button--ghost:hover {
+  border-color: var(--lime);
+  background: transparent;
+}
+
+/* Für Flächen, die selbst limefarben sind - dort wäre ein limer Button unsichtbar. */
+.button--dark {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.button--dark:hover {
+  background: var(--ink-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}

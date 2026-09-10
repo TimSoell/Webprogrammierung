@@ -1,0 +1,107 @@
+/**
+ * @file        assets/css/components/modal.css
+ * @layer       Komponente
+ * @description Das Overlay-Fenster für die Interessenten-Anmeldung.
+ *
+ *              Sichtbarkeit wird ausschließlich über die Klasse .open
+ *              gesteuert, gesetzt von assets/js/components/modal.js.
+ *              Kein style.display im JavaScript - so bleibt die gesamte
+ *              Darstellung im CSS und ist an einer Stelle nachvollziehbar.
+ * @see         assets/js/components/modal.js
+ * @see         partials/modal-anmeldung.php
+ */
+
+.modal {
+  position: fixed;
+  z-index: 10;
+  inset: 0;
+  display: none;
+  padding: 24px;
+  background: rgba(0, 0, 0, .7);
+  place-items: center;
+}
+
+.modal.open {
+  display: grid;
+}
+
+.modal-card {
+  position: relative;
+  width: min(490px, 100%);
+  padding: 38px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.modal-card h2 {
+  margin: 0 0 10px;
+  font: 700 3rem var(--display);
+  text-transform: uppercase;
+}
+
+.modal-card > p {
+  margin: 0 0 25px;
+  color: #6d7169;
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+.modal-close {
+  position: absolute;
+  top: 13px;
+  right: 15px;
+  padding: 6px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.signup-form {
+  display: grid;
+  gap: 11px;
+}
+
+/* Wird gebraucht, weil eine Klasse mit display:grid das hidden-Attribut
+   des Browsers überstimmt. Ohne diese Regel bliebe das Formular nach dem
+   Absenden sichtbar - siehe assets/js/pages/index.page.js. */
+.signup-form[hidden] {
+  display: none;
+}
+
+.signup-form label {
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.signup-form input {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #d3d4cc;
+  background: #fff;
+  font: .9rem var(--body);
+}
+
+.signup-form input:focus-visible {
+  outline: 2px solid var(--lime-dark);
+  outline-offset: 1px;
+}
+
+.signup-form .button {
+  margin-top: 7px;
+}
+
+/* Erfolgsmeldung nach dem Absenden. Wird per .show eingeblendet. */
+.form-success {
+  display: none;
+  padding: 15px;
+  background: var(--lime);
+  font-weight: 700;
+}
+
+.form-success.show {
+  display: block;
+}

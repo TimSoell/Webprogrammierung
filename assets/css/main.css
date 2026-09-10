@@ -1,0 +1,34 @@
+/**
+ * @file        assets/css/main.css
+ * @layer       Stylesheet-Einstiegspunkt
+ * @description Die EINZIGE CSS-Datei, die eine Seite einbindet
+ *              (siehe partials/head.php). Sie enthält selbst keine Regeln,
+ *              sondern nur Imports in fester Reihenfolge.
+ *
+ *              Die Reihenfolge ist bewusst und darf nicht vertauscht werden:
+ *              spätere Dateien dürfen frühere überschreiben, nicht umgekehrt.
+ *
+ *                01-tokens    Variablen (Farben, Schriften, Maße)
+ *                02-base      Reset und Grundtypografie
+ *                03-layout    Seitengerüst: Raster, Header, Footer
+ *                components/  einzelne Bausteine
+ *
+ *              NEUE KOMPONENTE? -> Datei in components/ anlegen und hier
+ *              unten in der Liste ergänzen. Sonst wird sie nicht geladen.
+ * @see         assets/css/README.md
+ */
+
+@import "01-tokens.css";
+@import "02-base.css";
+@import "03-layout.css";
+
+@import "components/button.css";
+@import "components/hero.css";
+@import "components/ticker.css";
+@import "components/intro.css";
+@import "components/section-head.css";
+@import "components/program-card.css";
+@import "components/quote.css";
+@import "components/join.css";
+@import "components/modal.css";
+@import "components/program-page.css";

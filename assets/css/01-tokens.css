@@ -1,0 +1,33 @@
+/**
+ * @file        assets/css/01-tokens.css
+ * @layer       Design-Tokens
+ * @description Alle Design-Entscheidungen an einer Stelle: Farben, Schriften,
+ *              Maximalbreite. Wer das Grün der Marke ändern will, ändert
+ *              --lime hier - und die gesamte Website zieht nach.
+ *
+ *              REGEL: Feste Farbwerte (#d8ff38) gehören NICHT in Komponenten.
+ *              Wenn ihr einen Wert an zwei Stellen braucht, wird er hier
+ *              zu einem Token.
+ * @see         docs/decisions/ADR-0003-css-aufteilung.md
+ */
+
+:root {
+  /* --- Farben ----------------------------------------------------------- */
+  --ink: #111313;                       /* Hintergrund dunkel  */
+  --ink-soft: #191c1b;                  /* Abstufung dazu      */
+  --paper: #f0efe9;                     /* Text auf dunkel / Hintergrund hell */
+  --lime: #d8ff38;                      /* Akzentfarbe der Marke */
+  --lime-hover: #e5ff75;                /* Akzent im Hover-Zustand */
+  --lime-dark: #627300;                 /* Akzent auf hellem Grund (Kontrast) */
+  --muted: #9b9f96;                     /* Nebentext */
+  --line: rgba(240, 239, 233, .16);     /* Trennlinien auf dunklem Grund */
+
+  /* --- Schriften -------------------------------------------------------- */
+  --display: "Barlow Condensed", Impact, sans-serif;   /* Ueberschriften */
+  --body: "DM Sans", Arial, sans-serif;                /* Fließtext */
+
+  /* --- Maße ------------------------------------------------------------ */
+  --wrap-max: 1240px;                   /* Maximale Inhaltsbreite */
+  --header-height: 88px;                /* Höhe der Kopfzeile (Desktop) */
+  --header-height-mobile: 74px;         /* Höhe der Kopfzeile (Mobil) */
+}

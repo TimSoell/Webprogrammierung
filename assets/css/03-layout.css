@@ -1,0 +1,150 @@
+/**
+ * @file        assets/css/03-layout.css
+ * @layer       Layout
+ * @description Das Seitengerüst, das auf jeder Seite gleich ist:
+ *              Inhaltsbreite (.wrap), Abschnittsabstände, Kopfzeile und Fußzeile.
+ *
+ *              Abgrenzung zu components/: hier steht, WO Dinge auf der Seite
+ *              liegen. In components/ steht, WIE ein einzelner Baustein aussieht.
+ * @see         partials/header.php
+ * @see         partials/footer.php
+ */
+
+/* Zentrierter Inhaltsbereich. Die calc()-Angabe sorgt für Seitenabstand
+   auf schmalen Bildschirmen, ohne eine zweite Media Query zu brauchen. */
+.wrap {
+  width: min(var(--wrap-max), calc(100% - 48px));
+  margin: 0 auto;
+}
+
+section {
+  padding: 118px 0;
+}
+
+/* Umschaltung auf hellen Hintergrund (z. B. der Programme-Abschnitt). */
+.light-section {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* --- Kopfzeile ------------------------------------------------------------
+   Der Header liegt absolut über dem Hero-Bild, damit das Bild bis ganz
+   nach oben läuft. Deshalb muss jeder Hero oben Platz dafür lassen. */
+header {
+  position: absolute;
+  z-index: 5;
+  top: 0;
+  right: 0;
+  left: 0;
+}
+
+.nav {
+  display: flex;
+  height: var(--header-height);
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+}
+
+.logo {
+  font: 800 1.7rem var(--display);
+  letter-spacing: .02em;
+}
+
+.logo span {
+  color: var(--lime);
+}
+
+.nav-links {
+  display: flex;
+  gap: 30px;
+  color: #d1d3cd;
+  font-size: .77rem;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.nav-links a:hover,
+.nav-links a[aria-current="page"] {
+  color: var(--lime);
+}
+
+/* Nur auf schmalen Bildschirmen sichtbar - siehe Media Query unten. */
+.menu-button {
+  display: none;
+  padding: 9px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--paper);
+  font-weight: 700;
+}
+
+/* --- Fußzeile ------------------------------------------------------------- */
+footer {
+  padding: 38px 0;
+  color: var(--muted);
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: .75rem;
+}
+
+.footer-logo {
+  color: var(--paper);
+  font: 700 1.3rem var(--display);
+}
+
+/* --- Schmale Bildschirme --------------------------------------------------
+   Die Navigation klappt unter der Kopfzeile auf. Das Umschalten der
+   Klasse .open übernimmt assets/js/components/nav.js. */
+@media (max-width: 800px) {
+  .wrap {
+    width: min(100% - 32px, 620px);
+  }
+
+  section {
+    padding: 78px 0;
+  }
+
+  .nav {
+    height: var(--header-height-mobile);
+  }
+
+  .nav-links {
+    position: absolute;
+    top: var(--header-height-mobile);
+    right: 0;
+    left: 0;
+    display: none;
+    flex-direction: column;
+    gap: 0;
+    padding: 8px 16px 20px;
+    border-bottom: 1px solid var(--line);
+    background: var(--ink);
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-links a {
+    padding: 14px 0;
+  }
+
+  .menu-button {
+    display: block;
+  }
+
+  /* Der Aktionsbutton in der Kopfzeile weicht dem Menü-Button. */
+  .nav .button {
+    display: none;
+  }
+
+  .footer-inner {
+    flex-direction: column;
+  }
+}

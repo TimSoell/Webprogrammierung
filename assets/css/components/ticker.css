@@ -1,0 +1,45 @@
+/**
+ * @file        assets/css/components/ticker.css
+ * @layer       Komponente
+ * @description Das durchlaufende Band mit den Studio-Schlagworten.
+ *
+ *              Die Endlosschleife funktioniert, weil die Wörter im Markup
+ *              doppelt stehen und die Animation genau um 50 % verschiebt.
+ *              Wenn ihr Wörter ergänzt, müsst ihr sie in BEIDEN Hälften
+ *              ergänzen, sonst ruckelt der Übergang.
+ * @see         index.php
+ */
+
+.ticker {
+  border-bottom: 1px solid var(--line);
+  background: var(--lime);
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  padding: 14px 0;
+  font: 700 1.02rem var(--display);
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  animation: ticker-marquee 22s linear infinite;
+}
+
+.ticker-track span {
+  padding: 0 28px;
+}
+
+@keyframes ticker-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+  }
+}

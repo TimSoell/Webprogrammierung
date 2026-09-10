@@ -1,0 +1,24 @@
+-- =============================================================================
+-- @file        database/seed.sql
+-- @layer       6 - Datenbank
+-- @description Testdaten zum Ausprobieren und Vorführen.
+--
+--              Getrennt von schema.sql, weil beide unterschiedlich oft
+--              gebraucht werden: das Schema läuft einmal, die Testdaten
+--              werden beim Entwickeln immer wieder neu eingespielt.
+--
+--              REGEL: Hier stehen ausschließlich erfundene Daten. Keine
+--              echten Namen, keine echten E-Mail-Adressen, keine Passwörter.
+--
+--              Einspielen wie schema.sql, aber DANACH.
+--
+-- STAND        Noch leer, weil es noch keine Tabellen gibt.
+--              Beispiel für später:
+--
+--              USE `baseline`;
+--
+--              INSERT INTO `beispiel_eintraege` (`name`, `tag`, `uhrzeit`) VALUES
+--                  ('Kraftzirkel', 'Montag',   '18:00:00'),
+--                  ('Boxen',       'Mittwoch', '19:30:00'),
+--                  ('Mobility',    'Freitag',  '17:00:00');
+-- =============================================================================

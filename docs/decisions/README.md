@@ -1,0 +1,31 @@
+# Architekturentscheidungen (ADRs)
+
+Ein ADR (*Architecture Decision Record*) hält eine Entscheidung fest, die den
+Aufbau des Projekts betrifft — **samt der Gründe und der verworfenen
+Alternativen**.
+
+## Wann ein ADR
+
+Immer, wenn eine Entscheidung schwer rückgängig zu machen ist oder wenn sich
+in drei Wochen jemand fragen wird „warum eigentlich so?".
+
+Typisch: Ordnerstruktur, Wahl einer Technik, eine feste Regel fürs Team.
+
+Kein ADR für: Farbwerte, Textänderungen, das Anlegen einer einzelnen Datei.
+
+## Regeln
+
+- Dateiname: `ADR-XXXX-kurztitel.md`, fortlaufend nummeriert ab `0001`.
+- **Ein ADR wird nie gelöscht und nie umgeschrieben.** Ändert sich die
+  Entscheidung, entsteht ein neues ADR, und im alten wird der Status auf
+  `ersetzt durch ADR-YYYY` gesetzt. Die Historie ist der eigentliche Wert.
+- Vorlage: [`../templates/adr.md`](../templates/adr.md)
+
+## Bestand
+
+| Nr. | Titel | Status |
+|---|---|---|
+| [0001](ADR-0001-php-includes.md) | PHP-Includes statt vier eigenständiger HTML-Dateien | angenommen |
+| [0002](ADR-0002-schichtenarchitektur.md) | Sechs Schichten mit einem Service als Naht zur Datenbank | angenommen |
+| [0003](ADR-0003-css-aufteilung.md) | CSS in Tokens, Basis, Layout und Komponenten | angenommen |
+| [0004](ADR-0004-php-entwicklungsserver.md) | PHP-Entwicklungsserver als Standard-Startweg | angenommen |

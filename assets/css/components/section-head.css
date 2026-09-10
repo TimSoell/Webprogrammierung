@@ -1,0 +1,50 @@
+/**
+ * @file        assets/css/components/section-head.css
+ * @layer       Komponente
+ * @description Der Kopf eines Abschnitts: Überschrift links, kurzer
+ *              Begleittext rechts. Wird für jeden neuen Abschnitt
+ *              wiederverwendet - bitte nicht kopieren, sondern nutzen.
+ *
+ *              Auf hellem Grund (.light-section) bekommt die .eyebrow eine
+ *              dunklere Variante, weil Lime auf Beige zu wenig Kontrast hat.
+ * @see         index.php
+ */
+
+.section-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 55px;
+}
+
+.section-head .eyebrow {
+  color: var(--lime-dark);
+}
+
+.section-head .eyebrow::before {
+  background: var(--lime-dark);
+}
+
+.section-title {
+  font-size: clamp(3.5rem, 7vw, 7rem);
+}
+
+.section-lead {
+  max-width: 270px;
+  margin: 0;
+  color: #73766e;
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 800px) {
+  .section-head {
+    display: block;
+    margin-bottom: 32px;
+  }
+
+  .section-lead {
+    margin-top: 22px;
+  }
+}

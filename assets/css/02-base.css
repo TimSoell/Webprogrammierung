@@ -1,0 +1,79 @@
+/**
+ * @file        assets/css/02-base.css
+ * @layer       Basis
+ * @description Reset und Grundtypografie. Gilt für JEDE Seite.
+ *
+ *              Hier stehen ausschließlich Regeln auf Element-Selektoren
+ *              (body, a, img ...) sowie zwei Typografie-Bausteine, die auf
+ *              mehreren Seiten vorkommen: .eyebrow und .display.
+ *
+ *              REGEL: Nichts Seitenspezifisches. Das gehört in components/.
+ * @see         assets/css/main.css
+ */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--body);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  width: 100%;
+  object-fit: cover;
+}
+
+button {
+  font: inherit;
+}
+
+/* Kleine Ueberschrift über einer Hauptüberschrift ("Dein neues Zuhause").
+   Der Strich davor wird per ::before erzeugt, nicht als Markup. */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 18px;
+  color: var(--lime);
+  font: 700 .74rem var(--body);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.eyebrow::before {
+  content: "";
+  width: 30px;
+  height: 2px;
+  background: var(--lime);
+}
+
+/* Große Schauschrift. Die Größe setzt jeweils die Komponente,
+   hier steht nur, was alle Schauschriften gemeinsam haben. */
+.display {
+  margin: 0;
+  font: 800 clamp(4.3rem, 11vw, 10.5rem)/.8 var(--display);
+  letter-spacing: -.035em;
+  text-transform: uppercase;
+}
+
+/* Nutzerinnen und Nutzer, die im Betriebssystem reduzierte Bewegung
+   eingestellt haben, bekommen keine Animationen. Barrierefreiheit. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

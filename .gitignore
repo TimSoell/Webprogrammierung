@@ -1,0 +1,15 @@
+# Lokale Konfiguration mit Zugangsdaten - NIEMALS committen.
+# Vorlage liegt unter config/config.example.php
+/config/config.php
+
+# Betriebssystem
+.DS_Store
+Thumbs.db
+
+# Editoren
+/.vscode/
+/.idea/
+*.swp
+
+# Logs
+*.log

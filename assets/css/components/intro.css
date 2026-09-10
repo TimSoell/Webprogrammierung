@@ -1,0 +1,72 @@
+/**
+ * @file        assets/css/components/intro.css
+ * @layer       Komponente
+ * @description Der Vorstellungsabschnitt der Startseite: zweispaltiger Text
+ *              plus die Zahlenreihe darunter (Quadratmeter, Öffnungszeiten ...).
+ *
+ *              Die Trennlinien zwischen den Zahlen entstehen nicht durch
+ *              border, sondern durch gap: 1px auf einem eingefärbten Raster.
+ *              So ist die Linie automatisch überall gleich, auch wenn ihr
+ *              eine vierte Kachel ergänzt.
+ * @see         index.php
+ */
+
+.intro-grid {
+  display: grid;
+  align-items: end;
+  gap: 90px;
+  grid-template-columns: 1.15fr .85fr;
+}
+
+.intro-title {
+  max-width: 720px;
+  font-size: clamp(3.4rem, 7vw, 7.1rem);
+}
+
+.intro-title span {
+  color: var(--lime);
+}
+
+.intro-text {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.stats {
+  display: grid;
+  gap: 1px;
+  margin-top: 90px;
+  background: var(--line);
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.stat {
+  padding: 28px;
+  background: var(--ink);
+}
+
+.stat strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--lime);
+  font: 700 3rem var(--display);
+}
+
+.stat span {
+  color: var(--muted);
+  font-size: .75rem;
+  text-transform: uppercase;
+}
+
+@media (max-width: 800px) {
+  .intro-grid {
+    gap: 34px;
+    grid-template-columns: 1fr;
+  }
+
+  .stats {
+    margin-top: 55px;
+  }
+}
