@@ -14,7 +14,7 @@ cd /d "%~dp0"
 
 REM PHP aus der XAMPP-Installation. Fehlt es dort, wird das PHP aus dem PATH
 REM benutzt - damit laeuft das Skript auch bei abweichendem Installationsort.
-set "PHP=C:\xampp\php\php.exe"
+set "PHP=C:\WebProgrammierung\XAMP\php\php.exe"
 if not exist "%PHP%" set "PHP=php"
 
 echo BASELINE laeuft auf http://localhost:8000/   (Beenden mit Strg+C)
