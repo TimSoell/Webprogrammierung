@@ -10,7 +10,7 @@ befolgt, dokumentiert automatisch mit — darum geht es.
 
 ## 1. Das Projekt
 
-**BASELINE Athletic Club** — Website eines Fitnessstudios.
+**SCHWITZKASTEN Athletic Club** — Website eines Fitnessstudios.
 Studienarbeit im Fach Webprogrammierung (DHBW, 3. Semester), 5 Personen.
 
 | | |

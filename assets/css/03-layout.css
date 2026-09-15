@@ -99,14 +99,17 @@ footer {
 
 .footer-inner {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 20px;
   font-size: .75rem;
 }
 
 .footer-logo {
-  color: var(--paper);
-  font: 700 1.3rem var(--display);
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
+  object-fit: contain;
 }
 
 /* --- Schmale Bildschirme --------------------------------------------------

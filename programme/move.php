@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 require __DIR__ . '/../src/bootstrap.php';
 
-$pageTitle       = 'Move — BASELINE';
-$pageDescription = 'Funktionelles Training bei BASELINE: Mobilität, Stabilität und Ausdauer für mehr Energie im Alltag.';
+$pageTitle       = 'Move — SCHWITZKASTEN';
+$pageDescription = 'Funktionelles Training bei SCHWITZKASTEN: Mobilität, Stabilität und Ausdauer für mehr Energie im Alltag.';
 $activeNav       = 'programme';
 
 require ROOT_PATH . '/partials/head.php';

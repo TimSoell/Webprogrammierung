@@ -21,10 +21,10 @@ if (!defined('BASE_URL')) {
 ?>
   <footer>
     <div class="wrap footer-inner">
-      <span class="footer-logo">BASE/LINE</span>
+      <img class="footer-logo" src="<?= e(BASE_URL) ?>assets/img/schwitzkasten-logo.png" alt="Schwitzkasten Athletic Club">
       <span>Venloer Straße 213 · 50823 Köln</span>
       <span>Mo–So · 24/7 für Mitglieder</span>
-      <span>© <?= date('Y') ?> BASELINE Athletic Club</span>
+      <span>© <?= date('Y') ?> SCHWITZKASTEN Athletic Club</span>
     </div>
   </footer>
 </body>

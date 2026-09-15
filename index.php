@@ -22,8 +22,8 @@ declare(strict_types=1);
 
 require __DIR__ . '/src/bootstrap.php';
 
-$pageTitle       = 'BASELINE — Athletic Club';
-$pageDescription = 'BASELINE Athletic Club — Dein neues Fitnessstudio in Köln. Strength, Move und Fight auf 1.200 m².';
+$pageTitle       = 'SCHWITZKASTEN — Athletic Club';
+$pageDescription = 'SCHWITZKASTEN Athletic Club — Dein neues Fitnessstudio in Köln. Strength, Move und Fight auf 1.200 m².';
 $pageScript      = 'index.page.js';
 
 require ROOT_PATH . '/partials/head.php';
@@ -59,7 +59,7 @@ require ROOT_PATH . '/partials/header.php';
             <p class="eyebrow">Dein neues Zuhause</p>
             <h2 class="display intro-title">Mehr als ein<br><span>Fitnessstudio.</span></h2>
           </div>
-          <p class="intro-text">BASELINE verbindet durchdachtes Training, starke Coaches und eine Community, die dich wirklich weiterbringt. 1.200 m² für deinen nächsten Schritt.</p>
+          <p class="intro-text">SCHWITZKASTEN verbindet durchdachtes Training, starke Coaches und eine Community, die dich wirklich weiterbringt. 1.200 m² für deinen nächsten Schritt.</p>
         </div>
 
         <div class="stats">
@@ -123,7 +123,7 @@ require ROOT_PATH . '/partials/header.php';
         <div>
           <p class="eyebrow">Unsere Philosophie</p>
           <blockquote>Stärke ist kein Ziel.<br>Sie ist eine <span>Gewohnheit.</span></blockquote>
-          <span class="quote-by">— Das BASELINE Prinzip</span>
+          <span class="quote-by">— Das SCHWITZKASTEN Prinzip</span>
         </div>
       </div>
     </section>

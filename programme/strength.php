@@ -19,8 +19,8 @@ declare(strict_types=1);
 
 require __DIR__ . '/../src/bootstrap.php';
 
-$pageTitle       = 'Strength — BASELINE';
-$pageDescription = 'Krafttraining bei BASELINE: saubere Technik, progressive Gewichte und Coaches, die dich voranbringen.';
+$pageTitle       = 'Strength — SCHWITZKASTEN';
+$pageDescription = 'Krafttraining bei SCHWITZKASTEN: saubere Technik, progressive Gewichte und Coaches, die dich voranbringen.';
 $activeNav       = 'programme';
 
 require ROOT_PATH . '/partials/head.php';

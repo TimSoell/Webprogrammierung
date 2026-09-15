@@ -49,7 +49,7 @@
  *   declare(strict_types=1);
  *   require __DIR__ . '/src/bootstrap.php';       // in Unterordnern: '/../src/...'
  *
- *   $pageTitle       = 'Kurse — BASELINE';
+ *   $pageTitle       = 'Kurse — SCHWITZKASTEN';
  *   $pageDescription = 'Alle Kurse im Überblick.';
  *   $pageScript      = 'kurse.page.js';           // optional
  *   $activeNav       = 'kurse';                   // optional, hebt den Menüpunkt hervor
