@@ -59,14 +59,16 @@ Am Quelltext ändert das nichts: `BASE_URL` wird berechnet und stimmt in beiden
 Fällen. Weil aber entwickelt und vorgeführt auf unterschiedlichen Servern
 wird, gilt: **vor der Abgabe einmal über Apache prüfen.**
 
-### Datenbank (optional, noch nicht nötig)
+### Datenbank (für den Mitglieder-Login)
+
+Startseite und Programmseiten laufen ohne Datenbank. Für Registrierung und
+Login braucht es sie:
 
 In XAMPP **MySQL** starten. Für phpMyAdmin zusätzlich **Apache** — das
 Startskript ersetzt Apache nur für die Projektseite, nicht für phpMyAdmin.
 Dann `http://localhost/phpmyadmin` öffnen und unter *Importieren* die Datei
-`database/schema.sql` einspielen.
-Aktuell legt sie nur die leere Datenbank an, weil es noch keine
-datenbankgestützten Features gibt.
+`database/schema.sql` einspielen. Sie legt die Datenbank `baseline` samt
+Tabellen an und darf beliebig oft eingespielt werden.
 
 ---
 
@@ -136,9 +138,11 @@ Umgesetzt sind die **Startseite** und die drei **Programmseiten**
 (Strength, Move, Fight), inklusive mobiler Navigation und dem Anmeldefenster
 für Interessenten.
 
-Die Architektur für datenbankgestützte Features steht vollständig, es gibt
-aber noch **keine** solchen Features. Als Vorlage dient das
-**Beispiel-Feature**: sechs Dateien, eine pro Schicht, die absichtlich keinen
+Dazu kommt das erste datenbankgestützte Feature: der **Mitglieder-Login**
+mit Registrierung, Login, Mein Konto und „Passwort vergessen“ — siehe
+[`docs/features/mitglieder-login.md`](docs/features/mitglieder-login.md).
+
+Als Vorlage für weitere Features dient das **Beispiel-Feature**: sechs Dateien, eine pro Schicht, die absichtlich keinen
 Code enthalten, sondern beschreiben, was in die jeweilige Schicht gehört.
 
 ```

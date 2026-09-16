@@ -12,7 +12,9 @@
 --
 --              Einspielen wie schema.sql, aber DANACH.
 --
--- STAND        Noch leer, weil es noch keine Tabellen gibt.
+-- STAND        Noch leer. Konten für den Mitglieder-Login gehören nicht hierher,
+--              weil sie ein Passwort brauchen - die legt man über die
+--              Registrierung an.
 --              Beispiel für später:
 --
 --              USE `baseline`;

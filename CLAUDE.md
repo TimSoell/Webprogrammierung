@@ -17,6 +17,7 @@ Studienarbeit im Fach Webprogrammierung (DHBW, 3. Semester), 5 Personen.
 |---|---|
 | Frontend | HTML, CSS, JavaScript als ES-Module. **Kein Framework** |
 | Backend | PHP 8, MySQL über PDO |
+| Login | [delight-im/auth](https://github.com/delight-im/PHP-Auth) über Composer, `vendor/` eingecheckt — siehe [`ADR-0005`](docs/decisions/ADR-0005-login-bibliothek.md) |
 | Umgebung | XAMPP — PHP-Server zum Entwickeln, Apache zur Abgabe, MySQL |
 | Aufbau | Sechs Schichten, siehe [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) |
 
@@ -84,6 +85,10 @@ Weitere feste Punkte:
   `.gitignore` und bleibt dort.
 - `require` bekommt `ROOT_PATH`, `href` und `src` bekommen `BASE_URL`.
   Diese beiden zu verwechseln ist der häufigste Fehler im Projekt.
+- **`vendor/` wird nie von Hand geändert.** Die Login-Bibliothek wird nur
+  über Composer aktualisiert. Erzeugt wird sie nur in `src/Auth.php`.
+- **Seiten nur für Mitglieder** rufen direkt nach `bootstrap.php`
+  `Auth::nurFuerMitglieder();` auf.
 
 ---
 

@@ -7,6 +7,8 @@
  *              Diese Klasse ist die einzige Stelle im Projekt, die eine
  *              PDO-Verbindung aufbaut. Repositories fragen sie hier ab,
  *              statt selbst "new PDO(...)" zu schreiben.
+ *              Einzige Ausnahme: Die Login-Bibliothek baut über src/Auth.php
+ *              ihre eigene Verbindung auf - ebenfalls erst bei Bedarf.
  *
  *              Verwendung in einem Repository:
  *                  $pdo = Database::connection();

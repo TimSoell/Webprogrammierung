@@ -3,10 +3,11 @@
  * @file        src/bootstrap.php
  * @layer       Infrastruktur
  * @description Startpunkt jeder Seite. Wird als ERSTE Zeile jeder .php-Seite
- *              eingebunden und erledigt drei Dinge:
+ *              eingebunden und erledigt vier Dinge:
  *                1. Konfiguration laden (config/config.php)
  *                2. ROOT_PATH definieren  -> Pfade im DATEISYSTEM (require)
  *                3. BASE_URL  definieren  -> Pfade im BROWSER (href/src)
+ *                4. Session starten (für den Mitglieder-Login)
  *
  *              Warum BASE_URL berechnet wird und nicht fest eingetragen ist:
  *              Bei fünf Personen liegt das Projekt bei jedem woanders im
@@ -82,3 +83,15 @@ spl_autoload_register(static function (string $class): void {
         require_once $file;
     }
 });
+
+// --- Bibliotheken ----------------------------------------------------------
+// Lädt die Klassen aus vendor/, aktuell nur die Login-Bibliothek delight-im/auth.
+// vendor/ liegt im Repository, niemand im Team braucht dafür Composer.
+// Siehe docs/decisions/ADR-0005-login-bibliothek.md
+require ROOT_PATH . '/vendor/autoload.php';
+
+// --- Session und Login -----------------------------------------------------
+// Startet die Session. Das muss vor jeder Ausgabe passieren, weil dabei ein
+// Cookie gesetzt wird - deshalb hier und nicht erst in partials/header.php.
+// Eine Datenbankverbindung entsteht dabei nicht, siehe src/Auth.php.
+Auth::instanz();

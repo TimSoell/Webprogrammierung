@@ -92,10 +92,11 @@ Unterschied. Genau dafür gibt es diese Schicht.
 | `assets/js/services/` | Datenbeschaffung | 3 |
 | `assets/js/lib/` | Allgemeine Helfer ohne Feature-Bezug | – |
 | `api/` | Endpunkte, geben JSON zurück | 4 |
-| `src/` | PHP-Klassen, nicht direkt aufrufbar | 5 |
+| `src/` | PHP-Klassen, nicht direkt aufrufbar (`Database`, `Auth`, `Api`) | 4–5 |
 | `src/Repositories/` | Datenzugriff, der einzige Ort mit SQL | 5 |
 | `database/` | Bauplan und Testdaten | 6 |
 | `config/` | Zugangsdaten (nicht im Repository) | – |
+| `vendor/` | Fremde Bibliotheken, aktuell nur der Login. Nie von Hand ändern | – |
 | `docs/` | Diese Dokumentation | – |
 
 ---

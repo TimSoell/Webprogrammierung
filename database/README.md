@@ -33,10 +33,15 @@ mysql -u root < database/schema.sql
 - Jede Tabelle hat `id` als Primärschlüssel und `erstellt_am` als Zeitstempel
 - `ENGINE = InnoDB` und `utf8mb4` — beides steht als Beispiel in `schema.sql`
 - In `seed.sql` **nur erfundene Daten**. Keine echten Namen, keine echten
-  E-Mail-Adressen, keine Passwörter.
+  E-Mail-Adressen, keine Passwörter. Testkonten legt man deshalb über die
+  Registrierung auf der Website an.
 
 ## Stand
 
-Es gibt noch keine Tabellen, weil es noch keine Features gibt. `schema.sql`
-legt bisher nur die leere Datenbank an und zeigt die Konventionen an einer
-auskommentierten Beispieltabelle.
+| Tabelle | Feature | Herkunft |
+|---|---|---|
+| `mitglieder` | Mitglieder-Login | unsere Stammdaten |
+| `users`, `users_*` (8 Tabellen) | Mitglieder-Login | Login-Bibliothek, siehe [ADR-0005](../docs/decisions/ADR-0005-login-bibliothek.md) |
+
+Die `users`-Tabellen sind die einzige Ausnahme von den Namensregeln oben: Die
+Bibliothek erwartet genau diese Namen und Spalten. Nicht umbenennen.

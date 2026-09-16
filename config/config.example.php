@@ -23,7 +23,11 @@ return [
         'password' => '',
     ],
 
-    // true  = PHP-Fehler werden im Browser angezeigt (während der Entwicklung)
-    // false = Fehler werden nur geloggt (für die Abgabe/Präsentation)
+    // true  = Entwicklung und Demo:
+    //         - PHP-Fehler werden im Browser angezeigt
+    //         - Login-Drosselung aus (sonst sperrt man sich beim Testen aus)
+    //         - "Passwort vergessen" zeigt den Link direkt auf der Seite an,
+    //           weil XAMPP keine E-Mails verschickt
+    // false = Fehler werden nur geloggt, Drosselung an, Link nur im Server-Log
     'debug' => true,
 ];

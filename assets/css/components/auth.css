@@ -1,0 +1,283 @@
+/**
+ * @file        assets/css/components/auth.css
+ * @layer       Komponente
+ * @description Die Seiten des Mitgliederbereichs: Login/Registrierung,
+ *              Passwort zurücksetzen und Mein Konto. Links ein großer Titel,
+ *              rechts eine Karte mit Formular bzw. Stammdaten.
+ *
+ *              Sichtbarkeit steuert das JavaScript ausschließlich über das
+ *              hidden-Attribut (Formulare, Reiter) und über leeren oder
+ *              gefüllten Text (Meldungen). Wie das aussieht, steht nur hier.
+ * @see         anmelden.php
+ * @see         passwort-zuruecksetzen.php
+ * @see         mein-konto.php
+ */
+
+/* --- Seitengerüst ---------------------------------------------------------- */
+.auth {
+  min-height: 100vh;
+  /* Platz für die fixierte Kopfzeile. */
+  padding: calc(var(--header-height) + 80px) 0 110px;
+}
+
+.auth-inner {
+  display: grid;
+  align-items: start;
+  gap: 70px;
+  grid-template-columns: 1fr minmax(0, 480px);
+}
+
+.auth-title {
+  font-size: clamp(4rem, 9vw, 8.5rem);
+}
+
+.auth-lead {
+  max-width: 420px;
+  margin: 30px 0 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* --- Karte ----------------------------------------------------------------- */
+.auth-card {
+  padding: 34px;
+  border: 1px solid var(--line);
+  background: var(--ink-soft);
+}
+
+/* Klassen mit display würden das hidden-Attribut überstimmen.
+   Diese Regel stellt sicher, dass hidden immer gewinnt. */
+.auth [hidden] {
+  display: none;
+}
+
+/* --- Reiter ---------------------------------------------------------------- */
+/* Der negative Außenabstand zieht die Reiter bis an den Kartenrand. */
+.auth-tabs {
+  display: grid;
+  margin: -34px -34px 30px;
+  border-bottom: 1px solid var(--line);
+  grid-template-columns: 1fr 1fr;
+}
+
+.auth-tab {
+  padding: 18px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.auth-tab:hover {
+  color: var(--paper);
+}
+
+.auth-tab[aria-selected="true"] {
+  border-bottom-color: var(--lime);
+  color: var(--paper);
+}
+
+/* --- Überschrift und Hinweis in der Karte ---------------------------------- */
+.auth-heading {
+  margin: 0 0 10px;
+  font: 700 2.2rem var(--display);
+  text-transform: uppercase;
+}
+
+.auth-hint {
+  margin: 0 0 18px;
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+/* --- Formular -------------------------------------------------------------- */
+.auth-form {
+  display: grid;
+  gap: 10px;
+}
+
+.auth-form label {
+  margin-top: 6px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid var(--line);
+  background: var(--ink);
+  color: var(--paper);
+  font: .95rem var(--body);
+}
+
+.auth-form input:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 1px;
+}
+
+.auth-form .button {
+  margin-top: 12px;
+}
+
+/* <button class="button"> zeigt sonst den Pfeil statt der Hand. */
+.auth-card .button {
+  cursor: pointer;
+}
+
+.auth-form .button:disabled {
+  opacity: .6;
+  cursor: wait;
+  transform: none;
+}
+
+/* Vor- und Nachname nebeneinander. */
+.auth-row {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.auth-field {
+  display: grid;
+  gap: 10px;
+}
+
+/* Unauffälliger Textbutton, z. B. "Passwort vergessen?" */
+.auth-link {
+  justify-self: start;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: .82rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.auth-link:hover {
+  color: var(--lime);
+}
+
+/* --- Passwort-Anforderungen ------------------------------------------------ */
+/* Die Klasse .ok setzt assets/js/components/passwort-kriterien.js. */
+.auth-rules {
+  display: grid;
+  gap: 4px;
+  margin: 2px 0 4px;
+  padding: 0;
+  color: var(--muted);
+  font-size: .8rem;
+  list-style: none;
+}
+
+.auth-rules li::before {
+  display: inline-block;
+  width: 1.5em;
+  content: "○";
+}
+
+.auth-rules li.ok {
+  color: var(--paper);
+}
+
+.auth-rules li.ok::before {
+  color: var(--lime);
+  content: "✓";
+}
+
+/* --- Meldungen ------------------------------------------------------------- */
+/* Leer = unsichtbar. Das JavaScript setzt nur den Text, siehe auth-formular.js. */
+.auth-message {
+  margin: 4px 0 0;
+  padding: 12px 14px;
+  border-left: 3px solid var(--danger);
+  background: var(--ink);
+  font-size: .88rem;
+  line-height: 1.45;
+}
+
+.auth-message:empty {
+  display: none;
+}
+
+.auth-message--success {
+  border-left-color: var(--lime);
+}
+
+/* Nur im Demo-Modus: der Reset-Link, den sonst die E-Mail enthielte. */
+.auth-demo {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px dashed var(--lime);
+  font-size: .85rem;
+  line-height: 1.5;
+}
+
+.auth-demo a {
+  color: var(--lime);
+  text-decoration: underline;
+}
+
+.auth-success .button {
+  margin-top: 8px;
+}
+
+/* --- Stammdaten (Mein Konto) ----------------------------------------------- */
+/* Gleiche Technik wie .attributes: Linien durch gap auf eingefärbtem Raster. */
+.auth-data {
+  display: grid;
+  gap: 1px;
+  margin: 18px 0 26px;
+  background: var(--line);
+}
+
+.auth-data div {
+  padding: 16px 18px;
+  background: var(--ink);
+}
+
+.auth-data dt {
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.auth-data dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 800px) {
+  .auth {
+    padding: calc(var(--header-height-mobile) + 48px) 0 80px;
+  }
+
+  .auth-inner {
+    gap: 40px;
+    grid-template-columns: 1fr;
+  }
+
+  .auth-card {
+    padding: 24px;
+  }
+
+  .auth-tabs {
+    margin: -24px -24px 24px;
+  }
+
+  .auth-row {
+    grid-template-columns: 1fr;
+  }
+}
