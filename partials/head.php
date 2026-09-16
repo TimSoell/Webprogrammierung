@@ -11,6 +11,7 @@
  *                  $pageTitle        Titel im Browser-Tab   (Pflicht)
  *                  $pageDescription  Text für Suchmaschinen (optional)
  *                  $pageScript       Dateiname in assets/js/pages/ (optional)
+ *                  $pageUsesMap      Leaflet für interaktive Karten (optional)
  *
  *              Beispiel siehe index.php.
  * @see         partials/README.md
@@ -39,6 +40,11 @@ if (!defined('BASE_URL')) {
 
   <!-- Eine einzige CSS-Datei. Was sie lädt, steht in assets/css/main.css. -->
   <link rel="stylesheet" href="<?= e(BASE_URL) ?>assets/css/main.css">
+
+<?php if (!empty($pageUsesMap)): ?>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<?php endif; ?>
 
   <!-- type="module" bedeutet: wird erst nach dem Aufbau der Seite ausgeführt.
        Deshalb dürfen die Skripte hier oben stehen und nicht am Seitenende. -->
