@@ -28,10 +28,10 @@ section {
 }
 
 /* --- Kopfzeile ------------------------------------------------------------
-   Der Header liegt absolut über dem Hero-Bild, damit das Bild bis ganz
-   nach oben läuft. Deshalb muss jeder Hero oben Platz dafür lassen. */
+  Der Header liegt fixiert über dem Hero-Bild, damit er beim Scrollen
+  sichtbar bleibt. Deshalb muss jeder Hero oben Platz dafür lassen. */
 header {
-  position: absolute;
+  position: fixed;
   z-index: 5;
   top: 0;
   right: 0;
