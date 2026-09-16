@@ -7,11 +7,14 @@ Seiten und Endpunkten eingebunden.
 |---|---|
 | `bootstrap.php` | Startpunkt jeder Seite: Konfiguration, `ROOT_PATH`, `BASE_URL`, `e()`, Autoloader |
 | `Database.php` | Die eine PDO-Verbindung zur Datenbank |
+| `Auth.php` | Die eine Instanz der Login-Bibliothek, Regeln für E-Mail und Passwort |
+| `Api.php` | JSON-Rumpf lesen und antworten, für die Endpunkte in `api/` |
 | `Repositories/` | Datenzugriff. Der einzige Ort mit SQL |
 
 ## Autoloader
 
-`bootstrap.php` registriert einen Autoloader. Klassen werden automatisch
+`bootstrap.php` registriert einen Autoloader und lädt danach `vendor/autoload.php`
+für die Login-Bibliothek. Klassen werden automatisch
 geladen, sobald sie benutzt werden — es braucht **kein `require`**.
 
 Bedingung: Namespace und Ordner müssen übereinstimmen.

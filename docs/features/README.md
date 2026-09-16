@@ -18,5 +18,9 @@ kommt: „Wo muss ich anfassen, wenn ich am Kursplan etwas ändern will?"
 
 ## Bestand
 
-Noch keine Features. Der Aufbau eines Features ist am Beispiel-Feature
-beschrieben — siehe [`../ARCHITECTURE.md`](../ARCHITECTURE.md).
+| Feature | Status | Verantwortlich |
+|---|---|---|
+| [Mitglieder-Login](mitglieder-login.md) | fertig | Tim |
+
+Der Aufbau eines Features ist am Beispiel-Feature beschrieben — siehe
+[`../ARCHITECTURE.md`](../ARCHITECTURE.md).

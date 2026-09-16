@@ -21,6 +21,7 @@
   --lime-dark: #627300;                 /* Akzent auf hellem Grund (Kontrast) */
   --muted: #9b9f96;                     /* Nebentext */
   --line: rgba(240, 239, 233, .16);     /* Trennlinien auf dunklem Grund */
+  --danger: #ff6b57;                    /* Fehlermeldungen */
 
   /* --- Schriften -------------------------------------------------------- */
   --display: "Barlow Condensed", Impact, sans-serif;   /* Ueberschriften */

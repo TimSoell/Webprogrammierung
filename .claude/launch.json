@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "schwitzkasten",
+      "runtimeExecutable": "/Applications/XAMPP/xamppfiles/bin/php",
+      "runtimeArgs": ["-S", "localhost:8000", "-t", "/Users/tim/Documents/Studium/GitHub Projekte/Webprogrammierung"],
+      "port": 8000
+    }
+  ]
+}

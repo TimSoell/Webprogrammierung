@@ -9,6 +9,7 @@ Seite eingebunden und existieren dadurch **genau einmal**.
 | `header.php` | Kopfzeile mit Logo, Navigation und Aktionsbutton |
 | `footer.php` | Fußzeile. Schließt `</body>` und `</html>` |
 | `modal-anmeldung.php` | Overlay-Fenster für die Interessenten-Anmeldung |
+| `passwort-kriterien.php` | Liste der Passwort-Anforderungen unter einem Passwortfeld |
 
 ## Reihenfolge in einer Seite
 
@@ -30,3 +31,5 @@ außerhalb von `</html>`.
 - Jeder Baustein prüft oben, ob `BASE_URL` definiert ist. Das verhindert, dass
   er versehentlich direkt im Browser aufgerufen wird.
 - Neuer Menüpunkt: nur das Array `$navItems` in `header.php` erweitern.
+  Ausnahme ist der Konto-Button („Login / Registrierung“ bzw. „Mein Konto“),
+  der vom Login-Zustand abhängt und deshalb darunter steht.

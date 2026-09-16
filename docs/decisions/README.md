@@ -29,3 +29,4 @@ Kein ADR für: Farbwerte, Textänderungen, das Anlegen einer einzelnen Datei.
 | [0002](ADR-0002-schichtenarchitektur.md) | Sechs Schichten mit einem Service als Naht zur Datenbank | angenommen |
 | [0003](ADR-0003-css-aufteilung.md) | CSS in Tokens, Basis, Layout und Komponenten | angenommen |
 | [0004](ADR-0004-php-entwicklungsserver.md) | PHP-Entwicklungsserver als Standard-Startweg | angenommen |
+| [0005](ADR-0005-login-bibliothek.md) | Mitglieder-Login mit delight-im/auth über Composer | angenommen |

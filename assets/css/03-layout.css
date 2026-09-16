@@ -43,6 +43,8 @@ header {
   height: var(--header-height);
   align-items: center;
   justify-content: space-between;
+  /* Mindestabstand, damit Links und Buttons sich knapp über 800 px nicht berühren. */
+  gap: 20px;
   border-bottom: 1px solid var(--line);
 }
 
@@ -68,7 +70,9 @@ header {
 
 .nav-links {
   display: flex;
-  gap: 30px;
+  align-items: center;
+  /* Wird zwischen 800 und 1200 px schmaler, sonst reicht der Platz nicht. */
+  gap: clamp(16px, 2.5vw, 30px);
   color: #d1d3cd;
   font-size: .77rem;
   font-weight: 700;
@@ -79,6 +83,23 @@ header {
 .nav-links a:hover,
 .nav-links a[aria-current="page"] {
   color: var(--lime);
+}
+
+/* "Login / Registrierung" bzw. "Mein Konto": als umrandeter Button
+   hervorgehoben. Der Selektor braucht .nav-links davor, damit er die
+   Hover-Farbe von oben schlägt - sonst stünde limefarbene Schrift auf
+   limefarbenem Grund. */
+.nav-links .nav-account {
+  padding: 10px 16px;
+  border: 1px solid var(--lime);
+  color: var(--lime);
+  white-space: nowrap;
+}
+
+.nav-links .nav-account:hover,
+.nav-links .nav-account[aria-current="page"] {
+  background: var(--lime);
+  color: var(--ink);
 }
 
 /* Nur auf schmalen Bildschirmen sichtbar - siehe Media Query unten. */
@@ -135,6 +156,7 @@ footer {
     left: 0;
     display: none;
     flex-direction: column;
+    align-items: stretch;
     gap: 0;
     padding: 8px 16px 20px;
     border-bottom: 1px solid var(--line);
@@ -147,6 +169,14 @@ footer {
 
   .nav-links a {
     padding: 14px 0;
+  }
+
+  /* Im aufgeklappten Menü bleibt der Konto-Button ein Button, bekommt
+     aber seitlichen Innenabstand zurück, den die Regel darüber wegnimmt. */
+  .nav-links .nav-account {
+    margin-top: 8px;
+    padding: 14px 16px;
+    text-align: center;
   }
 
   .menu-button {

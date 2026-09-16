@@ -5,7 +5,8 @@
  *
  *              Diese Datei ist das Gegenstück zu src/Database.php: so wie dort
  *              nur EINE Stelle die Datenbank öffnet, ruft hier nur EINE Stelle
- *              fetch() auf. Alles andere geht durch getJson() und postJson().
+ *              fetch() auf. Alles andere geht durch getJson(), postJson() und
+ *              sendJson().
  *
  *              Vorteil: Fehlerbehandlung, JSON-Auswertung und die Basis-URL
  *              stehen an einem Ort. Wenn sich daran etwas ändert, ändert es
@@ -108,13 +109,31 @@ export async function getJson(path, params = {}) {
  * @throws {ApiError}
  */
 export async function postJson(path, body) {
+  return sendJson('POST', path, body);
+}
+
+/**
+ * Schickt eine Anfrage mit frei wählbarer Methode, z. B. PUT zum Ändern
+ * oder DELETE zum Entfernen. postJson() ist der Sonderfall für POST.
+ *
+ * Der Content-Type application/json wird immer mitgeschickt, auch ohne
+ * echten Inhalt - die Endpunkte verlangen ihn als Schutz vor CSRF
+ * (siehe src/Api.php).
+ *
+ * @param {'POST'|'PUT'|'DELETE'} method
+ * @param {string} path      Pfad ohne führenden Slash, z. B. 'api/sitzung.php'
+ * @param {object} [body]    Wird als JSON übertragen
+ * @returns {Promise<unknown>}
+ * @throws {ApiError}
+ */
+export async function sendJson(method, path, body = {}) {
   const url = new URL(BASE_URL + path, window.location.origin);
 
   let response;
 
   try {
     response = await fetch(url, {
-      method: 'POST',
+      method,
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',

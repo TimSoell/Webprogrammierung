@@ -16,12 +16,26 @@ Angesprochen werden sie ausschließlich aus `assets/js/services/`.
 
 Vollständiges Muster: [`beispiel-feature.php`](beispiel-feature.php)
 
+Die Handgriffe 2, 4 und 6 nimmt `src/Api.php` ab — so machen es die
+Endpunkte des Mitglieder-Logins:
+
+```php
+$eingabe = Api::eingabe();                 // JSON lesen, sonst 415
+$email   = Api::text($eingabe, 'email');   // '' wenn fehlt oder kein Text
+Api::fehler(400, 'Bitte gib eine E-Mail-Adresse an.');
+Api::antworten(['id' => $id], 201);
+```
+
+`Api::eingabe()` verlangt den Content-Type `application/json`. Das schützt
+vor CSRF, deshalb gehört der Aufruf in **jeden** Endpunkt, der etwas ändert.
+
 ## Statuscodes
 
 | Code | Bedeutung | Wann |
 |---|---|---|
 | 200 | OK | Standardfall, muss nicht gesetzt werden |
 | 400 | Falsche Eingabe | Pflichtfeld fehlt, E-Mail ungültig |
+| 401 | Nicht angemeldet | Login fehlt oder Anmeldedaten falsch |
 | 404 | Nicht gefunden | id existiert nicht |
 | 405 | Methode nicht erlaubt | POST auf einen Nur-Lese-Endpunkt |
 | 500 | Serverfehler | Unerwartete Ausnahme |
