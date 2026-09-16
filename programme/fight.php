@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 require __DIR__ . '/../src/bootstrap.php';
 
-$pageTitle       = 'Fight — BASELINE';
-$pageDescription = 'Kampfsport bei BASELINE: Boxtechnik, Intervalltraining und Teamenergie für Kondition und einen klaren Kopf.';
+$pageTitle       = 'Fight — SCHWITZKASTEN';
+$pageDescription = 'Kampfsport bei SCHWITZKASTEN: Boxtechnik, Intervalltraining und Teamenergie für Kondition und einen klaren Kopf.';
 $activeNav       = 'programme';
 
 require ROOT_PATH . '/partials/head.php';
@@ -46,7 +46,7 @@ require ROOT_PATH . '/partials/header.php';
 
       <aside class="schedule">
         <h3>Lust auf Punch?</h3>
-        <p>Starte mit einem kostenlosen Kennenlerntermin und erlebe deine erste Fight-Session bei BASELINE.</p>
+        <p>Starte mit einem kostenlosen Kennenlerntermin und erlebe deine erste Fight-Session bei SCHWITZKASTEN.</p>
         <a class="button button--dark" href="<?= e(BASE_URL) ?>index.php#mitgliedschaft">Probetraining sichern</a>
       </aside>
     </div>

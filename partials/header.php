@@ -35,7 +35,9 @@ $navItems = [
 ?>
 <header>
   <nav class="nav wrap" aria-label="Hauptnavigation">
-    <a class="logo" href="<?= e(BASE_URL) ?>index.php">BASE<span>/</span>LINE</a>
+    <a class="logo" href="<?= e(BASE_URL) ?>index.php" aria-label="Schwitzkasten Athletic Club – Startseite">
+      <img src="<?= e(BASE_URL) ?>assets/img/schwitzkasten-logo.png" alt="Schwitzkasten Athletic Club">
+    </a>
 
     <div class="nav-links" id="nav-links">
 <?php foreach ($navItems as $key => [$label, $target]): ?>

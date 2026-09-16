@@ -1,4 +1,4 @@
-# BASELINE Athletic Club
+# SCHWITZKASTEN Athletic Club
 
 Website eines Fitnessstudios. Studienarbeit im Fach **Webprogrammierung**,
 DHBW, 3. Semester.

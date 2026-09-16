@@ -30,8 +30,8 @@ if (!defined('BASE_URL')) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><?= e($pageTitle ?? 'BASELINE — Athletic Club') ?></title>
-  <meta name="description" content="<?= e($pageDescription ?? 'BASELINE Athletic Club — Dein neues Fitnessstudio in Köln.') ?>">
+  <title><?= e($pageTitle ?? 'SCHWITZKASTEN — Athletic Club') ?></title>
+  <meta name="description" content="<?= e($pageDescription ?? 'SCHWITZKASTEN Athletic Club — Dein neues Fitnessstudio in Köln.') ?>">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
