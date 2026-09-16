@@ -28,9 +28,9 @@ if (!defined('BASE_URL')) {
  * Schlüssel = Kennung für $activeNav, Wert = [Beschriftung, Ziel].
  */
 $navItems = [
-    'studio'      => ['Studio', 'index.php#studio'],
-    'programme'   => ['Programme', 'index.php#programme'],
-    'philosophie' => ['Philosophie', 'index.php#philosophie'],
+  'probetraining' => ['Probetraining buchen', 'index.php#mitgliedschaft'],
+  'kundenlogin'   => ['Kundenlogin', 'index.php#kundenlogin'],
+  'locations'     => ['Locations', 'index.php#locations'],
 ];
 ?>
 <header>
@@ -45,7 +45,7 @@ $navItems = [
 <?php endforeach; ?>
     </div>
 
-    <a class="button" href="<?= e(BASE_URL) ?>index.php#mitgliedschaft">Probetraining</a>
+    <a class="button" href="<?= e(BASE_URL) ?>index.php#mitgliedschaft">Mitglied werden</a>
 
     <button class="menu-button" id="menu-button" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="nav-links">MENU</button>
   </nav>
