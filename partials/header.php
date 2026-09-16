@@ -29,7 +29,7 @@ if (!defined('BASE_URL')) {
  */
 $navItems = [
   'probetraining' => ['Probetraining buchen', 'index.php#mitgliedschaft'],
-  'locations'     => ['Locations', 'index.php#locations'],
+  'locations'     => ['Locations', 'locations.php'],
 ];
 
 /**
