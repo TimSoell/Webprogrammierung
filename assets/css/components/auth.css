@@ -53,13 +53,6 @@
   background: var(--ink-soft);
 }
 
-/* Erklärzeile direkt unter einer Kartenüberschrift. */
-.auth-hint {
-  margin: -8px 0 18px;
-  color: var(--muted);
-  font-size: .8rem;
-}
-
 /* Klassen mit display würden das hidden-Attribut überstimmen.
    Diese Regel stellt sicher, dass hidden immer gewinnt. */
 .auth [hidden] {
