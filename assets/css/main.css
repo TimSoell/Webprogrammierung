@@ -24,6 +24,7 @@
 
 @import "components/button.css";
 @import "components/hero.css";
+@import "components/preloader.css";
 @import "components/scroll-video.css";
 @import "components/ticker.css";
 @import "components/intro.css";
