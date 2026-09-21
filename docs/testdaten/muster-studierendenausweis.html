@@ -1,0 +1,164 @@
+<!doctype html>
+<!--
+  @file        docs/testdaten/muster-studierendenausweis.html
+  @layer       Testdaten
+  @description Ein ERFUNDENER Studierendenausweis zum Ausprobieren der
+               Bildprüfung aus docs/features/nachweise.md.
+
+               Wozu das gut ist: Für die Prüfung gehen Ausweisbilder an einen
+               externen Dienst. Auf der kostenlosen Stufe darf Google sie zur
+               Produktverbesserung verwenden. Deshalb darf niemand im Team
+               einen echten Ausweis hochladen - auch nicht den eigenen.
+               Diese Seite gibt allen etwas Unbedenkliches zum Testen.
+
+               SO WIRD SIE BENUTZT
+               1. http://localhost:8000/docs/testdaten/muster-studierendenausweis.html
+                  aufrufen
+               2. Ausschnitt abfotografieren (Windows: Win+Umschalt+S)
+               3. Als Bild speichern und unter "Mein Konto" hochladen
+
+               Das Ablaufdatum unten lässt sich im Quelltext ändern - etwa
+               auf ein vergangenes Datum, um die Fehlermeldung
+               "Dieser Ausweis ist am ... abgelaufen" auszulösen.
+  @see         docs/features/nachweise.md
+-->
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Muster-Studierendenausweis — Testdaten</title>
+  <style>
+    body {
+      display: grid;
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px;
+      background: #3a3f3c;
+      font-family: Arial, Helvetica, sans-serif;
+      place-items: center;
+    }
+
+    .ausweis {
+      position: relative;
+      width: 640px;
+      overflow: hidden;
+      border-radius: 10px;
+      background: #f4f4f0;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .4);
+      color: #141816;
+    }
+
+    .kopf {
+      padding: 18px 28px;
+      background: #1d4e89;
+      color: #fff;
+    }
+
+    .kopf strong {
+      font-size: 1.5rem;
+      letter-spacing: .04em;
+    }
+
+    .kopf span {
+      display: block;
+      margin-top: 2px;
+      font-size: .82rem;
+      opacity: .85;
+    }
+
+    .inhalt {
+      display: grid;
+      gap: 26px;
+      padding: 26px 28px 30px;
+      grid-template-columns: 1fr 150px;
+    }
+
+    dl {
+      margin: 0;
+    }
+
+    dt {
+      margin-bottom: 3px;
+      color: #6e736e;
+      font-size: .7rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: 0 0 16px;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    /* Das Feld, auf das es bei der Prüfung ankommt. */
+    .gueltig {
+      font-size: 1.6rem;
+    }
+
+    .bild {
+      height: 190px;
+      border: 1px solid #c9c9c4;
+      background: #dcdcd7;
+    }
+
+    /* Damit dieses Bild nie für echt gehalten werden kann.
+       Als Streifen am unteren Rand und nicht quer über die Karte: Sonst
+       verdeckt er ein Feld, und die Prüfung soll alle Angaben lesen können. */
+    .muster {
+      margin: 0;
+      padding: 10px 0;
+      background: #c83c32;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-align: center;
+    }
+
+    .hinweis {
+      max-width: 640px;
+      margin-top: 18px;
+      color: #d7d9d4;
+      font-size: .82rem;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <div class="ausweis">
+      <div class="kopf">
+        <strong>DHBW MUSTERSTADT</strong>
+        <span>Studierendenausweis</span>
+      </div>
+
+      <div class="inhalt">
+        <dl>
+          <dt>Name</dt>
+          <dd>Erika Mustermann</dd>
+
+          <dt>Matrikelnummer</dt>
+          <dd>1234567</dd>
+
+          <dt>Geburtsdatum</dt>
+          <dd>14.06.2003</dd>
+
+          <dt>Gültig bis</dt>
+          <dd class="gueltig">31.03.2027</dd>
+        </dl>
+
+        <div class="bild"></div>
+      </div>
+
+      <p class="muster">MUSTER · KEIN ECHTER AUSWEIS</p>
+    </div>
+
+    <p class="hinweis">
+      Erfundene Daten. Zum Testen der Ausweisprüfung abfotografieren
+      (Win+Umschalt+S) und unter „Mein Konto" hochladen.
+      <strong>Niemals einen echten Ausweis benutzen</strong> — siehe
+      docs/features/nachweise.md.
+    </p>
+  </div>
+</body>
+</html>

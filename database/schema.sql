@@ -14,12 +14,15 @@
 --              3. Reiter "Importieren", diese Datei auswählen, ausführen
 --
 --              Alternativ auf der Kommandozeile:
---                  mysql -u root < database/schema.sql
+--                  mysql --default-character-set=utf8mb4 -u root < database/schema.sql
+--              Der Schalter ist unter Windows Pflicht, sonst werden aus
+--              Umlauten Zeichensalat. Siehe database/README.md.
 --
 -- STAND        Feature Mitglieder-Login (Mitte): die acht users-Tabellen der
 --              Login-Bibliothek delight-im/auth und unsere Tabelle mitglieder.
---              Feature Programm-Details (ganz unten): programme, merkmale
---              und coaches.
+--              Feature Programm-Details: programme, merkmale und coaches.
+--              Feature Mitgliedschaften: tarife und mitgliedschaften.
+--              Feature Nachweise: nachweise (Ausweisprüfung, ohne Bilder).
 --              Die auskommentierte Tabelle in der Mitte zeigt die Konventionen.
 --
 --              Die Datei darf mehrfach eingespielt werden: CREATE ... IF NOT
@@ -401,6 +404,187 @@ CREATE TABLE IF NOT EXISTS `mitglied_auswahl` (
     CONSTRAINT `fk_auswahl_format`
         FOREIGN KEY (`format_id`) REFERENCES `merkmale` (`id`)
         ON DELETE SET NULL
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+
+-- -----------------------------------------------------------------------------
+-- FEATURE MITGLIEDSCHAFTEN - der Katalog
+-- -----------------------------------------------------------------------------
+-- Was das Studio anbietet und was es kostet. Vier Zeilen, gepflegt in
+-- database/seed.sql. Diese Tabelle beschreibt das ANGEBOT, nicht die Verträge -
+-- die stehen weiter unten in mitgliedschaften.
+--
+-- Siehe docs/decisions/ADR-0009-mitgliedschaften-datenmodell.md
+-- -----------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `tarife` (
+    `id`               INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+
+    -- Stabiler Schlüssel für Code und Seed: 'basis', 'wellness', 'kurse',
+    -- 'premium'. Die id ist auf jedem Rechner eine andere, die kennung nicht.
+    `kennung`          VARCHAR(20)   NOT NULL,
+
+    `name`             VARCHAR(60)   NOT NULL,
+    `beschreibung`     VARCHAR(255)  NOT NULL,
+
+    -- DECIMAL statt FLOAT: 44.90 ist als FLOAT nicht exakt 44.90, und bei
+    -- Geldbeträgen summieren sich solche Ungenauigkeiten auf.
+    -- NULL heißt: diesen Tarif gibt es für diese Preisgruppe nicht.
+    `preis_standard`   DECIMAL(6,2)  NOT NULL,
+    `preis_ermaessigt` DECIMAL(6,2)  NULL,
+    `preis_senior`     DECIMAL(6,2)  NULL,
+
+    -- Was der Tarif erlaubt. Absichtlich drei Spalten statt einer Stufe:
+    -- Ein späteres Feature fragt "zugang_kurse = 1" ab und muss nicht wissen,
+    -- welche Tarifnamen es gerade gibt.
+    `zugang_geraete`   TINYINT(1)    NOT NULL DEFAULT 0,
+    `zugang_wellness`  TINYINT(1)    NOT NULL DEFAULT 0,
+    `zugang_kurse`     TINYINT(1)    NOT NULL DEFAULT 0,
+
+    -- Reihenfolge der Karten auf der Seite. Ohne das ist sie zufällig.
+    `sortierung`       INT           NOT NULL DEFAULT 0,
+
+    -- Ein Tarif kann nicht gelöscht werden, sobald ein Vertrag auf ihn zeigt
+    -- (Fremdschlüssel unten). Aus dem Angebot nehmen geht über diese Spalte.
+    -- Gebraucht spätestens für den Eröffnungspreis der ersten 100 Mitglieder.
+    `aktiv`            TINYINT(1)    NOT NULL DEFAULT 1,
+
+    `erstellt_am`      TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uniq_kennung` (`kennung`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+
+-- -----------------------------------------------------------------------------
+-- FEATURE MITGLIEDSCHAFTEN - die Verträge
+-- -----------------------------------------------------------------------------
+-- Eine Zeile je abgeschlossenem Tarif. Ein Wechsel beendet die alte Zeile
+-- (endet_am wird gesetzt) und legt eine neue an - die Historie bleibt damit
+-- erhalten.
+--
+-- BEIDE DATUMSSPALTEN SIND EINSCHLIESSLICH GEMEINT:
+--   beginnt_am  erster Tag, an dem der Tarif gilt
+--   endet_am    LETZTER Tag, an dem er gilt (nicht der erste Tag danach)
+--
+-- Daraus folgen die drei Zustände, die eine Zeile haben kann:
+--   laufend     beginnt_am <= heute AND (endet_am IS NULL OR endet_am >= heute)
+--   vorgemerkt  beginnt_am >  heute          (Wechsel zum nächsten Monatsersten)
+--   vorbei      endet_am   <  heute
+--
+-- Eine Zeile mit beginnt_am in der ZUKUNFT ist also normal: Wechsel werden
+-- zum Monatsersten vorgemerkt, nicht sofort wirksam. Wer laufende Verträge
+-- sucht, darf deshalb nie nur auf endet_am IS NULL prüfen.
+-- Siehe docs/decisions/ADR-0010-tarifwechsel-zum-monatsersten.md
+--
+-- "Nur eine laufende Mitgliedschaft pro Mitglied" lässt sich in MySQL nicht
+-- als Constraint ausdrücken (es gibt keinen Unique-Index, der nur für
+-- endet_am IS NULL gilt). Das stellt MitgliedschaftRepository sicher, in einer
+-- Transaktion. Wer hier direkt per SQL einfügt, umgeht das.
+-- -----------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `mitgliedschaften` (
+    `id`              INT UNSIGNED NOT NULL AUTO_INCREMENT,
+
+    `mitglied_id`     INT UNSIGNED NOT NULL,
+    `tarif_id`        INT UNSIGNED NOT NULL,
+
+    -- Steht am Vertrag, nicht am Mitglied: Der Studentenstatus endet
+    -- irgendwann, der Seniorenstatus beginnt irgendwann.
+    `preisgruppe`     ENUM('standard','ermaessigt','senior') NOT NULL DEFAULT 'standard',
+
+    -- Kopie aus tarife zum Zeitpunkt des Abschlusses, absichtlich redundant:
+    -- Eine spätere Preisänderung im Katalog darf laufende Verträge nicht
+    -- rückwirkend verteuern.
+    `preis_monatlich` DECIMAL(6,2) NOT NULL,
+
+    -- Erster Gültigkeitstag. Liegt in der Zukunft, solange ein Wechsel nur
+    -- vorgemerkt ist.
+    `beginnt_am`      DATE         NOT NULL,
+
+    -- Letzter Gültigkeitstag, einschließlich. NULL = läuft unbefristet.
+    `endet_am`        DATE         NULL,
+
+    `erstellt_am`     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (`id`),
+
+    -- Deckt beide Abfragen ab: "alle Verträge eines Mitglieds" und
+    -- "der laufende Vertrag eines Mitglieds".
+    KEY `idx_mitglied_laufzeit` (`mitglied_id`, `endet_am`),
+
+    -- Wird ein Mitglied gelöscht, verschwinden seine Verträge mit.
+    CONSTRAINT `fk_mitgliedschaften_mitglieder`
+        FOREIGN KEY (`mitglied_id`) REFERENCES `mitglieder` (`id`)
+        ON DELETE CASCADE,
+
+    -- Hier ausdrücklich KEIN CASCADE: Ein Tarif, auf den Verträge zeigen,
+    -- darf nicht löschbar sein. Aus dem Angebot nehmen geht über tarife.aktiv.
+    CONSTRAINT `fk_mitgliedschaften_tarife`
+        FOREIGN KEY (`tarif_id`) REFERENCES `tarife` (`id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+
+-- -----------------------------------------------------------------------------
+-- FEATURE MITGLIEDSCHAFTEN - Nachweise für ermäßigte Preise
+-- -----------------------------------------------------------------------------
+-- Wer weniger zahlen will, muss es belegen: Schülerinnen und Schüler sowie
+-- Studierende mit ihrem Ausweis, Seniorinnen und Senioren ab 65 mit einem
+-- Lichtbildausweis.
+--
+-- HIER STEHT KEIN BILD UND KEIN PFAD ZU EINEM BILD. Das hochgeladene Foto
+-- wird ausgelesen und sofort verworfen, es landet nie auf der Festplatte.
+-- Gespeichert wird nur das Ergebnis der Prüfung. Das ist der Kern der
+-- Datenschutz-Entscheidung, siehe
+-- docs/decisions/ADR-0011-ausweispruefung-mit-ki.md
+--
+-- Ein Geburtsdatum wird ebenfalls nicht gespeichert: Wer einmal 65 ist,
+-- bleibt es. Für Senioren genügt art = 'senior' mit gueltig_bis = NULL.
+-- -----------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `nachweise` (
+    `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+
+    `mitglied_id` INT UNSIGNED NOT NULL,
+
+    -- Was belegt wurde. 'schueler' und 'student' berechtigen zum ermäßigten
+    -- Preis, 'senior' zum Seniorenpreis.
+    `art`         ENUM('schueler','student','senior') NOT NULL,
+
+    -- Letzter Tag, an dem der Nachweis gilt - einschließlich, wie bei
+    -- mitgliedschaften. NULL heißt unbefristet und kommt nur bei 'senior' vor.
+    `gueltig_bis` DATE NULL,
+
+    -- Wie geprüft wurde. 'ki' = ausgelesen von der Bilderkennung,
+    -- 'demo' = im Demo-Modus von Hand eingetragen, weil kein API-Schlüssel
+    -- hinterlegt ist. Der Unterschied muss sichtbar bleiben, sonst weiß
+    -- später niemand mehr, welche Angaben geprüft wurden.
+    `quelle`      ENUM('ki','demo') NOT NULL,
+
+    -- Welches Modell geprüft hat, für die Nachvollziehbarkeit. NULL im Demo-Modus.
+    `ki_modell`   VARCHAR(60) NULL,
+
+    -- Was beim Prüfen gelesen wurde, ein Satz. Ersetzt das gelöschte Bild als
+    -- Beleg, wenn jemand die Prüfung anzweifelt.
+    `hinweis`     VARCHAR(255) NOT NULL,
+
+    `geprueft_am` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (`id`),
+
+    -- Deckt die einzige häufige Abfrage ab: "hat dieses Mitglied einen
+    -- gültigen Nachweis dieser Art?"
+    KEY `idx_mitglied_art` (`mitglied_id`, `art`, `gueltig_bis`),
+
+    CONSTRAINT `fk_nachweise_mitglieder`
+        FOREIGN KEY (`mitglied_id`) REFERENCES `mitglieder` (`id`)
+        ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;

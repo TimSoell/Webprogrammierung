@@ -296,3 +296,64 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* --- Nachweise für ermäßigte Preise --------------------------------------- */
+
+.nachweis-liste {
+  display: grid;
+  gap: 1px;
+  margin: 18px 0;
+  padding: 0;
+  background: var(--line);
+  list-style: none;
+}
+
+/* Ohne diese Zeile bliebe eine leere Liste als 1px-Strich stehen. */
+.nachweis-liste:empty {
+  display: none;
+}
+
+.nachweis-eintrag {
+  padding: 14px 18px;
+  background: var(--ink);
+  font-size: .88rem;
+  line-height: 1.5;
+}
+
+/* Abgelaufen heißt: zählt nicht mehr. Das muss man sehen können, ohne das
+   Datum nachzurechnen. */
+.nachweis-eintrag[data-abgelaufen="ja"] {
+  border-left: 3px solid var(--danger);
+  color: var(--muted);
+}
+
+.nachweis-eintrag[data-abgelaufen="nein"] {
+  border-left: 3px solid var(--lime);
+}
+
+.nachweis-form select,
+.nachweis-form input[type="file"],
+.nachweis-form input[type="date"] {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid var(--line);
+  background: var(--ink);
+  color: var(--paper);
+  font: .9rem var(--body);
+}
+
+.nachweis-form select:focus-visible,
+.nachweis-form input:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 1px;
+}
+
+/* Die beiden Felder werden vom Seitenskript per hidden umgeschaltet. */
+.nachweis-form div[hidden] {
+  display: none;
+}
+
+.nachweis-demo-hinweis {
+  margin: 8px 0 0;
+  font-size: .78rem;
+}

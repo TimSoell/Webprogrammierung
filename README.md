@@ -74,8 +74,9 @@ einspielen:
 
 1. `database/schema.sql` — legt die Datenbank `schwitzkasten` samt Tabellen an
    und darf beliebig oft eingespielt werden.
-2. `database/seed.sql` — füllt die Programmseiten. Löscht dabei die gemerkten
-   Auswahlen aller Mitglieder, also nicht kurz vor einer Vorführung.
+2. `database/seed.sql` — füllt die Programmseiten und die Tarife. Löscht dabei
+   die gemerkten Auswahlen aller Mitglieder, also nicht kurz vor einer
+   Vorführung.
 
 **Umzug von `baseline`.** Bis September 2026 hieß die Datenbank `baseline`.
 Wer lokal noch damit arbeitet und seine Testkonten behalten will, kopiert sie
@@ -91,12 +92,14 @@ Windows (XAMPP unter `C:\xampp`, in PowerShell oder `cmd`):
 ```bat
 C:\xampp\mysql\bin\mysql.exe -u root -e "CREATE DATABASE schwitzkasten CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
 cmd /c "C:\xampp\mysql\bin\mysqldump.exe -u root baseline | C:\xampp\mysql\bin\mysql.exe -u root schwitzkasten"
-cmd /c "C:\xampp\mysql\bin\mysql.exe -u root < database\schema.sql"
-cmd /c "C:\xampp\mysql\bin\mysql.exe -u root < database\seed.sql"
+cmd /c "C:\xampp\mysql\bin\mysql.exe --default-character-set=utf8mb4 -u root < database\schema.sql"
+cmd /c "C:\xampp\mysql\bin\mysql.exe --default-character-set=utf8mb4 -u root < database\seed.sql"
 ```
 
 `cmd /c` ist unter PowerShell nötig: PowerShell kennt `<` nicht und würde die
-Pipe mit `|` neu kodieren, wodurch Umlaute kaputtgehen.
+Pipe mit `|` neu kodieren, wodurch Umlaute kaputtgehen. Aus demselben Grund
+braucht `mysql.exe` beim Einspielen den Zeichensatz-Schalter, siehe
+[`database/README.md`](database/README.md).
 
 macOS (XAMPP unter `/Applications/XAMPP`):
 

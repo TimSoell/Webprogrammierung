@@ -2,8 +2,9 @@
 /**
  * @file        mein-konto.php
  * @layer       1 – Seite
- * @description Startpunkt des Mitgliederbereichs. Zeigt die Stammdaten und
- *              bietet das Abmelden an.
+ * @description Startpunkt des Mitgliederbereichs. Zeigt die Stammdaten, die
+ *              gemerkte Programm-Auswahl, die laufende Mitgliedschaft und die
+ *              Nachweise und bietet das Abmelden an.
  *
  *              Nur für angemeldete Mitglieder: Wer nicht angemeldet ist, wird
  *              von Auth::nurFuerMitglieder() zur Anmeldeseite geschickt,
@@ -14,6 +15,7 @@
  *              der gewohnte Weg durch die Schichten.
  * @see         assets/js/pages/mein-konto.page.js
  * @see         docs/features/mitglieder-login.md
+ * @see         docs/features/mitgliedschaften.md
  */
 
 declare(strict_types=1);
@@ -70,6 +72,93 @@ require ROOT_PATH . '/partials/header.php';
           <ul class="auswahl-liste" id="auswahl-liste"></ul>
 
           <p class="auth-message" id="auswahl-meldung" role="alert"></p>
+        </div>
+
+        <!-- Welcher der beiden Blöcke sichtbar ist, entscheidet das
+             Seitenskript: Ohne gewählten Tarif gibt es nichts anzuzeigen. -->
+        <div class="auth-card">
+          <h2 class="auth-heading">Mitgliedschaft</h2>
+
+          <dl class="auth-data" id="konto-tarif-daten" hidden>
+            <div>
+              <dt>Tarif</dt>
+              <dd id="konto-tarif">…</dd>
+            </div>
+            <div>
+              <dt>Preisgruppe</dt>
+              <dd id="konto-preisgruppe">…</dd>
+            </div>
+            <div>
+              <dt>Monatsbeitrag</dt>
+              <dd id="konto-beitrag">…</dd>
+            </div>
+            <div>
+              <dt>Tarif seit</dt>
+              <dd id="konto-beginn">…</dd>
+            </div>
+
+            <!-- Nur sichtbar, wenn ein Wechsel zum Monatsersten vorgemerkt
+                 ist. Das Seitenskript blendet die Zeile sonst aus. -->
+            <div id="konto-wechsel-zeile" hidden>
+              <dt>Vorgemerkter Wechsel</dt>
+              <dd id="konto-wechsel">…</dd>
+            </div>
+          </dl>
+
+          <p class="auth-hint" id="konto-ohne-tarif" hidden>
+            Du hast noch keinen Tarif gewählt. Trainieren kannst du erst,
+            wenn eine Mitgliedschaft läuft.
+          </p>
+
+          <a class="button button--ghost" href="<?= e(BASE_URL) ?>mitgliedschaft.php">Tarife ansehen</a>
+        </div>
+
+        <!-- Nachweise für die ermäßigten Preise. Was hier hochgeladen wird,
+             wird ausgelesen und sofort verworfen - das Bild landet nie auf
+             der Festplatte. Siehe api/nachweise.php. -->
+        <div class="auth-card">
+          <h2 class="auth-heading">Nachweise</h2>
+          <p class="auth-hint">
+            Schüler-, Studierenden- und Seniorenpreise gelten nur mit Nachweis.
+            Fotografiere deinen Ausweis — wir lesen das Datum aus und löschen
+            das Bild sofort danach.
+          </p>
+
+          <ul class="nachweis-liste" id="nachweis-liste"></ul>
+
+          <p class="auth-hint" id="nachweis-leer" hidden>
+            Du hast noch keinen Nachweis hinterlegt.
+          </p>
+
+          <form class="auth-form nachweis-form" id="nachweis-form">
+            <label for="nachweis-art">Was möchtest du nachweisen?</label>
+            <select id="nachweis-art" name="art">
+              <option value="student">Studierendenausweis</option>
+              <option value="schueler">Schülerausweis</option>
+              <option value="senior">Senior (ab 65, Lichtbildausweis)</option>
+            </select>
+
+            <!-- Genau eines der beiden Felder ist sichtbar: das Bildfeld,
+                 wenn ein API-Schlüssel hinterlegt ist, sonst das Datumsfeld.
+                 Das entscheidet der Server, nicht die Seite. -->
+            <div id="nachweis-bild-feld" hidden>
+              <label for="nachweis-bild">Foto des Ausweises</label>
+              <input id="nachweis-bild" name="bild" type="file" accept="image/jpeg,image/png,image/webp">
+            </div>
+
+            <div id="nachweis-datum-feld" hidden>
+              <label for="nachweis-datum" id="nachweis-datum-label">Gültig bis</label>
+              <input id="nachweis-datum" name="datum" type="date">
+              <p class="auth-hint nachweis-demo-hinweis">
+                Demo-Modus: Es ist kein Schlüssel für die Bildprüfung
+                hinterlegt, deshalb wird das Datum von Hand eingetragen.
+              </p>
+            </div>
+
+            <p class="auth-message" id="nachweis-meldung" role="alert"></p>
+
+            <button class="button" type="submit">Nachweis prüfen lassen</button>
+          </form>
         </div>
       </div>
 

@@ -23,6 +23,37 @@ return [
         'password' => '',
     ],
 
+    // Zugang für die KI-Prüfung hochgeladener Ausweise (Schüler-,
+    // Studenten- und Seniorennachweis). Benutzt wird die Gemini-API von
+    // Google, Schlüssel gibt es unter https://aistudio.google.com/apikey
+    //
+    // LEER LASSEN IST EIN GÜLTIGER ZUSTAND. Ohne Schlüssel läuft die Prüfung
+    // im Demo-Modus: Das Ablaufdatum wird von Hand eingetragen, statt aus dem
+    // Bild gelesen. So funktioniert das Projekt auch ohne Schlüssel und ohne
+    // Internet - siehe docs/decisions/ADR-0011-ausweispruefung-mit-ki.md
+    //
+    // ACHTUNG BEI DER KOSTENLOSEN STUFE: Google darf die Eingaben zur
+    // Produktverbesserung verwenden, und Menschen dürfen sie lesen. Deshalb
+    // gilt für dieses Projekt: NUR ERFUNDENE AUSWEISE hochladen, keine
+    // echten - auch nicht die eigenen.
+    // Siehe docs/decisions/ADR-0012-gemini-statt-claude.md
+    //
+    // Der Schlüssel gehört NIE ins Repository. config/config.php steht in
+    // .gitignore, diese Vorlage bleibt leer.
+    'ki' => [
+        'api_key' => '',
+
+        // Leer = Standardmodell aus src/Ausweispruefung.php (gemini-3.5-flash).
+        // Welche Modelle die kostenlose Stufe abdeckt, ändert Google
+        // regelmäßig; die eigenen Grenzen stehen in Google AI Studio.
+        //
+        // Bei Fehler 503 ist das Modell überlastet, bei 404 gibt es das
+        // Modell für diesen Schlüssel nicht. Dann hier ein anderes
+        // eintragen - geprüft am 21.09.2026: 'gemini-3.1-flash-lite' läuft,
+        // 'gemini-3.8-flash' war überlastet, 'gemini-2.5-flash' gab 404.
+        'modell' => '',
+    ],
+
     // true  = Entwicklung und Demo:
     //         - PHP-Fehler werden im Browser angezeigt
     //         - Login-Drosselung aus (sonst sperrt man sich beim Testen aus)

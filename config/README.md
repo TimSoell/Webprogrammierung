@@ -35,3 +35,19 @@ Zwei Gründe:
 1. In `config.example.php` mit sinnvollem Standardwert und Kommentar ergänzen.
 2. Im Team ansagen — jede Person muss ihn in ihrer eigenen `config.php`
    nachtragen.
+
+## Der Schlüssel für die Ausweisprüfung
+
+`ki.api_key` steuert, wie Nachweise für ermäßigte Preise geprüft werden:
+
+| Wert | Verhalten |
+|---|---|
+| leer (Standard) | **Demo-Modus** — das Ablaufdatum wird von Hand eingetragen |
+| API-Schlüssel | das hochgeladene Ausweisfoto wird per Gemini ausgelesen |
+
+Beides funktioniert. Wer keinen Schlüssel hat, kann trotzdem alles am
+Projekt entwickeln und vorführen. Einzelheiten:
+[`docs/features/nachweise.md`](../docs/features/nachweise.md).
+
+**Der Schlüssel wird nie weitergegeben und nie committet.** Er steht nur in
+der eigenen `config.php`, und die steht in `.gitignore`.
