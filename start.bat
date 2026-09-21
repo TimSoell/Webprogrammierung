@@ -35,5 +35,6 @@ if not exist "config\config.php" (
 )
 
 echo BASELINE laeuft auf http://localhost:8000/   (Beenden mit Strg+C)
-"%PHP%" -S localhost:8000 -t .
+REM router.php beantwortet Range-Anfragen, ohne die kein Video springen kann.
+"%PHP%" -S localhost:8000 -t . router.php
 pause

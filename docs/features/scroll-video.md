@@ -32,6 +32,24 @@ Keine.
 
 Aus der lokalen Videodatei `assets/img/scroll-video.mp4`.
 
+## Anforderungen an den Server
+
+Der Server muss **Range-Anfragen** beantworten, also Teilstuecke der Datei
+mit `206 Partial Content` ausliefern. Sonst laesst Chrome kein Springen im
+Video zu (`video.seekable` ist `[0, 0]`), jedes Setzen von `currentTime`
+landet wieder bei 0, und das Bild bleibt beim Scrollen stehen.
+
+Apache kann das von selbst. Der eingebaute PHP-Server kann es nicht, deshalb
+startet `./start.sh` ihn mit `router.php`. Wer den Server von Hand ohne
+Router startet, hat genau dieses Standbild. Siehe
+[`ADR-0006`](../decisions/ADR-0006-router-fuer-entwicklungsserver.md).
+
+Schnelltest, ob der Server passt (muss `206` liefern):
+
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" -H "Range: bytes=0-99" http://localhost:8000/assets/img/scroll-video.mp4
+```
+
 ## Anforderungen an die Videodatei
 
 **Das ist der wichtigste Abschnitt dieser Doku.** Ob die Animation fluessig
@@ -67,6 +85,12 @@ ffmpeg -i original.mp4 -an -vf "scale=1280:-2,fps=25" -c:v libx264 -profile:v hi
 | `scale=1280:-2` | Breite 1280, Hoehe passend. Fuer eine Hintergrundflaeche reicht das |
 | `+faststart` | Metadaten an den Dateianfang |
 
+Die aktuelle Datei ist mit denselben Einstellungen entstanden, aber ohne
+ffmpeg: ueber AVFoundation, die Videobibliothek von macOS. Ergebnis:
+H.264 High, 1280×720, 24 fps, 121 Bilder, jedes davon ein Keyframe, ohne
+Tonspur, Metadaten am Dateianfang, 1,96 MB. Ein Sprung dauert damit an jeder
+Stelle des Videos rund 3 ms, vorher waren es je nach Position bis zu 44 ms.
+
 Danach pruefen, ob die Datei klein genug geworden ist:
 
 ```bash
@@ -89,7 +113,7 @@ Das Video wird nie abgespielt. Die Komponente setzt bei jedem Bild
 
 ## Was fehlt noch
 
-- Die Videodatei ist aktuell H.265 mit **einem einzigen Keyframe** und
-  6,7 MB gross. Sie muss nach der Anleitung oben neu kodiert werden — bis
-  dahin ruckelt es unabhaengig vom Code, und in Firefox laeuft gar nichts.
+- Getestet ist bisher nur Chromium (die Technik hinter Chrome) unter
+  macOS. Firefox, Safari und Edge sowie Windows muessen noch geprueft
+  werden.
 - Auf verschiedenen Bildschirmgroessen im Browser pruefen.
