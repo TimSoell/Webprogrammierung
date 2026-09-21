@@ -2,8 +2,8 @@
 /**
  * @file        index.php
  * @layer       1 – Seite
- * @description Die Startseite. Hero, Studio-Vorstellung, die drei Programme,
- *              Philosophie und der Aufruf zur Mitgliedschaft.
+ * @description Die Startseite. Scroll-Video, Hero, Studio-Vorstellung, die
+ *              drei Programme, Philosophie und der Aufruf zur Mitgliedschaft.
  *
  *              Diese Datei enthält bewusst NUR Inhalt und Struktur.
  *              Kein CSS, kein JavaScript, kein SQL. Das Aussehen liegt in
@@ -32,17 +32,6 @@ require ROOT_PATH . '/partials/header.php';
 
   <main id="top">
 
-    <section class="hero">
-      <div class="hero-content wrap">
-        <p class="eyebrow">Eröffnung Frühjahr 2025 · Köln</p>
-        <h1 class="display hero-title">Trainiere<br><em>deine</em><br>Basis.</h1>
-        <div class="hero-bottom">
-          <p class="hero-copy">Ein neuer Athletic Club für alle, die stärker werden wollen. Ohne Show. Mit System. Jeden Tag.</p>
-          <span class="scroll-note"><i></i> Entdecke deinen Club</span>
-        </div>
-      </div>
-    </section>
-
     <section class="scroll-video" data-scroll-video aria-label="Training in Bewegung">
       <div class="scroll-video-sticky">
         <video muted playsinline preload="auto" aria-label="Training im SCHWITZKASTEN Athletic Club">
@@ -56,6 +45,17 @@ require ROOT_PATH . '/partials/header.php';
               <h2>In den<br><span>Flow.</span></h2>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="hero">
+      <div class="hero-content wrap">
+        <p class="eyebrow">Eröffnung Frühjahr 2025 · Köln</p>
+        <h1 class="display hero-title">Trainiere<br><em>deine</em><br>Basis.</h1>
+        <div class="hero-bottom">
+          <p class="hero-copy">Ein neuer Athletic Club für alle, die stärker werden wollen. Ohne Show. Mit System. Jeden Tag.</p>
+          <span class="scroll-note"><i></i> Entdecke deinen Club</span>
         </div>
       </div>
     </section>
