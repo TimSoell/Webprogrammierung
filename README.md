@@ -62,16 +62,32 @@ Am Quelltext ändert das nichts: `BASE_URL` wird berechnet und stimmt in beiden
 Fällen. Weil aber entwickelt und vorgeführt auf unterschiedlichen Servern
 wird, gilt: **vor der Abgabe einmal über Apache prüfen.**
 
-### Datenbank (für den Mitglieder-Login)
+### Datenbank
 
-Startseite und Programmseiten laufen ohne Datenbank. Für Registrierung und
-Login braucht es sie:
+Nur die Startseite läuft ohne Datenbank. Login, Mitgliedsbereich und der
+untere Teil der Programmseiten (Merkmale, Coaches) brauchen sie:
 
 In XAMPP **MySQL** starten. Für phpMyAdmin zusätzlich **Apache** — das
 Startskript ersetzt Apache nur für die Projektseite, nicht für phpMyAdmin.
-Dann `http://localhost/phpmyadmin` öffnen und unter *Importieren* die Datei
-`database/schema.sql` einspielen. Sie legt die Datenbank `schwitzkasten` samt
-Tabellen an und darf beliebig oft eingespielt werden.
+Dann `http://localhost/phpmyadmin` öffnen und unter *Importieren* nacheinander
+einspielen:
+
+1. `database/schema.sql` — legt die Datenbank `schwitzkasten` samt Tabellen an
+   und darf beliebig oft eingespielt werden.
+2. `database/seed.sql` — füllt die Programmseiten. Löscht dabei die gemerkten
+   Auswahlen aller Mitglieder, also nicht kurz vor einer Vorführung.
+
+**Umzug von `baseline`.** Bis September 2026 hieß die Datenbank `baseline`.
+Wer lokal noch damit arbeitet, kopiert sie einmal hinüber, statt neu
+einzuspielen — sonst sind die Testkonten weg:
+
+```bash
+mysql -u root -e "CREATE DATABASE schwitzkasten CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+mysqldump -u root baseline | mysql -u root schwitzkasten
+```
+
+Danach in `config/config.php` bei `'name'` `schwitzkasten` eintragen.
+`baseline` kann anschließend gelöscht werden.
 
 ---
 
