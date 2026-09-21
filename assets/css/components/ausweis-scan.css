@@ -1,0 +1,271 @@
+/**
+ * @file        assets/css/components/ausweis-scan.css
+ * @layer       Komponente
+ * @description Die Scan-Animation während der KI-Prüfung eines Ausweises:
+ *              Vollbild-Overlay mit dem hochgeladenen Bild, wanderndem
+ *              Scanstrahl, Fortschrittsbalken, Haken und Konfetti.
+ *
+ *              Die Breite des Balkens kommt aus der CSS-Variable
+ *              --ausweis-scan-fortschritt, die das Seitenskript setzt.
+ *              Die Zufallswerte der Konfetti-Schnipsel ebenso.
+ * @see         assets/js/components/ausweis-scan.js
+ * @see         mein-konto.php
+ */
+
+.ausweis-scan {
+  --ausweis-scan-fortschritt: 0%;
+
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  padding: 24px;
+  background: rgba(17, 19, 19, .93);
+  backdrop-filter: blur(6px);
+  animation: ausweis-scan-auf .35s ease both;
+}
+
+/* Klassen mit display würden das hidden-Attribut überstimmen.
+   Diese Regel stellt sicher, dass hidden immer gewinnt. */
+.ausweis-scan[hidden] {
+  display: none;
+}
+
+/* Solange das Overlay liegt, soll die Seite darunter nicht scrollen. */
+.hat-ausweis-scan {
+  overflow: hidden;
+}
+
+/* --- Der Ausweis ---------------------------------------------------------- */
+
+.ausweis-scan__karte {
+  position: relative;
+  width: min(420px, 82vw);
+  aspect-ratio: 85.6 / 54;            /* Seitenverhältnis einer Scheckkarte */
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--ink-soft);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .55);
+}
+
+.ausweis-scan__bild {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(.75) contrast(1.05);
+}
+
+/* Feines Raster über dem Bild - lässt das Ganze nach Prüfgerät aussehen. */
+.ausweis-scan__raster {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 26px 26px;
+  opacity: .5;
+}
+
+/* --- Der Scanstrahl ------------------------------------------------------- */
+
+.ausweis-scan__strahl {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -18%;
+  width: 92px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(216, 255, 56, .16) 35%,
+    rgba(216, 255, 56, .85) 50%,
+    rgba(216, 255, 56, .16) 65%,
+    transparent
+  );
+  box-shadow: 0 0 34px 8px rgba(216, 255, 56, .3);
+  animation: ausweis-scan-strahl 1.9s cubic-bezier(.65, 0, .35, 1) infinite;
+}
+
+/* Ist die Prüfung durch, hört der Strahl auf zu wandern. */
+.ausweis-scan.is-fertig .ausweis-scan__strahl {
+  opacity: 0;
+  animation: none;
+  transition: opacity .3s ease;
+}
+
+.ausweis-scan.is-fertig .ausweis-scan__bild {
+  filter: saturate(1) contrast(1) brightness(.65);
+  transition: filter .4s ease;
+}
+
+.ausweis-scan.is-fertig .ausweis-scan__raster {
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+
+/* --- Der Haken ------------------------------------------------------------ */
+
+.ausweis-scan__haken {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ausweis-scan.is-fertig .ausweis-scan__haken {
+  opacity: 1;
+  animation: ausweis-scan-haken .5s cubic-bezier(.2, 1.5, .4, 1) both;
+}
+
+.ausweis-scan__haken svg {
+  width: 84px;
+  height: 84px;
+}
+
+.ausweis-scan__haken circle {
+  fill: var(--lime);
+}
+
+.ausweis-scan__haken path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  /* Der Haken zeichnet sich selbst: Strichlänge einmal ganz als Lücke,
+     dann auf null gefahren. 40 ist etwas mehr als der Pfad lang ist. */
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+}
+
+.ausweis-scan.is-fertig .ausweis-scan__haken path {
+  animation: ausweis-scan-strich .4s .22s ease forwards;
+}
+
+/* --- Text und Fortschritt ------------------------------------------------- */
+
+.ausweis-scan__text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: min(420px, 82vw);
+}
+
+.ausweis-scan__titel {
+  margin: 0;
+  color: var(--paper);
+  font-family: var(--display);
+  font-size: clamp(1.1rem, 3.4vw, 1.5rem);
+  letter-spacing: .04em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.ausweis-scan__balken {
+  width: 100%;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--line);
+}
+
+.ausweis-scan__balken::after {
+  display: block;
+  width: var(--ausweis-scan-fortschritt);
+  height: 100%;
+  background: var(--lime);
+  content: "";
+  transition: width .2s linear;
+}
+
+.ausweis-scan__wert {
+  margin: 0;
+  color: var(--lime);
+  font-family: var(--display);
+  font-size: 1.9rem;
+  font-variant-numeric: tabular-nums;   /* Ziffern springen beim Zählen nicht */
+  line-height: 1;
+}
+
+/* --- Konfetti ------------------------------------------------------------- */
+
+.ausweis-scan__konfetti {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ausweis-scan__schnipsel {
+  position: absolute;
+  top: 42%;
+  left: 50%;
+  width: var(--breite);
+  height: calc(var(--breite) * 1.6);
+  border-radius: 2px;
+  background: var(--farbe);
+  animation: ausweis-scan-konfetti var(--dauer) var(--verzug) cubic-bezier(.2, .6, .5, 1) both;
+}
+
+/* --- Bewegungen ----------------------------------------------------------- */
+
+@keyframes ausweis-scan-auf {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* left in Prozent bezieht sich auf die Karte, nicht auf den Strahl selbst.
+   Deshalb laeuft er zuverlaessig von ausserhalb links nach ausserhalb rechts,
+   egal wie breit die Karte gerade ist. */
+@keyframes ausweis-scan-strahl {
+  from { left: -18%; }
+  to   { left: 100%; }
+}
+
+@keyframes ausweis-scan-haken {
+  from { transform: scale(.4); }
+  to   { transform: scale(1); }
+}
+
+@keyframes ausweis-scan-strich {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes ausweis-scan-konfetti {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(var(--weite), var(--hoehe), 0) rotate(var(--drehung));
+  }
+}
+
+/* Wer Bewegung reduziert haben will, bekommt die Anzeige ohne Getanze.
+   Der Fortschritt bleibt lesbar, nur wandert und fliegt nichts mehr. */
+@media (prefers-reduced-motion: reduce) {
+  .ausweis-scan,
+  .ausweis-scan__strahl,
+  .ausweis-scan__haken,
+  .ausweis-scan.is-fertig .ausweis-scan__haken path {
+    animation: none;
+  }
+
+  .ausweis-scan__strahl {
+    opacity: .35;
+  }
+
+  .ausweis-scan.is-fertig .ausweis-scan__haken path {
+    stroke-dashoffset: 0;
+  }
+}

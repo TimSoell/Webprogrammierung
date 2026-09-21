@@ -138,6 +138,11 @@ require ROOT_PATH . '/partials/header.php';
               <option value="senior">Senior (ab 65, Lichtbildausweis)</option>
             </select>
 
+            <!-- Steht hier, wenn für die gewählte Art schon ein gültiger
+                 Nachweis vorliegt. Text und Sichtbarkeit setzt das
+                 Seitenskript; der Endpunkt lehnt Doppelte ohnehin ab. -->
+            <p class="auth-hint nachweis-vorhanden" id="nachweis-vorhanden" hidden></p>
+
             <!-- Genau eines der beiden Felder ist sichtbar: das Bildfeld,
                  wenn ein API-Schlüssel hinterlegt ist, sonst das Datumsfeld.
                  Das entscheidet der Server, nicht die Seite. -->
@@ -159,6 +164,32 @@ require ROOT_PATH . '/partials/header.php';
 
             <button class="button" type="submit">Nachweis prüfen lassen</button>
           </form>
+
+          <!-- Liegt über der ganzen Seite, solange die KI das Foto prüft.
+               Eingeblendet wird es von assets/js/components/ausweis-scan.js,
+               im Demo-Modus erscheint es nicht. Das Bild wird hier nur lokal
+               aus der gewählten Datei angezeigt und nie geladen. -->
+          <div class="ausweis-scan" data-ausweis-scan role="status" aria-live="polite" hidden>
+            <div class="ausweis-scan__karte">
+              <img class="ausweis-scan__bild" data-ausweis-scan-bild alt="">
+              <div class="ausweis-scan__raster"></div>
+              <div class="ausweis-scan__strahl"></div>
+              <div class="ausweis-scan__haken">
+                <svg viewBox="0 0 48 48" aria-hidden="true">
+                  <circle cx="24" cy="24" r="21"></circle>
+                  <path d="M14 24.5 21 31.5 34 18"></path>
+                </svg>
+              </div>
+            </div>
+
+            <div class="ausweis-scan__text">
+              <p class="ausweis-scan__titel" data-ausweis-scan-titel></p>
+              <div class="ausweis-scan__balken"></div>
+              <p class="ausweis-scan__wert" data-ausweis-scan-wert>0 %</p>
+            </div>
+
+            <div class="ausweis-scan__konfetti" data-ausweis-scan-konfetti aria-hidden="true"></div>
+          </div>
         </div>
       </div>
 
