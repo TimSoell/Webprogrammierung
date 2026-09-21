@@ -22,7 +22,7 @@
  *
  *              Dass ein Wechsel erst zum Monatsersten wirkt, ist die
  *              eigentliche Regel des Features:
- *              docs/decisions/ADR-0007-tarifwechsel-zum-monatsersten.md
+ *              docs/decisions/ADR-0010-tarifwechsel-zum-monatsersten.md
  *
  *              Kündigen gibt es bewusst nicht - siehe
  *              docs/features/mitgliedschaften.md, Abschnitt "Was fehlt noch".

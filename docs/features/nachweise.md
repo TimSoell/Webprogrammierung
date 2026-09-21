@@ -29,7 +29,7 @@ des Features.
 
 **Läuft ein Nachweis ab, wird der Vertrag zum nächsten Monatsersten auf den
 Standardpreis gestellt** — nach derselben Regel wie jeder Tarifwechsel
-([ADR-0007](../decisions/ADR-0007-tarifwechsel-zum-monatsersten.md)). Den
+([ADR-0010](../decisions/ADR-0010-tarifwechsel-zum-monatsersten.md)). Den
 laufenden Monat behält man zum ermäßigten Preis.
 
 Ein Seniorennachweis läuft nie ab: Wer einmal 65 ist, bleibt es.
@@ -63,7 +63,7 @@ Vorführen werden ausschließlich erfundene Ausweise benutzt, keine echten.
 
 Geprüft wird über die **Gemini-API von Google** auf der kostenlosen Stufe,
 Modell einstellbar über `ki.modell` in `config/config.php`
-([ADR-0009](../decisions/ADR-0009-gemini-statt-claude.md)).
+([ADR-0012](../decisions/ADR-0012-gemini-statt-claude.md)).
 
 > **Nur erfundene Ausweise hochladen.** Auf der kostenlosen Stufe darf Google
 > die Eingaben zur Produktverbesserung verwenden, und menschliche Prüfer
@@ -150,6 +150,6 @@ Sicherheit. Alles, was aus dem Browser kommt, ist manipulierbar.
   ihn über die Oberfläche nicht wieder los.
 - **Die Herabstufung läuft bei jedem Aufruf mit**, statt einmal nachts.
   Ohne Cronjob ist das der einzige Weg — siehe
-  [ADR-0008](../decisions/ADR-0008-ausweispruefung-mit-ki.md), Konsequenzen.
+  [ADR-0011](../decisions/ADR-0011-ausweispruefung-mit-ki.md), Konsequenzen.
 - Es gibt keine Erinnerung, bevor ein Nachweis ausläuft. Man sieht das
   Datum im Konto, aber es schreibt niemand eine E-Mail.

@@ -1,4 +1,4 @@
-# ADR-0006 — Tarife im Katalog, Verträge mit eingefrorenem Preis
+# ADR-0009 — Tarife im Katalog, Verträge mit eingefrorenem Preis
 
 **Status:** angenommen
 **Datum:** 2026-09-21

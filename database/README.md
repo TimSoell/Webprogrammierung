@@ -48,9 +48,9 @@ das nicht.
 |---|---|---|
 | `mitglieder` | Mitglieder-Login | unsere Stammdaten |
 | `users`, `users_*` (8 Tabellen) | Mitglieder-Login | Login-Bibliothek, siehe [ADR-0005](../docs/decisions/ADR-0005-login-bibliothek.md) |
-| `tarife` | Mitgliedschaften | Katalog, Inhalt aus `seed.sql`, siehe [ADR-0006](../docs/decisions/ADR-0006-mitgliedschaften-datenmodell.md) |
+| `tarife` | Mitgliedschaften | Katalog, Inhalt aus `seed.sql`, siehe [ADR-0009](../docs/decisions/ADR-0009-mitgliedschaften-datenmodell.md) |
 | `mitgliedschaften` | Mitgliedschaften | abgeschlossene Verträge |
-| `nachweise` | Nachweise | Ergebnis der Ausweisprüfung, **ohne Bild**, siehe [ADR-0008](../docs/decisions/ADR-0008-ausweispruefung-mit-ki.md) |
+| `nachweise` | Nachweise | Ergebnis der Ausweisprüfung, **ohne Bild**, siehe [ADR-0011](../docs/decisions/ADR-0011-ausweispruefung-mit-ki.md) |
 
 **`seed.sql` ist für die Tarife Pflicht, nicht optional.** Ohne sie ist
 `mitgliedschaft.php` leer — das ist die häufigste Fehlersuche an dieser Stelle.

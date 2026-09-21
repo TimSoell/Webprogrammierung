@@ -1,9 +1,9 @@
-# ADR-0009 — Die Ausweisprüfung läuft über Gemini auf der kostenlosen Stufe
+# ADR-0012 — Die Ausweisprüfung läuft über Gemini auf der kostenlosen Stufe
 
 **Status:** angenommen
 **Datum:** 2026-09-21
 
-**Ergänzt [ADR-0008](ADR-0008-ausweispruefung-mit-ki.md).** Dessen
+**Ergänzt [ADR-0011](ADR-0011-ausweispruefung-mit-ki.md).** Dessen
 Entscheidungen gelten unverändert weiter: Bilder werden nie gespeichert, die
 KI entscheidet nichts, ohne Schlüssel läuft der Demo-Modus, die Sperre sitzt
 im Endpunkt. Hier geht es nur um die Frage, **wessen** Modell die Bilder
@@ -11,7 +11,7 @@ liest.
 
 ## Kontext
 
-[ADR-0008](ADR-0008-ausweispruefung-mit-ki.md) hat die Ausweisprüfung gegen
+[ADR-0011](ADR-0011-ausweispruefung-mit-ki.md) hat die Ausweisprüfung gegen
 die Anthropic-API gebaut. Für das Team ist das keine gangbare Lösung: Diese
 API ist kostenpflichtig, und für eine Studienarbeit soll kein Geld ausgegeben
 werden. Vorhanden ist ein Schlüssel für die **kostenlose Stufe der
@@ -67,7 +67,7 @@ Ausweise hochgeladen.** Auch nicht die eigenen. Der Grund steht unten.
   mehreren Uploads hintereinander ist das ein realistischer Fall.
 - Eine Abhängigkeit von einem Anbieter, dessen kostenlose Stufe jederzeit
   wegfallen kann. Der Demo-Modus bleibt deshalb bestehen.
-- Der Abschnitt „Verworfene Alternativen" in ADR-0008 wägt das
+- Der Abschnitt „Verworfene Alternativen" in ADR-0011 wägt das
   Anthropic-SDK gegen curl ab. Diese Abwägung ist durch den Anbieterwechsel
   gegenstandslos geworden, bleibt aber als Teil der Historie stehen — ADRs
   werden nicht umgeschrieben.

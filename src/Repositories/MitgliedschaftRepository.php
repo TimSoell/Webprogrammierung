@@ -9,7 +9,7 @@
  *              gilt sofort, jeder spätere Wechsel erst zum nächsten
  *              Monatsersten. Dadurch kann niemand beliebig oft hin und her
  *              springen - siehe
- *              docs/decisions/ADR-0007-tarifwechsel-zum-monatsersten.md
+ *              docs/decisions/ADR-0010-tarifwechsel-zum-monatsersten.md
  *
  *              Beide Datumsspalten sind EINSCHLIESSLICH gemeint: beginnt_am
  *              ist der erste, endet_am der letzte Gültigkeitstag. Ein Vertrag

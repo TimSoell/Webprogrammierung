@@ -37,11 +37,11 @@
 -- schnell "Krafttraining fÃ¼r dich".
 --
 -- Der Name muss zu 'name' in config/config.php passen.
-CREATE DATABASE IF NOT EXISTS `baseline`
+CREATE DATABASE IF NOT EXISTS `schwitzkasten`
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
-USE `baseline`;
+USE `schwitzkasten`;
 
 
 -- -----------------------------------------------------------------------------
@@ -242,7 +242,7 @@ CREATE TABLE IF NOT EXISTS `mitglieder` (
 -- database/seed.sql. Diese Tabelle beschreibt das ANGEBOT, nicht die Verträge -
 -- die stehen weiter unten in mitgliedschaften.
 --
--- Siehe docs/decisions/ADR-0006-mitgliedschaften-datenmodell.md
+-- Siehe docs/decisions/ADR-0009-mitgliedschaften-datenmodell.md
 -- -----------------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS `tarife` (
@@ -305,7 +305,7 @@ CREATE TABLE IF NOT EXISTS `tarife` (
 -- Eine Zeile mit beginnt_am in der ZUKUNFT ist also normal: Wechsel werden
 -- zum Monatsersten vorgemerkt, nicht sofort wirksam. Wer laufende Verträge
 -- sucht, darf deshalb nie nur auf endet_am IS NULL prüfen.
--- Siehe docs/decisions/ADR-0007-tarifwechsel-zum-monatsersten.md
+-- Siehe docs/decisions/ADR-0010-tarifwechsel-zum-monatsersten.md
 --
 -- "Nur eine laufende Mitgliedschaft pro Mitglied" lässt sich in MySQL nicht
 -- als Constraint ausdrücken (es gibt keinen Unique-Index, der nur für
@@ -368,7 +368,7 @@ CREATE TABLE IF NOT EXISTS `mitgliedschaften` (
 -- wird ausgelesen und sofort verworfen, es landet nie auf der Festplatte.
 -- Gespeichert wird nur das Ergebnis der Prüfung. Das ist der Kern der
 -- Datenschutz-Entscheidung, siehe
--- docs/decisions/ADR-0008-ausweispruefung-mit-ki.md
+-- docs/decisions/ADR-0011-ausweispruefung-mit-ki.md
 --
 -- Ein Geburtsdatum wird ebenfalls nicht gespeichert: Wer einmal 65 ist,
 -- bleibt es. Für Senioren genügt art = 'senior' mit gueltig_bis = NULL.

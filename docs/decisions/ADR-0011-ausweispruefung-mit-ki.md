@@ -1,11 +1,11 @@
-# ADR-0008 — Ausweise werden per KI geprüft, das Bild wird nie gespeichert
+# ADR-0011 — Ausweise werden per KI geprüft, das Bild wird nie gespeichert
 
 **Status:** angenommen
 **Datum:** 2026-09-21
 
 ## Kontext
 
-Mit [ADR-0007](ADR-0007-tarifwechsel-zum-monatsersten.md) konnte jedes
+Mit [ADR-0010](ADR-0010-tarifwechsel-zum-monatsersten.md) konnte jedes
 Mitglied beim Abschluss angeben, zu welcher Preisgruppe es gehört —
 Standard, ermäßigt oder Senior. Geprüft wurde das nicht. Der ermäßigte Preis
 war damit eine Auswahl, die jede Person treffen konnte, und der Hinweis

@@ -14,7 +14,7 @@
  *              kostenlosen Stufe darf Google die Eingaben zur
  *              Produktverbesserung verwenden, und Menschen dürfen sie lesen.
  *              DESHALB NUR ERFUNDENE AUSWEISE HOCHLADEN, nie echte.
- *              Siehe docs/decisions/ADR-0009-gemini-statt-claude.md
+ *              Siehe docs/decisions/ADR-0012-gemini-statt-claude.md
  *
  *              WICHTIG: Das Bild wird NICHT gespeichert. Es kommt als
  *              base64-Text in der Anfrage an, geht an die Prüfung und

@@ -9,7 +9,7 @@
  *              Auswahl nur vor; verbindlich wird sie erst über den Button
  *              unten und die Rückfrage im Bestätigungsfenster. Grund:
  *              Ein Tarifwechsel kostet Geld und ändert Zugangsrechte -
- *              siehe docs/decisions/ADR-0007-tarifwechsel-zum-monatsersten.md
+ *              siehe docs/decisions/ADR-0010-tarifwechsel-zum-monatsersten.md
  *
  *              Die Tarife stehen NICHT im HTML, sondern kommen über
  *              assets/js/pages/mitgliedschaft.page.js aus api/tarife.php -

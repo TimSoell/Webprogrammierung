@@ -1,11 +1,11 @@
-# ADR-0007 — Tarifwechsel gelten zum Monatsersten und brauchen eine Bestätigung
+# ADR-0010 — Tarifwechsel gelten zum Monatsersten und brauchen eine Bestätigung
 
 **Status:** angenommen
 **Datum:** 2026-09-21
 
 ## Kontext
 
-Mit [ADR-0006](ADR-0006-mitgliedschaften-datenmodell.md) konnte jedes Mitglied
+Mit [ADR-0009](ADR-0009-mitgliedschaften-datenmodell.md) konnte jedes Mitglied
 einen Tarif wählen — und zwar beliebig oft. Ein Klick auf „Hierhin wechseln"
 war sofort wirksam, ohne Rückfrage und ohne Grenze. Man konnte an einem
 Nachmittag zwanzigmal zwischen Basisplan und Premium springen.

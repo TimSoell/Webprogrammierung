@@ -18,7 +18,7 @@ return [
     'db' => [
         'host'     => 'localhost',
         'port'     => 3306,
-        'name'     => 'baseline',
+        'name'     => 'schwitzkasten',
         'user'     => 'root',
         'password' => '',
     ],
@@ -30,13 +30,13 @@ return [
     // LEER LASSEN IST EIN GÜLTIGER ZUSTAND. Ohne Schlüssel läuft die Prüfung
     // im Demo-Modus: Das Ablaufdatum wird von Hand eingetragen, statt aus dem
     // Bild gelesen. So funktioniert das Projekt auch ohne Schlüssel und ohne
-    // Internet - siehe docs/decisions/ADR-0008-ausweispruefung-mit-ki.md
+    // Internet - siehe docs/decisions/ADR-0011-ausweispruefung-mit-ki.md
     //
     // ACHTUNG BEI DER KOSTENLOSEN STUFE: Google darf die Eingaben zur
     // Produktverbesserung verwenden, und Menschen dürfen sie lesen. Deshalb
     // gilt für dieses Projekt: NUR ERFUNDENE AUSWEISE hochladen, keine
     // echten - auch nicht die eigenen.
-    // Siehe docs/decisions/ADR-0009-gemini-statt-claude.md
+    // Siehe docs/decisions/ADR-0012-gemini-statt-claude.md
     //
     // Der Schlüssel gehört NIE ins Repository. config/config.php steht in
     // .gitignore, diese Vorlage bleibt leer.

@@ -28,7 +28,7 @@
  * @see         assets/js/services/nachweise.js
  * @see         src/Ausweispruefung.php
  * @see         src/Repositories/NachweisRepository.php
- * @see         docs/decisions/ADR-0008-ausweispruefung-mit-ki.md
+ * @see         docs/decisions/ADR-0011-ausweispruefung-mit-ki.md
  */
 
 declare(strict_types=1);

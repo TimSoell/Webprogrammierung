@@ -22,7 +22,7 @@
  * @see         mitgliedschaft.php
  * @see         assets/js/services/tarife.js
  * @see         assets/js/services/mitgliedschaften.js
- * @see         docs/decisions/ADR-0007-tarifwechsel-zum-monatsersten.md
+ * @see         docs/decisions/ADR-0010-tarifwechsel-zum-monatsersten.md
  */
 
 import { $, $$ } from '../lib/dom.js';

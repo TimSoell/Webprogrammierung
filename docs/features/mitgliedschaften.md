@@ -29,7 +29,7 @@ ersten Tag des nächsten Monats.**
 Sonst könnte man an einem Nachmittag zwanzigmal zwischen Basisplan und
 Premium wechseln, die Sauna benutzen und den günstigen Beitrag zahlen.
 Begründung und verworfene Alternativen:
-[ADR-0007](../decisions/ADR-0007-tarifwechsel-zum-monatsersten.md).
+[ADR-0010](../decisions/ADR-0010-tarifwechsel-zum-monatsersten.md).
 
 Ein vorgemerkter Wechsel ist bis zum Stichtag ersetzbar. Wer zurück auf den
 laufenden Tarif klickt und bestätigt, nimmt die Vormerkung zurück.
@@ -65,7 +65,7 @@ Der Preis steht **in beiden**. Das ist Absicht und keine vergessene
 Normalisierung: `mitgliedschaften.preis_monatlich` ist eine Kopie aus dem
 Katalog zum Zeitpunkt des Abschlusses. Ändert das Studio später seine Preise,
 bleiben laufende Verträge davon unberührt. Begründung in
-[ADR-0006](../decisions/ADR-0006-mitgliedschaften-datenmodell.md).
+[ADR-0009](../decisions/ADR-0009-mitgliedschaften-datenmodell.md).
 
 ### Die drei Zustände einer Vertragszeile
 
@@ -175,7 +175,7 @@ Seite leer.
 - ~~Der Nachweis für ermäßigte Preise wird nicht geprüft.~~ **Erledigt:**
   Ermäßigte Preisgruppen sind ohne gültigen Nachweis gesperrt, der Endpunkt
   antwortet mit 403. Siehe [Nachweise](nachweise.md) und
-  [ADR-0008](../decisions/ADR-0008-ausweispruefung-mit-ki.md).
+  [ADR-0011](../decisions/ADR-0011-ausweispruefung-mit-ki.md).
 - **Es wird nichts abgerechnet.** `preis_monatlich` ist eine Zahl, keine
   Zahlung. Zahlungen wären ein eigenes Feature mit eigener Tabelle.
 - **Die Rückfrage beim Verlassen der Seite ist die des Browsers.** Ihren
