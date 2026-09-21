@@ -7,8 +7,9 @@
  */
 
 /* Die Höhe dieses Abschnitts ist der Scrollweg des Videos.
-   Sichtbar sind immer 100vh (das klebende Kind), der Rest ist die Strecke,
-   über die das Video von Anfang bis Ende läuft: hier also 220vh.
+   Sichtbar sind immer 100vh (Kopfzeile plus das klebende Kind), der Rest
+   ist die Strecke, über die das Video von Anfang bis Ende läuft: hier
+   also 220vh.
 
    Je kürzer diese Strecke, desto mehr Videozeit liegt auf einem Pixel
    Scrollweg - und desto ruckeliger wirkt es. 320vh sind ein guter Wert für
@@ -24,11 +25,14 @@
   color: #f2f3ed;
 }
 
+/* Das Video beginnt unter der fixierten Kopfzeile statt dahinter - sonst
+   verdeckt sie den oberen Bildrand. Unten endet es weiter am Fensterrand,
+   deshalb stimmt die Rechnung in scroll-video.js unverändert. */
 .scroll-video-sticky {
   position: sticky;
-  top: 0;
+  top: var(--header-height);
   display: grid;
-  min-height: 100vh;
+  min-height: calc(100vh - var(--header-height));
   place-items: center;
   overflow: hidden;
 }
@@ -36,8 +40,11 @@
 .scroll-video video {
   display: block;
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - var(--header-height));
   object-fit: cover;
+  /* Ist das Fenster breiter als 16:9, muss cover oben oder unten etwas
+     abschneiden. Oben liegt die Hantel, also nur unten. */
+  object-position: center top;
   opacity: .86;
 }
 
@@ -79,11 +86,12 @@
   }
 
   .scroll-video-sticky {
-    min-height: 100svh;
+    top: var(--header-height-mobile);
+    min-height: calc(100svh - var(--header-height-mobile));
   }
 
   .scroll-video video {
-    height: 100svh;
+    height: calc(100svh - var(--header-height-mobile));
   }
 
   .scroll-video-overlay {
