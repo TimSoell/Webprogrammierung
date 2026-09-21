@@ -10,6 +10,7 @@ Seite eingebunden und existieren dadurch **genau einmal**.
 | `footer.php` | Fußzeile. Schließt `</body>` und `</html>` |
 | `modal-anmeldung.php` | Overlay-Fenster für die Interessenten-Anmeldung |
 | `passwort-kriterien.php` | Liste der Passwort-Anforderungen unter einem Passwortfeld |
+| `kurskalender.php` | Fenster mit den Kursterminen, auf allen drei Kursseiten |
 
 ## Reihenfolge in einer Seite
 

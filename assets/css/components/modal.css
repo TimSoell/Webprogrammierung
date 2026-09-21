@@ -33,6 +33,36 @@
   color: var(--ink);
 }
 
+/* Variante für den Kurskalender: dunkel wie die restliche Website statt hell
+   wie das Anmeldefenster, und breiter. Scrollt in sich, wenn die Termine
+   nicht auf den Bildschirm passen - sonst wäre das X oben nicht erreichbar. */
+.modal-card--kalender {
+  width: min(760px, 100%);
+  max-height: calc(100vh - 48px);
+  border: 1px solid var(--line);
+  background: var(--ink);
+  color: var(--paper);
+  overflow-y: auto;
+}
+
+.modal-card--kalender > p {
+  color: var(--muted);
+}
+
+.modal-card--kalender .modal-close {
+  color: var(--paper);
+}
+
+.modal-card--kalender .modal-close:hover {
+  color: var(--lime);
+}
+
+@media (max-width: 600px) {
+  .modal-card--kalender {
+    padding: 28px 20px;
+  }
+}
+
 .modal-card h2 {
   margin: 0 0 10px;
   font: 700 3rem var(--display);

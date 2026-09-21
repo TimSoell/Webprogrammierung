@@ -45,13 +45,15 @@ require ROOT_PATH . '/partials/header.php';
         <!-- Füllt assets/js/pages/fight.page.js aus der Datenbank. -->
         <div class="merkmale" id="merkmale">Merkmale werden geladen …</div>
         <div class="merken" id="merken" data-angemeldet="<?= $angemeldet ? '1' : '' ?>"></div>
+
+        <button class="button kurskalender-aufruf" id="kurskalender-oeffnen" type="button">Termin buchen</button>
       </section>
 
       <aside class="program-aside">
         <div class="schedule">
           <h3>Lust auf Punch?</h3>
           <p>Starte mit einem kostenlosen Kennenlerntermin und erlebe deine erste Fight-Session bei SCHWITZKASTEN.</p>
-          <a class="button button--dark" href="<?= e(BASE_URL) ?>index.php#mitgliedschaft">Probetraining sichern</a>
+          <a class="button button--dark" href="<?= e(BASE_URL) ?>probetraining.php">Probetraining sichern</a>
         </div>
 
         <div class="coaches">
@@ -63,4 +65,5 @@ require ROOT_PATH . '/partials/header.php';
   </main>
 
 <?php
+require ROOT_PATH . '/partials/kurskalender.php';
 require ROOT_PATH . '/partials/footer.php';

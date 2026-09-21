@@ -1,0 +1,192 @@
+/**
+ * @file        assets/css/components/probetraining.css
+ * @layer       Komponente
+ * @description Die Seite "Probetraining": Kopf, die drei Schritte, die
+ *              Coach-Karten zur Auswahl und die Zeiten als Schaltflächen.
+ *
+ *              Die Tagesüberschriften, Meldungen und die Stufenauswahl
+ *              kommen aus kalender.css - dieselben wie im Kurskalender.
+ * @see         probetraining.php
+ * @see         assets/js/pages/probetraining.page.js
+ * @see         assets/css/components/kalender.css
+ */
+
+.probetraining {
+  /* Platz für die Kopfzeile, die über der Seite liegt. */
+  padding: calc(var(--header-height) + 70px) 0 110px;
+}
+
+.probetraining-kopf {
+  max-width: 640px;
+  margin-bottom: 56px;
+}
+
+.probetraining-titel {
+  margin: 0;
+  font-size: clamp(3.4rem, 8vw, 7rem);
+}
+
+.probetraining-lead {
+  margin: 22px 0 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* --- Die drei Schritte ----------------------------------------------------- */
+.probetraining-schritt {
+  padding: 30px 0;
+  border-top: 1px solid var(--line);
+}
+
+/* Nach jeder Auswahl scrollt die Seite zur nächsten Frage. Ohne diesen
+   Abstand läge deren Überschrift unter der festen Kopfzeile. */
+.probetraining-schritt,
+.probetraining-abschluss {
+  scroll-margin-top: calc(var(--header-height) + 16px);
+}
+
+.probetraining-schritt-titel {
+  display: flex;
+  align-items: center;
+  margin: 0 0 20px;
+  font: 700 1.6rem var(--display);
+  gap: 12px;
+  text-transform: uppercase;
+}
+
+.probetraining-schritt-titel span {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  background: var(--lime);
+  color: var(--ink);
+  font-size: 1.1rem;
+  place-items: center;
+}
+
+/* --- Coach-Karten ---------------------------------------------------------- */
+.coach-wahl {
+  display: grid;
+  color: var(--muted);
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+}
+
+.coach-option {
+  display: grid;
+  padding: 18px 16px;
+  border: 1px solid var(--line);
+  background: var(--ink-soft);
+  color: var(--paper);
+  cursor: pointer;
+  font: inherit;
+  gap: 4px;
+  justify-items: center;
+  text-align: center;
+  transition: border-color .15s;
+}
+
+.coach-option:hover {
+  border-color: var(--lime);
+}
+
+.coach-option[aria-pressed="true"] {
+  border-color: var(--lime);
+  box-shadow: inset 0 0 0 1px var(--lime);
+}
+
+.coach-option-bild {
+  width: 76px;
+  height: 76px;
+  margin-bottom: 8px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.coach-option-bild--ersatz {
+  display: grid;
+  background: var(--ink);
+  color: var(--lime);
+  font: 700 1.4rem var(--display);
+  place-items: center;
+}
+
+.coach-option-programm {
+  color: var(--lime);
+  font-size: .66rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.coach-option-name {
+  font-weight: 700;
+}
+
+.coach-option-schwerpunkt {
+  color: var(--muted);
+  font-size: .76rem;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* --- Freie Zeiten ---------------------------------------------------------- */
+.slot-liste {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.slot {
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  background: none;
+  color: var(--paper);
+  cursor: pointer;
+  font: 600 .85rem var(--body);
+  font-variant-numeric: tabular-nums;
+}
+
+.slot:hover {
+  border-color: var(--lime);
+}
+
+.slot[aria-pressed="true"] {
+  border-color: var(--lime);
+  background: var(--lime);
+  color: var(--ink);
+}
+
+/* --- Abschluss ------------------------------------------------------------- */
+.probetraining-abschluss {
+  display: grid;
+  padding: 30px 0 0;
+  border-top: 1px solid var(--line);
+  gap: 14px;
+  justify-items: start;
+}
+
+.probetraining-zusammenfassung {
+  margin: 0;
+  font-weight: 700;
+}
+
+.probetraining-abschluss .button {
+  cursor: pointer;
+}
+
+.probetraining-hinweis {
+  margin: 0;
+  color: var(--muted);
+}
+
+.probetraining-hinweis a {
+  color: var(--lime);
+  text-decoration: underline;
+}
+
+@media (max-width: 800px) {
+  .probetraining {
+    padding: calc(var(--header-height-mobile) + 48px) 0 80px;
+  }
+}

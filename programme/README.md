@@ -25,6 +25,10 @@ und die Coaches lädt das Seitenskript über `api/programme.php` nach. Details:
 7. In `database/seed.sql` das Programm, seine Merkmale und seine Coaches
    ergänzen und die Datei neu einspielen. **Ohne diesen Schritt bleibt der
    untere Teil der Seite leer.**
+8. Im Seitenskript zusätzlich `kurskalenderAufbauen('<name>')` aufrufen und
+   in `seed.sql` den Wochenplan in `kurstermine` ergänzen. Ohne Einträge zeigt
+   „Termin buchen" einen leeren Kalender. Den Button und das Fenster
+   (`partials/kurskalender.php`) bringt die kopierte Seite schon mit.
 
 ## Warum drei Dateien und keine Vorlage mit Parameter
 
