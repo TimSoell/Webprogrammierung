@@ -55,25 +55,33 @@ Dieselben wie beim ersten Scroll-Video. Siehe
 [`scroll-video.md`](scroll-video.md), Abschnitt "Anforderungen an die
 Videodatei" - inklusive ffmpeg-Befehl.
 
+## Die aktuelle Datei
+
+Das Rohmaterial aus Higgsfield war H.265 (`hvc1`), 1920×1080, mit nur
+2 Keyframes bei 313 Bildern und 39,8 MB gross. Damit dauerte ein Sprung im
+Video bis zu 112 ms, und beim Scrollen kamen nur 52 der 313 Bilder
+ueberhaupt auf den Bildschirm. Umgewandelt mit:
+
+```bash
+ffmpeg -i hf_20260921_110742_c6c26f9d-b1f7-4c47-83aa-2ca04db5dbe7.mp4 -an -vf "scale=1280:-2,fps=24" -c:v libx264 -profile:v high -pix_fmt yuv420p -g 1 -crf 28 -movflags +faststart assets/img/studio-tour.mp4
+```
+
+Ergebnis: H.264 High, 1280×720, 24 fps, 313 Bilder, 13,04 s, jedes Bild
+ein Keyframe, 5,2 MB. Ein Sprung dauert rund 3 ms.
+
+Abweichend vom Befehl in `scroll-video.md`:
+
+- `fps=24` statt 25, weil das Rohmaterial 24 fps hat. Mit 25 wuerde ffmpeg
+  einzelne Bilder doppelt einfuegen.
+- `-crf 28` statt 26, sonst waeren es 6,4 MB. Der Unterschied ist bei
+  dieser Kamerafahrt mit viel Bewegungsunschaerfe nicht zu sehen.
+
+**Keine Zwischenbilder berechnet.** 313 Bilder auf rund 520vh Scrollweg sind
+bei einem 900 px hohen Fenster rund 15 px pro Bild - das reicht (Grenze
+siehe `scroll-video.md`). Interpolation wuerde die Datei verdoppeln und bei
+der schnellen Kamerafahrt Verzerrungen an Kanten riskieren.
+
 ## Was fehlt noch
-
-**Die Videodatei.** Das Rohmaterial aus Higgsfield ist H.265 (`hvc1`) mit
-nur 2 Keyframes bei 313 Bildern und 39,8 MB gross - damit funktioniert
-weder das Springen noch die Ladezeit. Es muss einmal durch ffmpeg, genau
-wie `scroll-video.mp4` vorher auch:
-
-```bash
-ffmpeg -i hf_20260921_110742_c6c26f9d-b1f7-4c47-83aa-2ca04db5dbe7.mp4 -an -vf "scale=1280:-2,fps=25" -c:v libx264 -profile:v high -pix_fmt yuv420p -g 1 -crf 26 -movflags +faststart assets/img/studio-tour.mp4
-```
-
-Danach pruefen - es darf **keine** `stss`-Zeile erscheinen, denn die
-bedeutet, dass nur ein Teil der Bilder Keyframes sind:
-
-```bash
-ffprobe -v error -show_entries format=size,duration -show_entries stream=codec_name,nb_frames -of default=noprint_wrappers=1 assets/img/studio-tour.mp4
-```
-
-Erwartet: `avc1`, rund 320 Bilder, moeglichst unter 5 MB.
 
 - Auf verschiedenen Bildschirmgroessen im Browser pruefen.
 - Pruefen, ob 620vh sich im Gebrauch zu lang anfuehlen. Falls ja: Video auf
