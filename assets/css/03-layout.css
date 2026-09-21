@@ -36,6 +36,17 @@ header {
   top: 0;
   right: 0;
   left: 0;
+  transition: background-color .3s ease, backdrop-filter .3s ease;
+}
+
+/* Sobald gescrollt wird, bekommt die Kopfzeile einen abgedunkelten,
+   weichgezeichneten Hintergrund - sonst ist die Schrift über hellen
+   Abschnitten kaum lesbar. Die Klasse .scrolled setzt
+   assets/js/components/nav.js. */
+header.scrolled {
+  background-color: color-mix(in srgb, var(--ink) 72%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
 }
 
 .nav {

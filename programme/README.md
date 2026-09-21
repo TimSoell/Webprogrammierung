@@ -36,4 +36,4 @@ Seit die Merkmale aus der Datenbank kommen, wäre eine Seite mit Parameter
 (`programm.php?slug=strength`) technisch möglich. Dagegen sprechen die
 bestehenden Links auf `programme/move.php` und weiterhin die gleichzeitige
 Bearbeitung im Team — abgewogen in
-[`ADR-0006`](../docs/decisions/ADR-0006-programm-details-aus-der-datenbank.md).
+[`ADR-0007`](../docs/decisions/ADR-0007-programm-details-aus-der-datenbank.md).

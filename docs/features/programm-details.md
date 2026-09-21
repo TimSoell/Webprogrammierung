@@ -93,7 +93,7 @@ legt sie neu an. Konten und Mitglieder bleiben unangetastet.
 
 **Ohne MySQL zeigen die Programmseiten unter dem Einleitungstext eine
 Fehlermeldung statt der Blöcke.** Vor diesem Feature liefen sie ohne
-Datenbank — siehe [ADR-0006](../decisions/ADR-0006-programm-details-aus-der-datenbank.md).
+Datenbank — siehe [ADR-0007](../decisions/ADR-0007-programm-details-aus-der-datenbank.md).
 
 ## Wo die Auswahl gespeichert wird
 

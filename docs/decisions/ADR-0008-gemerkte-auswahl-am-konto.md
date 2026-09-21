@@ -1,11 +1,11 @@
-# ADR-0007 — Gemerkte Auswahl liegt am Konto, nicht nur im Browser
+# ADR-0008 — Gemerkte Auswahl liegt am Konto, nicht nur im Browser
 
 **Status:** angenommen
 **Datum:** 2026-09-21
 
 ## Kontext
 
-[`ADR-0006`](ADR-0006-programm-details-aus-der-datenbank.md) hat die Level- und
+[`ADR-0007`](ADR-0007-programm-details-aus-der-datenbank.md) hat die Level- und
 Format-Auswahl auf den Programmseiten im `localStorage` abgelegt und die
 serverseitige Speicherung ausdrücklich verworfen — mit der Begründung, die
 Auswahl sei „reine Anzeigehilfe, kein Geschäftsvorgang".
@@ -18,7 +18,7 @@ und auf einem zweiten Gerät ist die Auswahl weg.
 Damit wird aus der Anzeigehilfe etwas anderes — eine Angabe, die das Mitglied
 über sich macht und später wiederfinden will.
 
-**Dieses ADR ersetzt ADR-0006 nicht.** Dessen Kernentscheidung, dass die
+**Dieses ADR ersetzt ADR-0007 nicht.** Dessen Kernentscheidung, dass die
 Programm-Details aus der Datenbank kommen, gilt unverändert. Revidiert wird
 nur eine der dort verworfenen Alternativen.
 

@@ -1,0 +1,99 @@
+/**
+ * @file        assets/css/components/scroll-video.css
+ * @layer       Komponente
+ * @description Sticky Video, dessen Fortschritt beim Scrollen gesteuert wird.
+ * @see         index.php
+ * @see         assets/js/components/scroll-video.js
+ */
+
+/* Die Höhe dieses Abschnitts ist der Scrollweg des Videos.
+   Sichtbar sind immer 100vh (das klebende Kind), der Rest ist die Strecke,
+   über die das Video von Anfang bis Ende läuft: hier also 220vh.
+
+   Je kürzer diese Strecke, desto mehr Videozeit liegt auf einem Pixel
+   Scrollweg - und desto ruckeliger wirkt es. 320vh sind ein guter Wert für
+   ein Video von rund fünf Sekunden. Wird die Videodatei ausgetauscht, sollte
+   dieser Wert mitwandern. */
+.scroll-video {
+  position: relative;
+  /* Ohne das würden die 118px aus 03-layout.css den Scrollweg verfälschen. */
+  padding: 0;
+  min-height: 320vh;
+  background: #202522;
+  color: #f2f3ed;
+}
+
+.scroll-video-sticky {
+  position: sticky;
+  top: 0;
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  overflow: hidden;
+}
+
+.scroll-video video {
+  display: block;
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+  opacity: .86;
+}
+
+.scroll-video-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: end;
+  padding: 0 0 9vh;
+  background: linear-gradient(180deg, rgba(10, 12, 11, .08), rgba(10, 12, 11, .78));
+  pointer-events: none;
+}
+
+.scroll-video-copy {
+  max-width: 390px;
+}
+
+.scroll-video-copy h2 {
+  margin: 10px 0 0;
+  color: #f2f3ed;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 7vw, 7rem);
+  line-height: .88;
+  text-transform: uppercase;
+}
+
+.scroll-video-copy h2 span {
+  color: var(--lime);
+}
+
+@media (max-width: 800px) {
+  /* Am Handy ist ein Wisch viel Scrollweg, deshalb darf der Abschnitt
+     etwas kürzer sein als am Rechner.
+     svh statt vh: das ist die Fensterhöhe MIT eingeblendeter Browserleiste.
+     Mit vh würde der Abschnitt springen, sobald die Leiste ein- oder
+     ausfährt - und das Video mit ihm. */
+  .scroll-video {
+    min-height: 260svh;
+  }
+
+  .scroll-video-sticky {
+    min-height: 100svh;
+  }
+
+  .scroll-video video {
+    height: 100svh;
+  }
+
+  .scroll-video-overlay {
+    padding-bottom: 55px;
+  }
+}
+
+/* Weniger Bewegung gewünscht: das JavaScript steigt aus, der Abschnitt
+   schrumpft auf eine Bildschirmhöhe und zeigt nur das erste Einzelbild. */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-video {
+    min-height: 100vh;
+  }
+}

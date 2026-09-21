@@ -16,7 +16,7 @@
  *              Klick (auswahl-speicher.js). Angemeldet: zusätzlich am Konto,
  *              aber erst auf Knopfdruck (services/auswahl.js). Beim Öffnen
  *              gewinnt das Konto - es ist die bewusstere Entscheidung.
- *              Begründung: docs/decisions/ADR-0007-gemerkte-auswahl-am-konto.md
+ *              Begründung: docs/decisions/ADR-0008-gemerkte-auswahl-am-konto.md
  *
  *              KEIN innerHTML mit Daten aus der Datenbank. Alles wird über
  *              createElement und textContent aufgebaut. Das ist das Gegenstück

@@ -45,6 +45,9 @@ Die Skripte starten den in PHP eingebauten Entwicklungsserver direkt aus dem
 Projektordner. Warum das so gelöst ist und warum ein Symlink nach `htdocs`
 **nicht** funktioniert, steht in
 [`ADR-0004`](docs/decisions/ADR-0004-php-entwicklungsserver.md).
+Dabei läuft `router.php` mit, damit der Server Videos stückweise ausliefern
+kann; ohne das steht das Scroll-Video still. Siehe
+[`ADR-0006`](docs/decisions/ADR-0006-router-fuer-entwicklungsserver.md).
 
 ### Alternative: über Apache aus `htdocs`
 

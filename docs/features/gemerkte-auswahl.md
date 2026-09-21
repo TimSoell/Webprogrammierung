@@ -134,7 +134,7 @@ dazu keine Zeilen (sie bräuchten ein Konto).
 ## Was fehlt noch
 
 - Ändern direkt im Mitgliedsbereich. Bewusst nicht gebaut, Begründung in
-  [ADR-0007](../decisions/ADR-0007-gemerkte-auswahl-am-konto.md).
+  [ADR-0008](../decisions/ADR-0008-gemerkte-auswahl-am-konto.md).
 - Der Merken-Button kennt nur „alles" — einzeln nur Level oder nur Format zu
   merken, geht über die Oberfläche nicht. Die Tabelle könnte es (beide Spalten
   sind `NULL` erlaubt).

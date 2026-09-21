@@ -1,8 +1,9 @@
 /**
  * @file        assets/js/pages/index.page.js
  * @layer       2 – Seitenskript
- * @description Verhalten, das es NUR auf der Startseite gibt: das Absenden
- *              des Interessenten-Formulars im Anmeldefenster.
+ * @description Verhalten, das es NUR auf der Startseite gibt: das
+ *              scrollgesteuerte Video und das Absenden des
+ *              Interessenten-Formulars im Anmeldefenster.
  *
  *              Eingebunden wird die Datei über die Variable $pageScript
  *              in index.php - nicht über main.js.
@@ -12,9 +13,13 @@
  *              Speicherung ist unten im Kommentar beschrieben.
  * @see         index.php
  * @see         partials/modal-anmeldung.php
+ * @see         assets/js/components/scroll-video.js
  */
 
 import { $ } from '../lib/dom.js';
+import { initScrollVideo } from '../components/scroll-video.js';
+
+initScrollVideo();
 
 const form = $('#signup-form');
 const success = $('#signup-success');

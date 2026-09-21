@@ -35,11 +35,11 @@
 -- schnell "Krafttraining fÃ¼r dich".
 --
 -- Der Name muss zu 'name' in config/config.php passen.
-CREATE DATABASE IF NOT EXISTS `baseline`
+CREATE DATABASE IF NOT EXISTS `schwitzkasten`
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
-USE `baseline`;
+USE `schwitzkasten`;
 
 
 -- -----------------------------------------------------------------------------
@@ -244,7 +244,7 @@ CREATE TABLE IF NOT EXISTS `mitglieder` (
 -- Coaches hat. Alles in eine Tabelle zu quetschen hiesse, Spalten wie
 -- level_1, level_2, level_3 anzulegen - und dann ist bei drei Schluss.
 --
--- Siehe docs/decisions/ADR-0006-programm-details-aus-der-datenbank.md
+-- Siehe docs/decisions/ADR-0007-programm-details-aus-der-datenbank.md
 -- -----------------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS `programme` (
@@ -345,12 +345,12 @@ CREATE TABLE IF NOT EXISTS `coaches` (
 -- weiterhin nur im localStorage des Browsers.
 --
 -- EINE Zeile pro Mitglied und Programm, mit zwei Spalten statt zwei Zeilen.
--- Das widerspricht nicht der Begruendung aus ADR-0006 gegen level_1, level_2:
+-- Das widerspricht nicht der Begruendung aus ADR-0007 gegen level_1, level_2:
 -- Dort ging es um eine unbekannte ANZAHL von Eintraegen. Hier sind es genau
 -- die Arten, die merkmale.art als ENUM ohnehin festlegt - eine vierte Art
 -- braeuchte so oder so eine Schema-Aenderung.
 --
--- Siehe docs/decisions/ADR-0007-gemerkte-auswahl-am-konto.md
+-- Siehe docs/decisions/ADR-0008-gemerkte-auswahl-am-konto.md
 -- -----------------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS `mitglied_auswahl` (

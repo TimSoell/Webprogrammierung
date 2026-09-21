@@ -1,4 +1,4 @@
-# ADR-0006 — Programm-Details kommen aus der Datenbank
+# ADR-0007 — Programm-Details kommen aus der Datenbank
 
 **Status:** angenommen
 **Datum:** 2026-09-21
