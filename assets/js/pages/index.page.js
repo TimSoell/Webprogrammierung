@@ -2,7 +2,7 @@
  * @file        assets/js/pages/index.page.js
  * @layer       2 – Seitenskript
  * @description Verhalten, das es NUR auf der Startseite gibt: das
- *              scrollgesteuerte Video und das Absenden des
+ *              scrollgesteuerte Hero-Video und das Absenden des
  *              Interessenten-Formulars im Anmeldefenster.
  *
  *              Eingebunden wird die Datei über die Variable $pageScript
@@ -20,7 +20,6 @@ import { $ } from '../lib/dom.js';
 import { initScrollVideo } from '../components/scroll-video.js';
 
 initScrollVideo('[data-scroll-video]');
-initScrollVideo('[data-studio-tour]');
 
 const form = $('#signup-form');
 const success = $('#signup-success');

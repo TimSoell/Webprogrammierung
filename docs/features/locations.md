@@ -22,6 +22,11 @@ jederzeit animiert zur Deutschlandübersicht zurück.
 | CSS | `assets/css/components/locations.css` |
 | Einbindung | `partials/head.php`, `partials/header.php` |
 
+Unter der Karte liegt zusaetzlich der scrollgesteuerte Studio-Rundgang. Der
+gehoert zu einem eigenen Feature und ist dort beschrieben:
+[`studiotour.md`](studiotour.md). Der Menuepunkt heisst deshalb
+"Locations & Studio".
+
 ## Datenform
 
 ```json
