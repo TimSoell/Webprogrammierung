@@ -4,7 +4,7 @@
     {
       "name": "schwitzkasten",
       "runtimeExecutable": "/Applications/XAMPP/xamppfiles/bin/php",
-      "runtimeArgs": ["-S", "localhost:8000", "-t", "/Users/tim/Documents/Studium/GitHub Projekte/Webprogrammierung"],
+      "runtimeArgs": ["-S", "localhost:8000", "-t", "/Users/tim/Documents/Studium/GitHub Projekte/Webprogrammierung", "/Users/tim/Documents/Studium/GitHub Projekte/Webprogrammierung/router.php"],
       "port": 8000
     },
     {

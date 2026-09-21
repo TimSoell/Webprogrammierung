@@ -2,8 +2,8 @@
 /**
  * @file        index.php
  * @layer       1 – Seite
- * @description Die Startseite. Hero, Studio-Vorstellung, die drei Programme,
- *              Philosophie und der Aufruf zur Mitgliedschaft.
+ * @description Die Startseite. Scroll-Video, Hero, Studio-Vorstellung, die
+ *              drei Programme, Philosophie und der Aufruf zur Mitgliedschaft.
  *
  *              Diese Datei enthält bewusst NUR Inhalt und Struktur.
  *              Kein CSS, kein JavaScript, kein SQL. Das Aussehen liegt in
@@ -31,6 +31,23 @@ require ROOT_PATH . '/partials/header.php';
 ?>
 
   <main id="top">
+
+    <section class="scroll-video" data-scroll-video aria-label="Training in Bewegung">
+      <div class="scroll-video-sticky">
+        <video muted playsinline preload="auto" aria-label="Training im SCHWITZKASTEN Athletic Club">
+          <source src="<?= e(BASE_URL) ?>assets/img/scroll-video.mp4" type="video/mp4">
+          Dein Browser kann dieses Video nicht anzeigen.
+        </video>
+        <div class="scroll-video-overlay">
+          <div class="wrap">
+            <div class="scroll-video-copy">
+              <p class="eyebrow">Jede Bewegung zaehlt</p>
+              <h2>In den<br><span>Flow.</span></h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <section class="hero">
       <div class="hero-content wrap">
@@ -66,6 +83,23 @@ require ROOT_PATH . '/partials/header.php';
           <div class="stat"><strong>1.200</strong><span>Quadratmeter Trainingsfläche</span></div>
           <div class="stat"><strong>24/7</strong><span>Zugang für Mitglieder</span></div>
           <div class="stat"><strong>04</strong><span>Trainingszonen für jedes Ziel</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="scroll-video scroll-video--tour" data-studio-tour aria-label="Rundgang durch das Studio">
+      <div class="scroll-video-sticky">
+        <video muted playsinline preload="auto" aria-label="Rundgang durch den SCHWITZKASTEN Athletic Club">
+          <source src="<?= e(BASE_URL) ?>assets/img/studio-tour.mp4" type="video/mp4">
+          Dein Browser kann dieses Video nicht anzeigen.
+        </video>
+        <div class="scroll-video-overlay">
+          <div class="wrap">
+            <div class="scroll-video-copy">
+              <p class="eyebrow">Rundgang</p>
+              <h2>Dein<br><span>Revier.</span></h2>
+            </div>
+          </div>
         </div>
       </div>
     </section>

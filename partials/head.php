@@ -54,3 +54,11 @@ if (!defined('BASE_URL')) {
 <?php endif; ?>
 </head>
 <body>
+  <div class="preloader" data-preloader role="status" aria-label="Seite wird geladen">
+    <div class="preloader-inner">
+      <div class="preloader-mark">
+        <img src="<?= e(BASE_URL) ?>assets/img/schwitzkasten-logo.png" alt="SCHWITZKASTEN Athletic Club">
+      </div>
+      <p class="preloader-label">Athletic Club</p>
+    </div>
+  </div>

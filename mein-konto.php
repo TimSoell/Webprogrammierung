@@ -2,8 +2,9 @@
 /**
  * @file        mein-konto.php
  * @layer       1 – Seite
- * @description Startpunkt des Mitgliederbereichs. Zeigt die Stammdaten und
- *              die laufende Mitgliedschaft und bietet das Abmelden an.
+ * @description Startpunkt des Mitgliederbereichs. Zeigt die Stammdaten, die
+ *              gemerkte Programm-Auswahl, die laufende Mitgliedschaft und die
+ *              Nachweise und bietet das Abmelden an.
  *
  *              Nur für angemeldete Mitglieder: Wer nicht angemeldet ist, wird
  *              von Auth::nurFuerMitglieder() zur Anmeldeseite geschickt,
@@ -39,8 +40,7 @@ require ROOT_PATH . '/partials/header.php';
         <h1 class="display auth-title">Mein<br>Konto.</h1>
       </div>
 
-      <div class="auth-stack">
-
+      <div class="auth-cards">
         <div class="auth-card">
           <h2 class="auth-heading">Stammdaten</h2>
 
@@ -62,6 +62,16 @@ require ROOT_PATH . '/partials/header.php';
           <p class="auth-message" id="konto-meldung" role="alert"></p>
 
           <button class="button button--ghost" id="abmelden" type="button">Abmelden</button>
+        </div>
+
+        <div class="auth-card">
+          <h2 class="auth-heading">Meine Auswahl</h2>
+          <p class="auth-hint">Was du dir auf den Programmseiten gemerkt hast.</p>
+
+          <!-- Füllt assets/js/pages/mein-konto.page.js aus api/auswahl.php. -->
+          <ul class="auswahl-liste" id="auswahl-liste"></ul>
+
+          <p class="auth-message" id="auswahl-meldung" role="alert"></p>
         </div>
 
         <!-- Welcher der beiden Blöcke sichtbar ist, entscheidet das
@@ -150,7 +160,6 @@ require ROOT_PATH . '/partials/header.php';
             <button class="button" type="submit">Nachweis prüfen lassen</button>
           </form>
         </div>
-
       </div>
 
     </div>

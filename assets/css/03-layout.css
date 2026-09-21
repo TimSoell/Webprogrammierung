@@ -29,13 +29,20 @@ section {
 
 /* --- Kopfzeile ------------------------------------------------------------
   Der Header liegt fixiert über dem Hero-Bild, damit er beim Scrollen
-  sichtbar bleibt. Deshalb muss jeder Hero oben Platz dafür lassen. */
+  sichtbar bleibt. Deshalb muss jeder Hero oben Platz dafür lassen.
+
+  Der Hintergrund ist immer abgedunkelt und weichgezeichnet, auch ganz oben
+  auf der Seite - sonst ist die Schrift über hellen Abschnitten kaum lesbar,
+  und die Kopfzeile sähe oben anders aus als nach dem ersten Scrollen. */
 header {
   position: fixed;
   z-index: 5;
   top: 0;
   right: 0;
   left: 0;
+  background-color: color-mix(in srgb, var(--ink) 72%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
 }
 
 .nav {
@@ -45,7 +52,6 @@ header {
   justify-content: space-between;
   /* Mindestabstand, damit Links und Buttons sich knapp über 800 px nicht berühren. */
   gap: 20px;
-  border-bottom: 1px solid var(--line);
 }
 
 .logo {

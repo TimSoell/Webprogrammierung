@@ -41,12 +41,18 @@
   transform: scale(1.06);
 }
 
-/* Abdunklung nach unten, damit der weiße Text auf jedem Bild lesbar bleibt. */
+/* Abdunklung nach unten, damit der weiße Text auf jedem Bild lesbar bleibt.
+
+   pointer-events: none ist hier entscheidend, nicht kosmetisch: Ohne das
+   liegt dieser Verlauf über dem Link und schluckt jeden Klick. Anklickbar
+   bliebe dann nur .program-content, weil das mit z-index: 1 darüber liegt -
+   also ausgerechnet nur der Bereich um den Programmnamen. */
 .program::after {
   position: absolute;
   inset: 0;
   content: "";
   background: linear-gradient(0deg, rgba(12, 15, 14, .9), transparent 60%);
+  pointer-events: none;
 }
 
 .program-content {

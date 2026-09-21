@@ -21,7 +21,12 @@ require __DIR__ . '/../src/bootstrap.php';
 
 $pageTitle       = 'Strength — SCHWITZKASTEN';
 $pageDescription = 'Krafttraining bei SCHWITZKASTEN: saubere Technik, progressive Gewichte und Coaches, die dich voranbringen.';
+$pageScript      = 'strength.page.js';
 $activeNav       = 'programme';
+
+// Entscheidet nur, ob unten der Merken-Button oder der Hinweis zur Anmeldung
+// erscheint. isLoggedIn() liest die Session, nicht die Datenbank.
+$angemeldet = Auth::instanz()->isLoggedIn();
 
 require ROOT_PATH . '/partials/head.php';
 require ROOT_PATH . '/partials/header.php';
@@ -44,17 +49,22 @@ require ROOT_PATH . '/partials/header.php';
         <h2 class="program-heading">Deine<br>Basis.</h2>
         <p class="copy">Strength ist dein strukturierter Weg zu mehr Muskelkraft und Selbstvertrauen. Du trainierst die großen Bewegungsmuster und lernst, deinen Körper kontrolliert zu belasten.</p>
 
-        <div class="attributes">
-          <div class="attribute"><strong>Fokus</strong><span>Kraft, Technik und Muskelaufbau</span></div>
-          <div class="attribute"><strong>Level</strong><span>Einsteiger bis Fortgeschrittene</span></div>
-          <div class="attribute"><strong>Format</strong><span>Freies Training und Coaching</span></div>
-        </div>
+        <!-- Füllt assets/js/pages/strength.page.js aus der Datenbank. -->
+        <div class="merkmale" id="merkmale">Merkmale werden geladen …</div>
+        <div class="merken" id="merken" data-angemeldet="<?= $angemeldet ? '1' : '' ?>"></div>
       </section>
 
-      <aside class="schedule">
-        <h3>Bereit für mehr?</h3>
-        <p>Starte mit einem kostenlosen Kennenlerntermin und finde heraus, welches Strength-Programm zu dir passt.</p>
-        <a class="button button--dark" href="<?= e(BASE_URL) ?>index.php#mitgliedschaft">Probetraining sichern</a>
+      <aside class="program-aside">
+        <div class="schedule">
+          <h3>Bereit für mehr?</h3>
+          <p>Starte mit einem kostenlosen Kennenlerntermin und finde heraus, welches Strength-Programm zu dir passt.</p>
+          <a class="button button--dark" href="<?= e(BASE_URL) ?>index.php#mitgliedschaft">Probetraining sichern</a>
+        </div>
+
+        <div class="coaches">
+          <h3 class="coaches-titel">Deine Coaches</h3>
+          <ul class="coach-liste" id="coaches"></ul>
+        </div>
       </aside>
     </div>
   </main>

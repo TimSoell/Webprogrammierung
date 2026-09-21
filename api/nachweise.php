@@ -59,14 +59,13 @@ try {
         Api::fehler(401, 'Du bist nicht angemeldet.');
     }
 
-    $mitglied = (new MitgliedRepository())->findenNachUserId($auth->getUserId());
+    $mitgliedId = (new MitgliedRepository())->idFindenNachUserId($auth->getUserId());
 
-    if ($mitglied === null) {
+    if ($mitgliedId === null) {
         Api::fehler(500, 'Zu deinem Konto fehlen die Stammdaten.');
     }
 
-    $mitgliedId = (int) $mitglied['id'];
-    $nachweise  = new NachweisRepository();
+    $nachweise = new NachweisRepository();
 
     $alsAntwort = static fn (array $zeile): array => [
         'art'        => $zeile['art'],

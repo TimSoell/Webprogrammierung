@@ -13,8 +13,43 @@
 
 import { $, $$ } from '../lib/dom.js';
 import { anmelden, passwortResetAnfordern, registrieren } from '../services/mitglieder.js';
+import { auswahlMerken, meineAuswahlLaden } from '../services/auswahl.js';
 import { formularAbsenden, meldungZeigen } from '../components/auth-formular.js';
+import { lokalAlleLesen } from '../components/auswahl-speicher.js';
 import { initPasswortKriterien, passwortPruefen } from '../components/passwort-kriterien.js';
+
+/**
+ * Übernimmt eine als Gast getroffene Auswahl ans frisch angemeldete Konto.
+ *
+ * Nur für Programme, zu denen am Konto noch NICHTS steht: Wer sich auf einem
+ * fremden Rechner anmeldet, soll dort nicht seine bewusst gemerkte Auswahl
+ * durch zufälliges Herumklicken überschreiben.
+ *
+ * Läuft in try/catch und ohne Rückmeldung: Es ist eine Bequemlichkeit, kein
+ * Teil des Anmeldens. Scheitert sie, geht es trotzdem weiter.
+ *
+ * @returns {Promise<void>}
+ */
+async function auswahlUebernehmen() {
+  try {
+    const lokal = lokalAlleLesen();
+
+    if (lokal.length === 0) {
+      return;
+    }
+
+    const { auswahl } = await meineAuswahlLaden();
+    const vorhanden = new Set(auswahl.map((eintrag) => eintrag.slug));
+
+    await Promise.all(
+      lokal
+        .filter((eintrag) => !vorhanden.has(eintrag.slug))
+        .map((eintrag) => auswahlMerken(eintrag.slug, eintrag.level, eintrag.format)),
+    );
+  } catch {
+    // Siehe oben - bewusst still.
+  }
+}
 
 const seite = $('#auth-seite');
 
@@ -64,6 +99,7 @@ if (seite) {
 
     formularAbsenden(formLogin, $('#login-meldung'), async () => {
       await anmelden(formLogin.email.value, formLogin.passwort.value);
+      await auswahlUebernehmen();
       window.location.assign(seite.dataset.weiter);
     });
   });
@@ -114,6 +150,7 @@ if (seite) {
         passwort: formRegistrierung.passwort.value,
         passwortWiederholung: formRegistrierung.passwortWiederholung.value,
       });
+      await auswahlUebernehmen();
       window.location.assign(seite.dataset.weiter);
     });
   });

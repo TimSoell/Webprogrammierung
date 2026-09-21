@@ -40,19 +40,37 @@ final class MitgliedRepository
     }
 
     /**
-     * Sucht die Stammdaten zu einem Konto.
+     * Sucht die mitglieder.id zu einem Konto.
      *
-     * Die id kommt mit, weil alle fachlichen Tabellen auf mitglieder.id
-     * verweisen und nicht auf users.id - die Mitgliedschaften zum Beispiel.
-     * Wer nur den Namen braucht, ignoriert sie.
+     * Gebraucht von allen Endpunkten, die etwas Fachliches am Mitglied
+     * speichern: Die Login-Bibliothek kennt nur users.id, fachliche Tabellen
+     * verweisen aber auf mitglieder.id.
      *
      * @param int $userId  id des Kontos aus der Tabelle users
-     * @return array{id: int, vorname: string, nachname: string}|null  null, wenn es keine gibt
+     * @return int|null    null, wenn es zu dem Konto keine Stammdaten gibt
+     */
+    public function idFindenNachUserId(int $userId): ?int
+    {
+        $stmt = Database::connection()->prepare(
+            'SELECT id FROM mitglieder WHERE user_id = ?'
+        );
+        $stmt->execute([$userId]);
+
+        $id = $stmt->fetchColumn();
+
+        return $id === false ? null : (int) $id;
+    }
+
+    /**
+     * Sucht die Stammdaten zu einem Konto.
+     *
+     * @param int $userId  id des Kontos aus der Tabelle users
+     * @return array{vorname: string, nachname: string}|null  null, wenn es keine gibt
      */
     public function findenNachUserId(int $userId): ?array
     {
         $stmt = Database::connection()->prepare(
-            'SELECT id, vorname, nachname FROM mitglieder WHERE user_id = ?'
+            'SELECT vorname, nachname FROM mitglieder WHERE user_id = ?'
         );
         $stmt->execute([$userId]);
 

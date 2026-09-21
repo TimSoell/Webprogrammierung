@@ -16,6 +16,7 @@
 
 import { initNav } from './components/nav.js';
 import { initModal } from './components/modal.js';
+import { initPreloader } from './components/preloader.js';
 
 initNav();
 
@@ -28,3 +29,4 @@ initModal({
   closeId: 'close-modal',
   focusId: 'name',
 });
+initPreloader();

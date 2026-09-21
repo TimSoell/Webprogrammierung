@@ -53,14 +53,13 @@ try {
     }
 
     // Alle fachlichen Tabellen hängen an mitglieder.id, nicht an users.id.
-    $mitglied = (new MitgliedRepository())->findenNachUserId($auth->getUserId());
+    $mitgliedId = (new MitgliedRepository())->idFindenNachUserId($auth->getUserId());
 
-    if ($mitglied === null) {
+    if ($mitgliedId === null) {
         // Konto ohne Stammdaten: Das sollte api/mitglieder.php verhindern.
         Api::fehler(500, 'Zu deinem Konto fehlen die Stammdaten.');
     }
 
-    $mitgliedId       = (int) $mitglied['id'];
     $mitgliedschaften = new MitgliedschaftRepository();
     $nachweise        = new NachweisRepository();
     $tarife           = new TarifRepository();
@@ -92,7 +91,7 @@ try {
      * Das läuft bei jedem Aufruf mit, weil es im Projekt keinen Cronjob gibt,
      * der nachts aufräumen könnte. Der Preis dafür: Ein GET kann eine
      * Vormerkung anlegen. Das ist bewusst in Kauf genommen und hier die
-     * einzige Stelle, an der so etwas passiert - siehe ADR-0008.
+     * einzige Stelle, an der so etwas passiert - siehe ADR-0011.
      *
      * Herabgestuft wird nach derselben Regel wie jeder Wechsel: zum nächsten
      * Monatsersten. Wer bereits einen Wechsel vorgemerkt hat, wird in Ruhe

@@ -22,6 +22,8 @@ kommt: „Wo muss ich anfassen, wenn ich am Kursplan etwas ändern will?"
 |---|---|---|
 | [Mitglieder-Login](mitglieder-login.md) | fertig | Tim |
 | [Standortübersicht](locations.md) | fertig | Team |
+| [Programm-Details](programm-details.md) | fertig | Jonny |
+| [Gemerkte Auswahl](gemerkte-auswahl.md) | fertig | Jonny |
 | [Mitgliedschaften](mitgliedschaften.md) | in Arbeit | Felix |
 | [Nachweise](nachweise.md) | in Arbeit | Felix |
 

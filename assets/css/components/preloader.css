@@ -1,0 +1,102 @@
+/**
+ * @file        assets/css/components/preloader.css
+ * @layer       Komponente
+ * @description Globaler Ladebildschirm mit animiertem Ring und Wortmarke.
+ * @see         partials/head.php
+ * @see         assets/js/components/preloader.js
+ */
+
+.preloader {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(17, 19, 19, .72);
+  -webkit-backdrop-filter: blur(9px) saturate(.8);
+  backdrop-filter: blur(9px) saturate(.8);
+  color: #f2f3ed;
+  opacity: 1;
+  transition: opacity .8s ease, visibility .8s ease;
+}
+
+.preloader.is-hidden {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.preloader-inner {
+  display: grid;
+  justify-items: center;
+  gap: 20px;
+}
+
+.preloader-mark {
+  position: relative;
+  display: grid;
+  width: 176px;
+  height: 176px;
+  place-items: center;
+  border: 1px solid rgba(242, 243, 237, .25);
+  border-radius: 50%;
+  animation: preloader-pulse 1.8s ease-in-out infinite;
+}
+
+.preloader-mark::before,
+.preloader-mark::after {
+  position: absolute;
+  inset: -1px;
+  border: 1px solid transparent;
+  border-top-color: var(--lime);
+  border-radius: inherit;
+  content: "";
+  animation: preloader-spin 1.8s linear infinite;
+}
+
+.preloader-mark::after {
+  inset: 9px;
+  border-top-color: rgba(242, 243, 237, .7);
+  animation-duration: 2.6s;
+  animation-direction: reverse;
+}
+
+.preloader-mark img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 126px;
+  height: auto;
+}
+
+.preloader-label {
+  margin: 0;
+  color: #b4b8ad;
+  font-size: .65rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+
+@keyframes preloader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes preloader-pulse {
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preloader-mark,
+  .preloader-mark::before,
+  .preloader-mark::after {
+    animation: none;
+  }
+
+  .preloader {
+    transition-duration: .01ms;
+  }
+}
