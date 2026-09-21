@@ -43,6 +43,23 @@ require ROOT_PATH . '/partials/header.php';
       </div>
     </section>
 
+    <section class="scroll-video" data-scroll-video aria-label="Training in Bewegung">
+      <div class="scroll-video-sticky">
+        <video muted playsinline preload="auto" aria-label="Training im SCHWITZKASTEN Athletic Club">
+          <source src="<?= e(BASE_URL) ?>assets/img/scroll-video.mp4" type="video/mp4">
+          Dein Browser kann dieses Video nicht anzeigen.
+        </video>
+        <div class="scroll-video-overlay">
+          <div class="wrap">
+            <div class="scroll-video-copy">
+              <p class="eyebrow">Jede Bewegung zaehlt</p>
+              <h2>In den<br><span>Flow.</span></h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Die Wörter stehen doppelt, damit die Schleife nahtlos läuft.
          Erklärung in assets/css/components/ticker.css -->
     <div class="ticker" aria-label="Studio-Highlights">
