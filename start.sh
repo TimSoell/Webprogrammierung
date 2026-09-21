@@ -17,4 +17,5 @@ PHP="/Applications/XAMPP/xamppfiles/bin/php"
 [ -x "$PHP" ] || PHP="php"
 
 echo "BASELINE laeuft auf http://localhost:8000/   (Beenden mit Ctrl+C)"
-exec "$PHP" -S localhost:8000 -t .
+# router.php beantwortet Range-Anfragen, ohne die kein Video springen kann.
+exec "$PHP" -S localhost:8000 -t . router.php
