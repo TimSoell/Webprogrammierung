@@ -106,3 +106,18 @@
     min-height: 100vh;
   }
 }
+
+/* --- Variante: Studiotour -------------------------------------------------
+  Das Tour-Video ist mit rund 13 Sekunden gut doppelt so lang wie das erste
+  und braucht deshalb entsprechend mehr Scrollweg. Faustregel aus der
+  Feature-Doku: rund 40vh Abschnittshoehe je Sekunde Video, plus die 100vh,
+  die das klebende Kind selbst einnimmt. */
+.scroll-video--tour {
+  min-height: 620vh;
+}
+
+@media (max-width: 800px) {
+  .scroll-video--tour {
+    min-height: 500svh;
+  }
+}
