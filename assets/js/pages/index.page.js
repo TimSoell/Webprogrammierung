@@ -19,7 +19,8 @@
 import { $ } from '../lib/dom.js';
 import { initScrollVideo } from '../components/scroll-video.js';
 
-initScrollVideo();
+initScrollVideo('[data-scroll-video]');
+initScrollVideo('[data-studio-tour]');
 
 const form = $('#signup-form');
 const success = $('#signup-success');

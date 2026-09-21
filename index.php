@@ -87,6 +87,23 @@ require ROOT_PATH . '/partials/header.php';
       </div>
     </section>
 
+    <section class="scroll-video scroll-video--tour" data-studio-tour aria-label="Rundgang durch das Studio">
+      <div class="scroll-video-sticky">
+        <video muted playsinline preload="auto" aria-label="Rundgang durch den SCHWITZKASTEN Athletic Club">
+          <source src="<?= e(BASE_URL) ?>assets/img/studio-tour.mp4" type="video/mp4">
+          Dein Browser kann dieses Video nicht anzeigen.
+        </video>
+        <div class="scroll-video-overlay">
+          <div class="wrap">
+            <div class="scroll-video-copy">
+              <p class="eyebrow">Rundgang</p>
+              <h2>Dein<br><span>Revier.</span></h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="light-section" id="programme">
       <div class="wrap">
         <div class="section-head">
