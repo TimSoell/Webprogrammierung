@@ -1,0 +1,424 @@
+/**
+ * @file        assets/css/components/tarifkarte.css
+ * @layer       Komponente
+ * @description Die vier Tarifkarten auf mitgliedschaft.php, dazu der
+ *              Umschalter für die Preisgruppe und der Seitenkopf.
+ *
+ *              Ob eine Leistung im Tarif enthalten ist, steht als
+ *              data-enthalten="ja|nein" am <li>. Das Häkchen davor erzeugt
+ *              CSS über ::before - so steht kein Symbol im HTML, und das
+ *              Seitenskript setzt nur ein Attribut statt Markup.
+ *
+ *              Die Farbe allein unterscheidet enthalten und nicht enthalten
+ *              bewusst NICHT: Das Zeichen (Haken oder Strich) trägt die
+ *              Information, damit sie auch ohne Farbwahrnehmung ankommt.
+ * @see         mitgliedschaft.php
+ * @see         assets/js/pages/mitgliedschaft.page.js
+ */
+
+/* --- Seitenkopf ----------------------------------------------------------- */
+
+.tarife-hero {
+  min-height: 455px;
+  padding: calc(var(--header-height) + 82px) 0 72px;
+  background:
+    linear-gradient(110deg, rgba(10, 12, 11, .96), rgba(10, 12, 11, .62)),
+    url("https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1800&q=85") center/cover;
+}
+
+.tarife-title {
+  max-width: 650px;
+}
+
+.tarife-title span {
+  color: var(--lime);
+}
+
+.tarife-lead {
+  max-width: 470px;
+  margin: 34px 0 0;
+  color: #d0d2cb;
+  line-height: 1.6;
+}
+
+.tarife-content {
+  padding: 100px 0 120px;
+}
+
+/* --- Umschalter für die Preisgruppe --------------------------------------- */
+
+.preisgruppe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 34px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.preisgruppe-legend {
+  width: 100%;
+  margin-bottom: 14px;
+  padding: 0;
+  color: var(--muted);
+  font-size: .82rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* Der Radiobutton bleibt im HTML und damit für Tastatur und Screenreader
+   nutzbar - er wird nur unsichtbar gemacht. Die Optik trägt das <span>.
+   Nicht über opacity: 0 oder display: none: Beides nimmt das Feld aus dem
+   Accessibility-Baum, und dann ist die Preisgruppe per Tastatur nicht mehr
+   wählbar. Getestet - genau das war hier zuerst der Fall.
+   Diese Kombination aus 1px-Größe und clip-path lässt das Feld bedienbar. */
+.preisgruppe-option input {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.preisgruppe-option span {
+  display: block;
+  padding: 11px 18px;
+  border: 1px solid var(--line);
+  color: var(--paper);
+  font-size: .86rem;
+  cursor: pointer;
+  transition: border-color .2s, color .2s;
+}
+
+.preisgruppe-option span:hover {
+  border-color: var(--lime);
+}
+
+.preisgruppe-option input:checked + span {
+  border-color: var(--lime);
+  background: var(--lime);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* Ohne das wäre beim Tabben nicht zu sehen, wo man gerade ist. */
+.preisgruppe-option input:focus-visible + span {
+  outline: 2px solid var(--lime);
+  outline-offset: 3px;
+}
+
+/* --- Die Liste ------------------------------------------------------------ */
+
+.tarife-liste {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 30px;
+}
+
+.tarifkarte {
+  display: flex;
+  flex-direction: column;
+  padding: 30px 26px 26px;
+  border: 1px solid var(--line);
+  background: var(--ink-soft);
+}
+
+/* Der Tarif, der gerade läuft. */
+.tarifkarte--aktuell {
+  border-color: var(--lime);
+}
+
+.tarifkarte-name {
+  margin: 0;
+  color: var(--lime);
+  font: 700 1.9rem var(--display);
+  text-transform: uppercase;
+}
+
+.tarifkarte-preis {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 16px 0 0;
+}
+
+.tarifkarte-betrag {
+  font: 800 2.9rem var(--display);
+  letter-spacing: -.02em;
+}
+
+.tarifkarte-einheit {
+  color: var(--muted);
+  font-size: .8rem;
+}
+
+/* Das Seitenskript blendet die Einheit aus, wenn es für die gewählte
+   Preisgruppe keinen Preis gibt. Ohne diese Zeile bliebe sie sichtbar. */
+.tarifkarte-einheit[hidden] {
+  display: none;
+}
+
+.tarifkarte-beschreibung {
+  margin: 14px 0 0;
+  color: #c8cbc2;
+  font-size: .85rem;
+  line-height: 1.5;
+}
+
+.tarifkarte-leistungen {
+  margin: 22px 0 26px;
+  padding: 22px 0 0;
+  border-top: 1px solid var(--line);
+  list-style: none;
+}
+
+.tarifkarte-leistung {
+  display: flex;
+  gap: 10px;
+  padding: 7px 0;
+  font-size: .85rem;
+}
+
+.tarifkarte-leistung::before {
+  flex: none;
+  width: 14px;
+  content: "—";
+  color: var(--muted);
+  text-align: center;
+}
+
+.tarifkarte-leistung[data-enthalten="nein"] {
+  color: var(--muted);
+}
+
+.tarifkarte-leistung[data-enthalten="ja"]::before {
+  content: "✓";
+  color: var(--lime);
+  font-weight: 700;
+}
+
+/* margin-top: auto schiebt den Button an den unteren Rand, damit die
+   Buttons aller vier Karten auf einer Linie stehen - auch wenn die
+   Beschreibungen unterschiedlich lang sind. */
+.tarifkarte-button {
+  width: 100%;
+  margin-top: auto;
+}
+
+.tarifkarte-button:disabled {
+  opacity: .55;
+  cursor: default;
+}
+
+/* Ohne das würde der bereits gebuchte Tarif beim Überfahren so tun,
+   als ließe er sich anklicken. */
+.tarifkarte-button:disabled:hover {
+  background: var(--lime);
+  transform: none;
+}
+
+.tarife-hinweis {
+  margin: 30px 0 0;
+  color: var(--muted);
+  font-size: .8rem;
+  line-height: 1.5;
+}
+
+.tarife-meldung {
+  margin-top: 24px;
+}
+
+/* --- Schmalere Bildschirme ------------------------------------------------ */
+
+@media (max-width: 1000px) {
+  .tarife-liste {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 620px) {
+  .tarife-liste {
+    grid-template-columns: 1fr;
+  }
+
+  .tarife-content {
+    padding: 64px 0 80px;
+  }
+}
+
+/* --- Auswahl und Status auf der Karte ------------------------------------- */
+
+/* Kleiner Hinweis über dem Tarifnamen: "Aktueller Tarif" oder das Datum,
+   ab dem ein vorgemerkter Wechsel gilt. Ist er leer, nimmt er keinen Platz
+   weg - sonst stünden die Tarifnamen der vier Karten nicht auf einer Linie. */
+.tarifkarte-status {
+  margin: 0 0 8px;
+  color: var(--lime);
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.tarifkarte-status:empty {
+  display: none;
+}
+
+/* Angeklickt. Bewusst ein innenliegender Ring und KEIN Rahmen: Der Rahmen
+   gehört .tarifkarte--aktuell. Beide Zustände treffen im Normalfall auf
+   dieselbe Karte zu - der laufende Tarif ist auch der ausgewählte - und
+   müssen deshalb nebeneinander sichtbar bleiben. */
+.tarifkarte--gewaehlt {
+  box-shadow: inset 0 0 0 2px var(--paper);
+}
+
+/* --- Leiste unten --------------------------------------------------------- */
+
+/* Klebt beim Scrollen am unteren Rand: Auf dem Handy liegen sonst drei
+   Karten zwischen der Auswahl und dem Button, mit dem man sie übernimmt. */
+.tarife-aktion {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 30px;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+  background: var(--ink);
+}
+
+.tarife-aktion-text {
+  margin: 0;
+  color: var(--muted);
+  font-size: .85rem;
+  line-height: 1.5;
+}
+
+.tarife-aktion .button:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
+.tarife-aktion .button:disabled:hover {
+  background: var(--lime);
+  transform: none;
+}
+
+/* --- Bestätigungsfenster -------------------------------------------------- */
+/* Das Fenster selbst (Rahmen, Hintergrund, Schließen) kommt aus
+   components/modal.css. Hier steht nur, was der Inhalt braucht. */
+
+.wechsel-daten {
+  display: grid;
+  gap: 1px;
+  margin: 0 0 20px;
+  background: #d3d4cc;
+}
+
+.wechsel-daten div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #fff;
+}
+
+/* Ohne diese beiden Zeilen würde display: grid bzw. flex oben das
+   hidden-Attribut überstimmen, mit dem das Seitenskript die Zeile
+   "Unterschied" und bei einer Rücknahme die ganze Tabelle ausblendet. */
+.wechsel-daten[hidden],
+.wechsel-daten div[hidden] {
+  display: none;
+}
+
+.wechsel-daten dt {
+  color: #6d7169;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.wechsel-daten dd {
+  margin: 0;
+  font-weight: 700;
+  text-align: right;
+}
+
+.wechsel-rechte {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.wechsel-rechte-block {
+  padding: 12px 14px;
+  border-left: 3px solid var(--lime-dark);
+  background: #f6f5f0;
+}
+
+.wechsel-rechte-block[hidden] {
+  display: none;
+}
+
+/* Was wegfällt, bekommt die Warnfarbe - das ist die Information, die man
+   beim Herunterstufen am ehesten übersieht. */
+.wechsel-rechte-block--verlust {
+  border-left-color: var(--danger);
+}
+
+.wechsel-rechte-titel {
+  margin: 0 0 6px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.wechsel-rechte-liste {
+  margin: 0;
+  padding-left: 18px;
+  font-size: .88rem;
+  line-height: 1.6;
+}
+
+.wechsel-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.wechsel-buttons .button {
+  flex: 1;
+}
+
+/* --- Gesperrte Preisgruppen ----------------------------------------------- */
+
+/* Ohne gültigen Nachweis lässt sich der ermäßigte Preis zwar ansehen, aber
+   nicht buchen. Das Schloss macht das sichtbar, ohne das Feld zu sperren -
+   wer wissen will, was der Preis wäre, darf hinschauen.
+   Der Haken daneben: Die eigentliche Sperre sitzt im Endpunkt, nicht hier. */
+.preisgruppe-option[data-gesperrt="ja"] span::after {
+  content: " 🔒";
+  font-size: .8em;
+}
+
+.preisgruppe-option[data-gesperrt="ja"] span {
+  color: var(--muted);
+}
+
+.preisgruppe-option[data-gesperrt="ja"] input:checked + span {
+  border-color: var(--muted);
+  background: transparent;
+  color: var(--muted);
+}

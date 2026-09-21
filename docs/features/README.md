@@ -22,6 +22,8 @@ kommt: „Wo muss ich anfassen, wenn ich am Kursplan etwas ändern will?"
 |---|---|---|
 | [Mitglieder-Login](mitglieder-login.md) | fertig | Tim |
 | [Standortübersicht](locations.md) | fertig | Team |
+| [Mitgliedschaften](mitgliedschaften.md) | in Arbeit | Felix |
+| [Nachweise](nachweise.md) | in Arbeit | Felix |
 
 Der Aufbau eines Features ist am Beispiel-Feature beschrieben — siehe
 [`../ARCHITECTURE.md`](../ARCHITECTURE.md).

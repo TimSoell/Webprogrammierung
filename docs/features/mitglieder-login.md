@@ -106,7 +106,8 @@ baut man in `api/passwort-reset.php` an der markierten Stelle ein.
 
 - Echter E-Mail-Versand (SMTP), dafür braucht es Zugangsdaten und eine weitere
   Bibliothek oder einen Mailserver.
-- Stammdaten ändern, Verträge, Buchungen, Zahlungen: eigene Issues, die auf
-  `mitglieder.id` aufbauen.
+- Stammdaten ändern, Buchungen, Zahlungen: eigene Issues, die auf
+  `mitglieder.id` aufbauen. Der erste davon ist gebaut — die Tarife und
+  Verträge stehen in [Mitgliedschaften](mitgliedschaften.md).
 - Die Kopfzeile ist zwischen 801 und etwa 880 px Breite sehr voll. Dort bricht
   „Probetraining buchen“ auf zwei Zeilen um.

@@ -25,7 +25,11 @@ import { $ } from '../lib/dom.js';
  * @param {string}  [options.openId]     id des Buttons, der es öffnet
  * @param {string}  [options.closeId]    id des Buttons, der es schließt
  * @param {string}  [options.focusId]    id des Feldes, das beim Öffnen den Fokus bekommt
- * @returns {void}
+ * @returns {{open: () => void, close: () => void}|undefined}
+ *          Beide Wege bleiben nutzbar: der Button oben und diese Rückgabe.
+ *          Gebraucht wird sie, wenn sich das Fenster nach einer geglückten
+ *          Aktion selbst schließen soll - siehe mitgliedschaft.page.js.
+ *          undefined, wenn es das Fenster oder den Button nicht gibt.
  */
 export function initModal({
   modalId = 'modal',
@@ -75,4 +79,6 @@ export function initModal({
       close();
     }
   });
+
+  return { open, close };
 }

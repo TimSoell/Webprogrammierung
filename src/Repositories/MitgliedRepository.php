@@ -42,13 +42,17 @@ final class MitgliedRepository
     /**
      * Sucht die Stammdaten zu einem Konto.
      *
+     * Die id kommt mit, weil alle fachlichen Tabellen auf mitglieder.id
+     * verweisen und nicht auf users.id - die Mitgliedschaften zum Beispiel.
+     * Wer nur den Namen braucht, ignoriert sie.
+     *
      * @param int $userId  id des Kontos aus der Tabelle users
-     * @return array{vorname: string, nachname: string}|null  null, wenn es keine gibt
+     * @return array{id: int, vorname: string, nachname: string}|null  null, wenn es keine gibt
      */
     public function findenNachUserId(int $userId): ?array
     {
         $stmt = Database::connection()->prepare(
-            'SELECT vorname, nachname FROM mitglieder WHERE user_id = ?'
+            'SELECT id, vorname, nachname FROM mitglieder WHERE user_id = ?'
         );
         $stmt->execute([$userId]);
 

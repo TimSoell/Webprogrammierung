@@ -28,8 +28,9 @@ if (!defined('BASE_URL')) {
  * Schlüssel = Kennung für $activeNav, Wert = [Beschriftung, Ziel].
  */
 $navItems = [
-  'probetraining' => ['Probetraining buchen', 'index.php#mitgliedschaft'],
-  'locations'     => ['Locations', 'locations.php'],
+  'probetraining'  => ['Probetraining buchen', 'index.php#mitgliedschaft'],
+  'mitgliedschaft' => ['Mitgliedschaft', 'mitgliedschaft.php'],
+  'locations'      => ['Locations', 'locations.php'],
 ];
 
 /**
