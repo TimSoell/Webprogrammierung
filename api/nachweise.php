@@ -94,6 +94,18 @@ try {
             Api::fehler(400, 'Bitte gib an, was du nachweisen möchtest.');
         }
 
+        // Liegt für diese Art schon ein gültiger Nachweis vor? Der Wert wird
+        // weiter unten noch einmal gebraucht, deshalb hier einmal geholt.
+        $vorhanden = $nachweise->gueltigenFindenNachArt($mitgliedId, $art);
+
+        // Ein Seniorennachweis gilt unbefristet - ein zweiter kann nichts
+        // verbessern. Das steht schon fest, bevor das Bild gelesen wurde,
+        // also hier abbrechen: Das spart eine Anfrage an die Prüfung und
+        // damit Kontingent der kostenlosen Stufe.
+        if ($art === 'senior' && $vorhanden !== null) {
+            Api::fehler(409, 'Deinen Seniorennachweis hast du schon hinterlegt. Er gilt unbefristet, ein weiterer Upload ändert daran nichts.');
+        }
+
         $heute = new DateTimeImmutable('today');
 
         if (Ausweispruefung::verfuegbar()) {
@@ -179,6 +191,20 @@ try {
             }
 
             $gueltigBis = $gelesenesDatum->format('Y-m-d');
+        }
+
+        // Zweimal derselbe Ausweis bringt nichts und stand bisher zweimal in
+        // der Liste. Gespeichert wird ein weiterer Nachweis derselben Art nur,
+        // wenn er LAENGER gilt als der vorhandene. Ein anderer Ausweis - also
+        // eine andere Art - bleibt jederzeit möglich.
+        //
+        // Beide Daten stehen als 'JJJJ-MM-TT' da. In diesem Format ist der
+        // Zeichenvergleich gleichbedeutend mit dem Datumsvergleich.
+        if ($vorhanden !== null && $vorhanden['gueltig_bis'] !== null && $vorhanden['gueltig_bis'] >= $gueltigBis) {
+            $bisher = DateTimeImmutable::createFromFormat('!Y-m-d', (string) $vorhanden['gueltig_bis']);
+
+            Api::fehler(409, 'Du hast dafür schon einen Nachweis bis ' . $bisher->format('d.m.Y')
+                . '. Lade erst wieder einen hoch, wenn er länger gilt.');
         }
 
         $nachweise->anlegen($mitgliedId, $art, $gueltigBis, $quelle, $modell, $hinweis);

@@ -213,6 +213,215 @@ ON DUPLICATE KEY UPDATE
     `sortierung`       = VALUES(`sortierung`);
 
 
+-- =============================================================================
+-- Auslastung: die typische Kurve im Wochenverlauf
+--
+-- Erfundene Werte, siehe Kommentar bei der Tabelle in schema.sql. Grundmuster:
+-- werktags eine Morgenspitze vor der Arbeit, eine Mittagsdelle und eine grosse
+-- Abendspitze gegen 19 Uhr; am Wochenende ein spaeterer, breiterer Vormittag.
+-- Montag ist voller als der Rest, Freitag und Sonntag sind am ruhigsten.
+--
+-- ON DUPLICATE KEY UPDATE: seed.sql darf mehrfach laufen, ohne die Kurve zu
+-- verdoppeln oder mit einem Schluesselfehler abzubrechen.
+-- =============================================================================
+
+-- Montag
+INSERT INTO `auslastung_basis` (`wochentag`, `stunde`, `personen`) VALUES
+    (1, 0, 3),
+    (1, 1, 2),
+    (1, 2, 2),
+    (1, 3, 2),
+    (1, 4, 4),
+    (1, 5, 12),
+    (1, 6, 39),
+    (1, 7, 65),
+    (1, 8, 57),
+    (1, 9, 44),
+    (1, 10, 35),
+    (1, 11, 31),
+    (1, 12, 42),
+    (1, 13, 39),
+    (1, 14, 33),
+    (1, 15, 37),
+    (1, 16, 60),
+    (1, 17, 96),
+    (1, 18, 134),
+    (1, 19, 140),
+    (1, 20, 113),
+    (1, 21, 75),
+    (1, 22, 37),
+    (1, 23, 14)
+ON DUPLICATE KEY UPDATE `personen` = VALUES(`personen`);
+
+-- Dienstag
+INSERT INTO `auslastung_basis` (`wochentag`, `stunde`, `personen`) VALUES
+    (2, 0, 3),
+    (2, 1, 2),
+    (2, 2, 2),
+    (2, 3, 2),
+    (2, 4, 4),
+    (2, 5, 12),
+    (2, 6, 38),
+    (2, 7, 62),
+    (2, 8, 55),
+    (2, 9, 42),
+    (2, 10, 34),
+    (2, 11, 30),
+    (2, 12, 40),
+    (2, 13, 38),
+    (2, 14, 32),
+    (2, 15, 36),
+    (2, 16, 58),
+    (2, 17, 92),
+    (2, 18, 128),
+    (2, 19, 134),
+    (2, 20, 108),
+    (2, 21, 72),
+    (2, 22, 36),
+    (2, 23, 14)
+ON DUPLICATE KEY UPDATE `personen` = VALUES(`personen`);
+
+-- Mittwoch
+INSERT INTO `auslastung_basis` (`wochentag`, `stunde`, `personen`) VALUES
+    (3, 0, 2),
+    (3, 1, 1),
+    (3, 2, 1),
+    (3, 3, 1),
+    (3, 4, 3),
+    (3, 5, 11),
+    (3, 6, 37),
+    (3, 7, 60),
+    (3, 8, 53),
+    (3, 9, 41),
+    (3, 10, 33),
+    (3, 11, 29),
+    (3, 12, 39),
+    (3, 13, 37),
+    (3, 14, 31),
+    (3, 15, 35),
+    (3, 16, 56),
+    (3, 17, 90),
+    (3, 18, 125),
+    (3, 19, 131),
+    (3, 20, 105),
+    (3, 21, 70),
+    (3, 22, 35),
+    (3, 23, 13)
+ON DUPLICATE KEY UPDATE `personen` = VALUES(`personen`);
+
+-- Donnerstag
+INSERT INTO `auslastung_basis` (`wochentag`, `stunde`, `personen`) VALUES
+    (4, 0, 3),
+    (4, 1, 2),
+    (4, 2, 2),
+    (4, 3, 2),
+    (4, 4, 4),
+    (4, 5, 12),
+    (4, 6, 38),
+    (4, 7, 62),
+    (4, 8, 55),
+    (4, 9, 42),
+    (4, 10, 34),
+    (4, 11, 30),
+    (4, 12, 40),
+    (4, 13, 38),
+    (4, 14, 32),
+    (4, 15, 36),
+    (4, 16, 58),
+    (4, 17, 92),
+    (4, 18, 128),
+    (4, 19, 134),
+    (4, 20, 108),
+    (4, 21, 72),
+    (4, 22, 36),
+    (4, 23, 14)
+ON DUPLICATE KEY UPDATE `personen` = VALUES(`personen`);
+
+-- Freitag
+INSERT INTO `auslastung_basis` (`wochentag`, `stunde`, `personen`) VALUES
+    (5, 0, 2),
+    (5, 1, 1),
+    (5, 2, 1),
+    (5, 3, 1),
+    (5, 4, 3),
+    (5, 5, 9),
+    (5, 6, 31),
+    (5, 7, 50),
+    (5, 8, 45),
+    (5, 9, 34),
+    (5, 10, 27),
+    (5, 11, 24),
+    (5, 12, 32),
+    (5, 13, 31),
+    (5, 14, 26),
+    (5, 15, 29),
+    (5, 16, 47),
+    (5, 17, 75),
+    (5, 18, 104),
+    (5, 19, 109),
+    (5, 20, 88),
+    (5, 21, 59),
+    (5, 22, 29),
+    (5, 23, 11)
+ON DUPLICATE KEY UPDATE `personen` = VALUES(`personen`);
+
+-- Samstag
+INSERT INTO `auslastung_basis` (`wochentag`, `stunde`, `personen`) VALUES
+    (6, 0, 6),
+    (6, 1, 4),
+    (6, 2, 3),
+    (6, 3, 2),
+    (6, 4, 2),
+    (6, 5, 3),
+    (6, 6, 8),
+    (6, 7, 16),
+    (6, 8, 30),
+    (6, 9, 52),
+    (6, 10, 74),
+    (6, 11, 86),
+    (6, 12, 78),
+    (6, 13, 62),
+    (6, 14, 54),
+    (6, 15, 50),
+    (6, 16, 48),
+    (6, 17, 46),
+    (6, 18, 42),
+    (6, 19, 36),
+    (6, 20, 28),
+    (6, 21, 20),
+    (6, 22, 12),
+    (6, 23, 8)
+ON DUPLICATE KEY UPDATE `personen` = VALUES(`personen`);
+
+-- Sonntag
+INSERT INTO `auslastung_basis` (`wochentag`, `stunde`, `personen`) VALUES
+    (7, 0, 4),
+    (7, 1, 3),
+    (7, 2, 2),
+    (7, 3, 1),
+    (7, 4, 1),
+    (7, 5, 2),
+    (7, 6, 6),
+    (7, 7, 12),
+    (7, 8, 23),
+    (7, 9, 40),
+    (7, 10, 57),
+    (7, 11, 67),
+    (7, 12, 60),
+    (7, 13, 48),
+    (7, 14, 42),
+    (7, 15, 39),
+    (7, 16, 37),
+    (7, 17, 35),
+    (7, 18, 32),
+    (7, 19, 28),
+    (7, 20, 21),
+    (7, 21, 15),
+    (7, 22, 9),
+    (7, 23, 6)
+ON DUPLICATE KEY UPDATE `personen` = VALUES(`personen`);
+
+
 -- -----------------------------------------------------------------------------
 -- FEATURE TERMINKALENDER
 -- -----------------------------------------------------------------------------

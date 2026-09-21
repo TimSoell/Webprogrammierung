@@ -7,33 +7,47 @@
 ## Was kann man damit
 
 Ein zweites scrollgesteuertes Video, das einen Rundgang durch das Studio
-zeigt. Es liegt zwischen der Studio-Vorstellung und den Programmen. Technik
-und Bedienung sind identisch zum ersten Scroll-Video - es ist dieselbe
-Komponente, nur mit einer anderen Datei und mehr Scrollweg.
+zeigt. Es steht auf der **Locations-Seite unter der Karte**, zusammen mit
+einem Info-Abschnitt aus vier Kennzahlen.
+
+Der Gedanke dahinter: wer wissen will, wo ein Club ist, will meistens auch
+wissen, wie es drinnen aussieht. Auf der Startseite stand der Rundgang
+vorher zwischen Studio-Vorstellung und Programmen und hat den Erzaehlfaden
+unterbrochen.
+
+Technik und Bedienung sind identisch zum ersten Scroll-Video - es ist
+dieselbe Komponente, nur mit einer anderen Datei und mehr Scrollweg.
 
 ## Beteiligte Dateien
 
 | Schicht | Datei |
 |---|---|
-| 1 Seite | `index.php` (Abschnitt `.scroll-video--tour`) |
-| 2 Seitenskript | `assets/js/pages/index.page.js` |
+| 1 Seite | `locations.php` (Abschnitte `.studio-info` und `.scroll-video--tour`) |
+| 2 Seitenskript | `assets/js/pages/locations.page.js` |
 | 2 Komponente | `assets/js/components/scroll-video.js` (unveraendert mitbenutzt) |
 | CSS | `assets/css/components/scroll-video.css` (Variante `--tour`) |
+| CSS | `assets/css/components/studio-info.css` |
 | Mediendatei | `assets/img/studio-tour.mp4` |
+| Navigation | `partials/header.php` (Menuepunkt "Locations & Studio") |
 
 ## Warum keine eigene Komponente
 
 Das Verhalten ist zu 100 % dasselbe. `initScrollVideo()` nimmt einen
-Selektor entgegen, deshalb reicht ein zweiter Aufruf:
+Selektor entgegen, deshalb reicht ein Aufruf im Seitenskript der
+Locations-Seite:
 
 ```js
-initScrollVideo('[data-scroll-video]');
 initScrollVideo('[data-studio-tour]');
 ```
 
 Auch das CSS wird geteilt. Unterschiedlich ist nur die Abschnittshoehe, und
 die steht in einer Variante nach eurer Konvention mit zwei Bindestrichen:
 `.scroll-video--tour`.
+
+Der Info-Abschnitt darueber benutzt `.section-head` aus `section-head.css`
+und `.stats` aus `intro.css` mit. `studio-info.css` enthaelt nur die
+Abweichungen: kein Abstand nach unten, damit das Video buendig anschliesst,
+und vier statt drei Spalten fuer die Kennzahlen.
 
 ## Scrollweg berechnen
 

@@ -56,7 +56,7 @@ Einordnung, keine buchbare Kategorie.
 ## Wie Termine entstehen
 
 In der Datenbank stehen **Wochenmuster**, keine Einzeltermine — Begründung in
-[ADR-0013](../decisions/ADR-0013-terminkalender-wochenplan.md).
+[ADR-0014](../decisions/ADR-0014-terminkalender-wochenplan.md).
 
 | Tabelle | Beispielzeile | wird zu |
 |---|---|---|
@@ -190,7 +190,7 @@ Unter Windows mit vollem Pfad, siehe `README.md`.
 
 ## Was fehlt noch
 
-- Ausfälle an einzelnen Tagen („am 3. Oktober kein Kurs"), siehe ADR-0013.
+- Ausfälle an einzelnen Tagen („am 3. Oktober kein Kurs"), siehe ADR-0014.
 - Eine Warteliste für volle Termine.
 - Eine Grenze, wie viele Probetrainings ein Mitglied buchen darf. Aktuell
   beliebig viele.

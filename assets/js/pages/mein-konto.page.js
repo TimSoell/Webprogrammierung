@@ -2,14 +2,16 @@
  * @file        assets/js/pages/mein-konto.page.js
  * @layer       2 – Seitenskript
  * @description Lädt die Stammdaten, die gemerkte Programm-Auswahl, die
- *              laufende Mitgliedschaft und die Nachweise des
- *              angemeldeten Mitglieds in die Seite und meldet über den
- *              Button "Abmelden" ab.
+ *              laufende Mitgliedschaft, die Nachweise und die angekündigten
+ *              Besuche des angemeldeten Mitglieds in die Seite und meldet
+ *              über den Button "Abmelden" ab.
  * @see         mein-konto.php
  * @see         assets/js/services/mitglieder.js
  * @see         assets/js/services/auswahl.js
  * @see         assets/js/services/mitgliedschaften.js
  * @see         assets/js/components/meine-termine.js  (Karte "Meine Termine")
+ * @see         assets/js/components/ausweis-scan.js
+ * @see         assets/js/services/auslastung.js
  */
 
 import { $ } from '../lib/dom.js';
@@ -19,6 +21,8 @@ import { standLaden } from '../services/mitgliedschaften.js';
 import { alleLaden as nachweiseLaden, demoEintragen, hochladen } from '../services/nachweise.js';
 import { formularAbsenden, meldungZeigen } from '../components/auth-formular.js';
 import { meineTermineAufbauen } from '../components/meine-termine.js';
+import { scanStarten } from '../components/ausweis-scan.js';
+import { auslastungLaden, besuchEintragen, besuchEntfernen } from '../services/auslastung.js';
 
 const seite = $('#konto-seite');
 
@@ -26,6 +30,8 @@ if (seite) {
   const meldung = $('#konto-meldung');
   const liste = $('#auswahl-liste');
   const auswahlMeldung = $('#auswahl-meldung');
+  const besuchListe = $('#besuch-liste');
+  const besuchMeldung = $('#besuch-meldung');
   const baseUrl = document.documentElement.dataset.baseUrl ?? '/';
 
   /**
@@ -167,6 +173,16 @@ if (seite) {
   const nachweisArt = $('#nachweis-art');
 
   /**
+   * Bis wann je Art schon ein gültiger Nachweis vorliegt.
+   *
+   * Schlüssel ist die Art, Wert das Ablaufdatum - oder null für
+   * unbefristet. Fehlt die Art, gibt es keinen gültigen Nachweis.
+   *
+   * @type {Record<string, string|null>}
+   */
+  let vorhandeneNachweise = {};
+
+  /**
    * Zeichnet die Liste der Nachweise und schaltet das Formular zwischen
    * Bild- und Datumsfeld um.
    *
@@ -175,6 +191,23 @@ if (seite) {
    */
   function nachweiseZeigen(stand) {
     const heute = new Date().toISOString().slice(0, 10);
+
+    // Je Art den besten noch gültigen Nachweis merken: unbefristet schlägt
+    // befristet, sonst gewinnt der, der am längsten gilt. Dieselbe Regel
+    // wie in NachweisRepository::gueltigenFindenNachArt().
+    vorhandeneNachweise = {};
+    stand.nachweise.forEach((nachweis) => {
+      if (nachweis.gueltigBis !== null && nachweis.gueltigBis < heute) {
+        return;
+      }
+
+      const bisher = vorhandeneNachweise[nachweis.art];
+
+      if (!(nachweis.art in vorhandeneNachweise)
+        || (bisher !== null && (nachweis.gueltigBis === null || nachweis.gueltigBis > bisher))) {
+        vorhandeneNachweise[nachweis.art] = nachweis.gueltigBis;
+      }
+    });
 
     $('#nachweis-leer').hidden = stand.nachweise.length > 0;
     $('#nachweis-liste').replaceChildren(...stand.nachweise.map((nachweis) => {
@@ -198,6 +231,43 @@ if (seite) {
     // Ohne Schlüssel gibt es nichts auszulesen, dann wird das Datum getippt.
     $('#nachweis-bild-feld').hidden = !stand.kiVerfuegbar;
     $('#nachweis-datum-feld').hidden = stand.kiVerfuegbar;
+
+    vorhandenenHinweisZeigen();
+  }
+
+  /**
+   * Sagt unter der Auswahl, ob für die gewählte Art schon ein gültiger
+   * Nachweis vorliegt - und sperrt den Button, wo ein weiterer Upload
+   * nichts ändern kann.
+   *
+   * Das ist nur die Bequemlichkeit. Die verbindliche Prüfung steht in
+   * api/nachweise.php, sonst könnte man sie mit der Konsole umgehen.
+   *
+   * @returns {void}
+   */
+  function vorhandenenHinweisZeigen() {
+    const hinweis = $('#nachweis-vorhanden');
+    const button = $('#nachweis-form button[type="submit"]');
+    const art = nachweisArt.value;
+
+    if (!(art in vorhandeneNachweise)) {
+      hinweis.hidden = true;
+      button.disabled = false;
+
+      return;
+    }
+
+    const bis = vorhandeneNachweise[art];
+
+    // Unbefristet gibt es nur beim Senior. Da kann kein zweiter Ausweis
+    // etwas verbessern, also bleibt der Button gesperrt.
+    hinweis.textContent = bis === null
+      ? 'Diesen Nachweis hast du schon hinterlegt, er gilt unbefristet. Ein weiterer Upload ändert nichts.'
+      : `Du hast dafür schon einen Nachweis bis ${datumAnzeigen(bis)}. `
+        + 'Lade nur einen hoch, der länger gilt - oder wähle eine andere Art.';
+
+    hinweis.hidden = false;
+    button.disabled = bis === null;
   }
 
   // Beim Seniorennachweis wird nicht das Ablaufdatum gebraucht, sondern das
@@ -206,6 +276,8 @@ if (seite) {
     $('#nachweis-datum-label').textContent = nachweisArt.value === 'senior'
       ? 'Geburtsdatum'
       : 'Gültig bis';
+
+    vorhandenenHinweisZeigen();
   });
 
   $('#nachweis-form').addEventListener('submit', async (ereignis) => {
@@ -222,14 +294,133 @@ if (seite) {
     }
 
     await formularAbsenden(formular, nachweisMeldung, async () => {
-      const stand = mitBild
-        ? await hochladen(nachweisArt.value, datei)
-        : await demoEintragen(nachweisArt.value, $('#nachweis-datum').value);
+      // Die Animation gibt es nur beim Bild-Upload: Nur der dauert, weil das
+      // Foto geprueft werden muss. Im Demo-Modus ist die Antwort sofort da,
+      // da waere ein Scanner reine Behauptung.
+      const scan = mitBild ? scanStarten(datei) : null;
+
+      let stand;
+
+      try {
+        stand = mitBild
+          ? await hochladen(nachweisArt.value, datei)
+          : await demoEintragen(nachweisArt.value, $('#nachweis-datum').value);
+      } catch (fehler) {
+        // Weg mit dem Overlay, sonst liegt es ueber der Fehlermeldung.
+        // formularAbsenden faengt den Fehler und zeigt ihn im Formular an.
+        scan?.abbrechen();
+
+        throw fehler;
+      }
+
+      // Erst Haken und Konfetti zu Ende laufen lassen, dann die Seite
+      // aktualisieren - sonst sieht man das Ergebnis hinter dem Overlay.
+      await scan?.abschliessen();
 
       nachweiseZeigen(stand);
       formular.reset();
       meldungZeigen(nachweisMeldung, 'Nachweis gespeichert. Der Preis steht dir ab sofort offen.', true);
     });
+
+    // formularAbsenden() gibt den Button am Ende immer wieder frei. Wo er
+    // gesperrt bleiben soll, weil schon ein unbefristeter Nachweis vorliegt,
+    // muss das danach noch einmal gesetzt werden.
+    vorhandenenHinweisZeigen();
+  });
+
+  // --- Mein Besuch -----------------------------------------------------------
+
+  /**
+   * Macht aus '2026-09-21 18:00:00' die Anzeige '18:00'.
+   *
+   * Der Server schickt volle Zeitstempel. Für die Liste reicht die Uhrzeit,
+   * weil dort nur Besuche stehen, die noch bevorstehen.
+   *
+   * @param {string} zeitstempel  'YYYY-MM-DD HH:MM:SS'
+   * @returns {string}
+   */
+  const nurUhrzeit = (zeitstempel) => zeitstempel.slice(11, 16);
+
+  /**
+   * Baut eine Zeile der Besuchsliste.
+   *
+   * @param {{id: number, beginn: string, ende: string, art: string}} besuch
+   * @returns {HTMLLIElement}
+   */
+  const besuchZeile = (besuch) => {
+    const zeile = document.createElement('li');
+    zeile.className = 'besuch-eintrag';
+
+    const text = document.createElement('span');
+    text.textContent = besuch.art === 'jetzt'
+      ? `Eingecheckt, gezählt bis ${nurUhrzeit(besuch.ende)}`
+      : `Angekündigt für ${nurUhrzeit(besuch.beginn)} bis ${nurUhrzeit(besuch.ende)}`;
+
+    const knopf = document.createElement('button');
+    knopf.type = 'button';
+    knopf.className = 'besuch-entfernen';
+    knopf.textContent = 'Entfernen';
+    knopf.setAttribute('aria-label', `Besuch um ${nurUhrzeit(besuch.beginn)} entfernen`);
+
+    knopf.addEventListener('click', async () => {
+      try {
+        await besuchEntfernen(besuch.id);
+        await besucheAnzeigen();
+        meldungZeigen(besuchMeldung, 'Besuch entfernt.', true);
+      } catch (fehler) {
+        meldungZeigen(besuchMeldung, fehler.message);
+      }
+    });
+
+    zeile.append(text, knopf);
+
+    return zeile;
+  };
+
+  /**
+   * Lädt die offenen Besuche und schreibt sie in die Liste.
+   *
+   * @returns {Promise<void>}
+   */
+  async function besucheAnzeigen() {
+    const daten = await auslastungLaden();
+    const meine = daten.meine ?? [];
+
+    besuchListe.replaceChildren(...meine.map(besuchZeile));
+
+    if (meine.length === 0) {
+      const leer = document.createElement('li');
+      leer.className = 'besuch-leer';
+      leer.textContent = 'Kein Besuch eingetragen.';
+      besuchListe.append(leer);
+    }
+  }
+
+  $('#besuch-jetzt').addEventListener('click', async (event) => {
+    event.currentTarget.disabled = true;
+
+    try {
+      await besuchEintragen('jetzt');
+      await besucheAnzeigen();
+      meldungZeigen(besuchMeldung, 'Eingecheckt. Du zählst jetzt in die Auslastung.', true);
+    } catch (fehler) {
+      meldungZeigen(besuchMeldung, fehler.message);
+    } finally {
+      event.currentTarget.disabled = false;
+    }
+  });
+
+  $('#besuch-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    try {
+      await besuchEintragen('geplant', $('#besuch-zeit').value);
+      await besucheAnzeigen();
+      $('#besuch-form').reset();
+      meldungZeigen(besuchMeldung, 'Besuch eingetragen. Danke fürs Bescheidsagen.', true);
+    } catch (fehler) {
+      meldungZeigen(besuchMeldung, fehler.message);
+    }
   });
 
   $('#abmelden').addEventListener('click', async () => {
@@ -269,5 +460,11 @@ if (seite) {
     await auswahlAnzeigen();
   } catch (fehler) {
     meldungZeigen(auswahlMeldung, fehler.message);
+  }
+
+  try {
+    await besucheAnzeigen();
+  } catch (fehler) {
+    meldungZeigen(besuchMeldung, fehler.message);
   }
 }

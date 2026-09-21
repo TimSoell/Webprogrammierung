@@ -20,7 +20,7 @@
  *              Alle Zeiten sind Berliner Zeit. Die Datenbank speichert sie
  *              ohne Zeitzone, deshalb wird die Zone hier ausdrücklich gesetzt
  *              statt sich auf die php.ini zu verlassen.
- * @see         docs/decisions/ADR-0013-terminkalender-wochenplan.md
+ * @see         docs/decisions/ADR-0014-terminkalender-wochenplan.md
  * @see         api/kurstermine.php
  * @see         api/verfuegbarkeiten.php
  */

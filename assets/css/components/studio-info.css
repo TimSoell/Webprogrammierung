@@ -1,0 +1,43 @@
+/**
+ * @file        assets/css/components/studio-info.css
+ * @layer       Komponente
+ * @description Der Info-Abschnitt ueber dem Studio-Rundgang auf der
+ *              Locations-Seite: Ueberschrift, Einleitung und vier Kennzahlen.
+ *
+ *              Ueberschrift und Kennzahlen kommen aus vorhandenen Bausteinen
+ *              (section-head.css und die .stats aus intro.css). Hier steht
+ *              nur, was sich an dieser Stelle davon unterscheidet.
+ * @see         locations.php
+ * @see         assets/css/components/intro.css
+ */
+
+.studio-info {
+  /* Oben weniger Abstand: der Abschnitt schliesst direkt an die Karte an
+     und gehoert inhaltlich dazu. Unten gar keiner, weil darunter das
+     Video beginnt und jede Luecke dort als Bruch wirkt. */
+  padding: 0 0 96px;
+}
+
+/* .stats aus intro.css ist auf drei Kennzahlen ausgelegt, hier sind es
+   vier. Ohne diese Zeile bricht die vierte in eine eigene Reihe um. */
+.studio-info .stats {
+  margin-top: 54px;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 1000px) {
+  .studio-info .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 800px) {
+  .studio-info {
+    padding-bottom: 60px;
+  }
+
+  .studio-info .stats {
+    margin-top: 38px;
+    grid-template-columns: 1fr;
+  }
+}

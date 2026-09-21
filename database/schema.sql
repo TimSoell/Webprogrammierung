@@ -593,6 +593,91 @@ CREATE TABLE IF NOT EXISTS `nachweise` (
 
 
 -- -----------------------------------------------------------------------------
+-- auslastung_basis - die typische Auslastung im Wochenverlauf
+--
+-- Erfundene Werte. Ein echtes Studio wuerde sie aus Drehkreuzdaten gewinnen;
+-- fuer die Studienarbeit stehen sie in dieser Tabelle, damit die Vorhersage
+-- aus der Datenbank kommt und nicht aus dem Quelltext. Wer die Kurve aendern
+-- will, aendert seed.sql - kein PHP.
+--
+-- Eine Zeile je Wochentag und Stunde, also 7 x 24 = 168 Zeilen.
+--
+-- Siehe docs/decisions/ADR-0013-auslastung-und-besuche.md
+-- -----------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `auslastung_basis` (
+    `id`        INT UNSIGNED NOT NULL AUTO_INCREMENT,
+
+    -- 1 = Montag bis 7 = Sonntag, wie ISO-8601 und wie PHPs date('N').
+    -- Absichtlich nicht MySQLs DAYOFWEEK(), das faengt sonntags bei 1 an.
+    `wochentag` TINYINT UNSIGNED NOT NULL,
+
+    `stunde`    TINYINT UNSIGNED NOT NULL,
+
+    -- Wie viele Personen ueblicherweise zu dieser Zeit da sind.
+    `personen`  SMALLINT UNSIGNED NOT NULL,
+
+    PRIMARY KEY (`id`),
+
+    -- Je Wochentag und Stunde genau ein Wert. Verhindert, dass ein zweiter
+    -- Durchlauf von seed.sql die Kurve verdoppelt.
+    UNIQUE KEY `uniq_wochentag_stunde` (`wochentag`, `stunde`),
+
+    -- Wochentag 0 oder 8 waere ein Tippfehler, den sonst niemand bemerkt.
+    CONSTRAINT `chk_wochentag` CHECK (`wochentag` BETWEEN 1 AND 7),
+    CONSTRAINT `chk_stunde`    CHECK (`stunde`    BETWEEN 0 AND 23)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+
+-- -----------------------------------------------------------------------------
+-- besuche - angekuendigte und laufende Besuche der Mitglieder
+--
+-- EINE Tabelle fuer beide Faelle, die der Mitgliedsbereich anbietet:
+--
+--   "Ich bin jetzt da"   -> beginn = jetzt,          ende = jetzt + 90 Min
+--   "Ich komme um 18:00" -> beginn = heute 18:00,    ende = beginn + 90 Min
+--
+-- Der Unterschied liegt also nur im Startzeitpunkt, nicht in der Struktur.
+-- Dadurch braucht die Auslastung genau eine Abfrage: zaehle alle Zeilen,
+-- deren Zeitraum den gefragten Moment enthaelt. Begruendung und verworfene
+-- Alternativen in docs/decisions/ADR-0013-auslastung-und-besuche.md
+-- -----------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `besuche` (
+    `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+
+    -- Zeigt auf mitglieder.id, NICHT auf users.id - dieselbe Regel wie fuer
+    -- alle fachlichen Tabellen, siehe Kommentar bei mitglieder oben.
+    `mitglied_id` INT UNSIGNED NOT NULL,
+
+    `beginn`      DATETIME NOT NULL,
+    `ende`        DATETIME NOT NULL,
+
+    -- Nur fuer die Anzeige im Mitgliedsbereich ("jetzt eingecheckt" gegenueber
+    -- "fuer 18:00 angekuendigt"). Fuer die Zaehlung spielt es keine Rolle.
+    `art`         ENUM('jetzt', 'geplant') NOT NULL,
+
+    `erstellt_am` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (`id`),
+
+    -- Die Auslastungsabfrage sucht ueber beginn und ende. Ohne diesen
+    -- Schluessel liest sie bei jedem Aufruf die ganze Tabelle.
+    KEY `idx_zeitraum` (`beginn`, `ende`),
+
+    KEY `idx_mitglied` (`mitglied_id`),
+
+    CONSTRAINT `fk_besuche_mitglied`
+        FOREIGN KEY (`mitglied_id`) REFERENCES `mitglieder` (`id`)
+        ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+
+-- -----------------------------------------------------------------------------
 -- FEATURE TERMINKALENDER - Kurstermine und ihre Buchungen
 -- -----------------------------------------------------------------------------
 -- Kurstermine sind ein WOCHENPLAN, keine Liste fester Daten: "Move, Small
@@ -603,7 +688,7 @@ CREATE TABLE IF NOT EXISTS `nachweise` (
 -- Gebucht wird dagegen ein KONKRETER Tag: kursbuchungen hat deshalb neben
 -- dem Wochenplan-Eintrag ein Datum.
 --
--- Siehe docs/decisions/ADR-0013-terminkalender-wochenplan.md
+-- Siehe docs/decisions/ADR-0014-terminkalender-wochenplan.md
 -- -----------------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS `kurstermine` (

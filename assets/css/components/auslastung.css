@@ -1,0 +1,253 @@
+/**
+ * @file        assets/css/components/auslastung.css
+ * @layer       Komponente
+ * @description Das Auslastungsdiagramm auf der Startseite und die Karte
+ *              "Mein Besuch" im Mitgliedsbereich.
+ *
+ *              Beides steht hier zusammen, weil es dieselbe Ampel benutzt:
+ *              die Stufen "entspannt", "gut besucht" und "voll" kommen vom
+ *              Server und werden über [data-stufe] eingefaerbt.
+ * @see         index.php
+ * @see         mein-konto.php
+ * @see         assets/js/components/auslastung-diagramm.js
+ */
+
+.auslastung {
+  background: var(--ink-soft);
+}
+
+/* --- Die aktuelle Zahl ---------------------------------------------------- */
+
+.auslastung-jetzt {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin: 44px 0 26px;
+}
+
+.auslastung-stufe {
+  margin: 0;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+/* Die Ampel. Die Kennung setzt das Seitenskript aus der Server-Antwort,
+   damit Startseite und Mitgliedsbereich nie unterschiedlich einstufen. */
+.auslastung-stufe[data-stufe="entspannt"] {
+  background: var(--lime);
+  color: var(--ink);
+}
+
+.auslastung-stufe[data-stufe="gut besucht"] {
+  background: #f0b429;
+  color: var(--ink);
+}
+
+.auslastung-stufe[data-stufe="voll"] {
+  background: var(--danger);
+  color: var(--paper);
+}
+
+.auslastung-zahl {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 0;
+}
+
+.auslastung-zahl strong {
+  color: var(--paper);
+  font: 700 2.6rem/1 var(--display);
+}
+
+.auslastung-zahl span {
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+/* --- Das Diagramm --------------------------------------------------------- */
+
+.auslastung-diagramm {
+  /* Platzhalterhoehe, solange das SVG noch nicht da ist. Ohne sie springt
+     der Rest der Seite nach unten, sobald die Antwort eintrifft. */
+  min-height: 240px;
+}
+
+.auslastung-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Der untere Teil jedes Balkens: die typische Auslastung aus der Datenbank. */
+.auslastung-balken {
+  fill: #3a423d;
+}
+
+.auslastung-balken--jetzt {
+  fill: #58635b;
+}
+
+/* Der obere Teil: angekuendigte Besuche. Bewusst die Markenfarbe - das ist
+   der Teil, der bei der Vorfuehrung waechst. */
+.auslastung-balken-gebucht {
+  fill: var(--lime);
+}
+
+.auslastung-kapazitaet {
+  stroke: rgba(240, 239, 233, .28);
+  stroke-dasharray: 4 4;
+  stroke-width: 1;
+}
+
+.auslastung-kapazitaet-text,
+.auslastung-stunde {
+  fill: var(--muted);
+  font-family: var(--body);
+  font-size: 11px;
+}
+
+.auslastung-stunde--jetzt {
+  fill: var(--lime);
+  font-weight: 700;
+}
+
+.auslastung-meldung {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+.auslastung-meldung:empty {
+  display: none;
+}
+
+/* --- Legende -------------------------------------------------------------- */
+
+.auslastung-legende {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 26px;
+  margin: 18px 0 0;
+  padding: 0;
+  color: var(--muted);
+  font-size: .76rem;
+  list-style: none;
+}
+
+.auslastung-legende li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auslastung-punkt {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.auslastung-punkt--basis {
+  background: #3a423d;
+}
+
+.auslastung-punkt--gebucht {
+  background: var(--lime);
+}
+
+/* --- Karte "Mein Besuch" im Mitgliedsbereich ------------------------------ */
+
+.besuch-aktionen {
+  display: grid;
+  gap: 20px;
+  margin-top: 18px;
+}
+
+.besuch-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: .72rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.besuch-eingabe {
+  display: flex;
+  gap: 10px;
+}
+
+.besuch-zeit {
+  min-width: 0;
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--ink);
+  color: var(--paper);
+  font: inherit;
+  font-size: .9rem;
+}
+
+.besuch-zeit:focus-visible {
+  border-color: var(--lime);
+  outline: none;
+}
+
+.besuch-liste {
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.besuch-eintrag {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  font-size: .88rem;
+}
+
+.besuch-entfernen {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: .76rem;
+  text-decoration: underline;
+}
+
+.besuch-entfernen:hover {
+  color: var(--danger);
+}
+
+.besuch-leer {
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: .84rem;
+}
+
+@media (max-width: 800px) {
+  .auslastung-jetzt {
+    margin-top: 30px;
+  }
+
+  .auslastung-zahl strong {
+    font-size: 2rem;
+  }
+
+  .besuch-eingabe {
+    flex-direction: column;
+  }
+}

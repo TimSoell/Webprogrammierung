@@ -74,6 +74,36 @@ final class NachweisRepository
     }
 
     /**
+     * Sucht den besten noch gültigen Nachweis EINER bestimmten Art.
+     *
+     * Der Unterschied zu gueltigenFinden(): Dort geht es um eine Preisgruppe
+     * ('ermaessigt' umfasst Schüler und Studierende), hier um genau eine Art.
+     * Gebraucht wird das beim Hochladen - ein zweiter Nachweis derselben Art
+     * lohnt nur, wenn er länger gilt als der vorhandene.
+     *
+     * @param int    $mitgliedId  mitglieder.id, NICHT users.id
+     * @param string $art         'schueler', 'student' oder 'senior'
+     * @return array<string, mixed>|null  null, wenn es keinen gültigen gibt
+     */
+    public function gueltigenFindenNachArt(int $mitgliedId, string $art): ?array
+    {
+        $stmt = Database::connection()->prepare(
+            'SELECT art, gueltig_bis, quelle, hinweis, geprueft_am
+               FROM nachweise
+              WHERE mitglied_id = ?
+                AND art = ?
+                AND (gueltig_bis IS NULL OR gueltig_bis >= CURDATE())
+              ORDER BY gueltig_bis IS NULL DESC, gueltig_bis DESC
+              LIMIT 1'
+        );
+        $stmt->execute([$mitgliedId, $art]);
+
+        // Gleiche Sortierung wie oben: unbefristet schlägt befristet, sonst
+        // gewinnt der, der am längsten gilt.
+        return $stmt->fetch() ?: null;
+    }
+
+    /**
      * Liefert alle Nachweise eines Mitglieds, neueste zuerst.
      *
      * Auch abgelaufene: Im Konto soll sichtbar sein, dass ein Nachweis

@@ -3,9 +3,12 @@
  * @file        locations.php
  * @layer       1 – Seite
  * @description Standortübersicht mit interaktiver Leaflet-Karte für die vier
- *              SCHWITZKASTEN Athletic Club Locations.
+ *              SCHWITZKASTEN Athletic Club Locations. Darunter folgen ein
+ *              Info-Abschnitt und der scrollgesteuerte Studio-Rundgang.
  * @see         assets/js/pages/locations.page.js
  * @see         assets/css/components/locations.css
+ * @see         assets/css/components/studio-info.css
+ * @see         docs/features/studiotour.md
  */
 
 declare(strict_types=1);
@@ -48,6 +51,42 @@ require ROOT_PATH . '/partials/header.php';
           </div>
 
           <div class="locations-list" id="locations-list" aria-label="Standortliste"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="studio-info" aria-labelledby="studio-heading">
+      <div class="wrap">
+        <div class="section-head locations-section-head">
+          <div>
+            <p class="eyebrow">Rundgang</p>
+            <h2 class="display section-title" id="studio-heading">So sieht es<br>drinnen aus.</h2>
+          </div>
+          <p class="section-lead">Alle vier Clubs sind nach demselben Prinzip aufgebaut: vier Zonen, kurze Wege, keine Wartezeiten an den Geräten. Scrolle durch den Rundgang und sieh dich um.</p>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><strong>1.200</strong><span>Quadratmeter Trainingsfläche</span></div>
+          <div class="stat"><strong>04</strong><span>Zonen: Strength, Move, Fight, Recovery</span></div>
+          <div class="stat"><strong>24/7</strong><span>Zugang für Mitglieder</span></div>
+          <div class="stat"><strong>120</strong><span>Geräte und Trainingsstationen</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="scroll-video scroll-video--tour" data-studio-tour aria-label="Rundgang durch das Studio">
+      <div class="scroll-video-sticky">
+        <video muted playsinline preload="auto" aria-label="Rundgang durch den SCHWITZKASTEN Athletic Club">
+          <source src="<?= e(BASE_URL) ?>assets/img/studio-tour.mp4" type="video/mp4">
+          Dein Browser kann dieses Video nicht anzeigen.
+        </video>
+        <div class="scroll-video-overlay">
+          <div class="wrap">
+            <div class="scroll-video-copy">
+              <p class="eyebrow">Jede Zone, ein Zweck</p>
+              <h2>Dein<br><span>Revier.</span></h2>
+            </div>
+          </div>
         </div>
       </div>
     </section>
