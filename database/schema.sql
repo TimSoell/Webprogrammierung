@@ -34,11 +34,11 @@
 -- schnell "Krafttraining fÃ¼r dich".
 --
 -- Der Name muss zu 'name' in config/config.php passen.
-CREATE DATABASE IF NOT EXISTS `baseline`
+CREATE DATABASE IF NOT EXISTS `schwitzkasten`
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
-USE `baseline`;
+USE `schwitzkasten`;
 
 
 -- -----------------------------------------------------------------------------
