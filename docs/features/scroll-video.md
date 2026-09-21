@@ -61,7 +61,7 @@ JavaScript.
 | Codec | H.264 (`avc1`) | H.265/HEVC spielt Firefox gar nicht ab |
 | Keyframes | **jedes Bild** (`-g 1`) | Sonst rechnet der Decoder bei jedem Sprung vom letzten Keyframe an neu — die Hauptursache fuer Ruckeln |
 | `faststart` | ja | Sonst stehen Dauer und Metadaten erst nach dem vollstaendigen Download fest |
-| Laenge | 4–6 Sekunden | Laenger heisst bei „jedes Bild ein Keyframe" sehr grosse Dateien |
+| Laenge | hoechstens rund 6 Sekunden | Laenger heisst bei „jedes Bild ein Keyframe" sehr grosse Dateien |
 | Groesse | moeglichst unter 3 MB | Die Datei muss vor dem Scrollen komplett geladen sein |
 | Bildrate | 24–25 fps | Mehr Bilder bringen beim Scrubben nichts, kosten aber Dateigroesse |
 
@@ -86,10 +86,13 @@ ffmpeg -i original.mp4 -an -vf "scale=1280:-2,fps=25" -c:v libx264 -profile:v hi
 | `+faststart` | Metadaten an den Dateianfang |
 
 Die aktuelle Datei ist mit denselben Einstellungen entstanden, aber ohne
-ffmpeg: ueber AVFoundation, die Videobibliothek von macOS. Ergebnis:
-H.264 High, 1280×720, 24 fps, 121 Bilder, jedes davon ein Keyframe, ohne
-Tonspur, Metadaten am Dateianfang, 1,96 MB. Ein Sprung dauert damit an jeder
-Stelle des Videos rund 3 ms, vorher waren es je nach Position bis zu 44 ms.
+ffmpeg: ueber AVFoundation, die Videobibliothek von macOS. Sie enthaelt nur
+das letzte Viertel des Originals (Commit `214e1e9`), also Bild 91 bis 120
+bzw. 3,79 s bis 5,04 s, in normaler Geschwindigkeit. Ergebnis: H.264 High,
+1280×720, 24 fps, 30 Bilder, 1,25 s, jedes Bild ein Keyframe, ohne Tonspur,
+Metadaten am Dateianfang, 0,49 MB. Ein Sprung dauert damit an jeder Stelle
+des Videos rund 3 ms, mit dem Original waren es je nach Position bis zu
+44 ms.
 
 Danach pruefen, ob die Datei klein genug geworden ist:
 
