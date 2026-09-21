@@ -70,7 +70,7 @@ Login braucht es sie:
 In XAMPP **MySQL** starten. Für phpMyAdmin zusätzlich **Apache** — das
 Startskript ersetzt Apache nur für die Projektseite, nicht für phpMyAdmin.
 Dann `http://localhost/phpmyadmin` öffnen und unter *Importieren* die Datei
-`database/schema.sql` einspielen. Sie legt die Datenbank `baseline` samt
+`database/schema.sql` einspielen. Sie legt die Datenbank `schwitzkasten` samt
 Tabellen an und darf beliebig oft eingespielt werden.
 
 ---

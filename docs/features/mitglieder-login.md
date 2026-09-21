@@ -77,7 +77,7 @@ entfernt die Bibliothek vor dem Speichern, deshalb prüfen beide Seiten ohne sie
 ## Woher kommen die Daten aktuell
 
 **MySQL.** Vor dem ersten Test `database/schema.sql` einspielen (legt die
-Datenbank `baseline` samt Tabellen an). Testkonten legt man über die
+Datenbank `schwitzkasten` samt Tabellen an). Testkonten legt man über die
 Registrierung an, `seed.sql` darf keine Passwörter enthalten.
 
 ## Demo-Modus für „Passwort vergessen“
