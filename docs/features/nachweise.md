@@ -26,6 +26,23 @@ des Features.
 | Schüler- und Studierendenausweis | gilt bis zum aufgedruckten Ablaufdatum |
 | Senior | ab 65 Jahren, gilt unbefristet |
 | Standardpreis | braucht nie einen Nachweis |
+| Zweiter Nachweis derselben Art | nur, wenn er **länger** gilt als der vorhandene |
+| Zweiter Seniorennachweis | gar nicht - der erste gilt unbefristet |
+
+Denselben Ausweis zweimal hochzuladen ergab früher zwei gleiche Einträge in
+der Liste. Das lehnt `api/nachweise.php` jetzt mit **409** ab: Ein weiterer
+Nachweis derselben Art wird nur gespeichert, wenn sein Ablaufdatum nach dem
+des vorhandenen liegt. Eine andere Art bleibt jederzeit möglich — wer einen
+Studierendenausweis hinterlegt hat, kann weiterhin einen Seniorennachweis
+nachreichen.
+
+Beim Senior greift die Sperre schon, **bevor** das Bild an die Prüfung geht:
+Ein unbefristeter Nachweis lässt sich durch nichts verbessern, also wird kein
+Kontingent der kostenlosen Stufe dafür verbraucht.
+
+Im Konto steht der Hinweis unter der Auswahl, sobald für die gewählte Art
+schon etwas vorliegt. Beim Senior ist der Button zusätzlich gesperrt. Das ist
+Bequemlichkeit, keine Absicherung — verbindlich prüft der Endpunkt.
 
 **Läuft ein Nachweis ab, wird der Vertrag zum nächsten Monatsersten auf den
 Standardpreis gestellt** — nach derselben Regel wie jeder Tarifwechsel
@@ -81,19 +98,45 @@ Dass er unsicher ist — jede Person kann sich ihr Datum aussuchen — ist der
 Grund, warum er **nur** ohne hinterlegten Schlüssel greift und warum
 `quelle` das in der Datenbank festhält.
 
+## Was man während der Prüfung sieht
+
+Die KI-Prüfung dauert spürbar - je nach Auslastung einige Sekunden. Damit in
+dieser Zeit nicht nur ein gesperrter Button zu sehen ist, legt sich eine
+Animation über die Seite: das gerade gewählte Foto, ein durchlaufender
+Scanstrahl, ein Fortschrittswert und am Ende ein Haken mit Konfetti.
+
+**Die Prozentzahl ist eine Schätzung, keine Messung.** Der Upload ist eine
+einzige Anfrage an `api/nachweise.php`; dabei entsteht kein Zwischenstand,
+den man anzeigen könnte. Der Wert wächst deshalb gebremst gegen 95 % und
+springt erst auf 100 %, wenn die Antwort wirklich da ist. Damit kann die
+Anzeige einen Abschluss nie vortäuschen - sie wirkt höchstens langsamer als
+die Wirklichkeit, nie schneller.
+
+**Das Bild verlässt den Browser nicht wegen der Animation.** Angezeigt wird
+es über eine lokale Objekt-URL aus der gewählten Datei, die beim Ausblenden
+wieder freigegeben wird. Die Zusagen im Abschnitt „Was gespeichert wird"
+gelten unverändert.
+
+Im Demo-Modus erscheint die Animation nicht: Dort ist die Antwort sofort da,
+ein Scanner wäre reine Behauptung.
+
+Wer im Betriebssystem „Bewegung reduzieren" eingestellt hat, bekommt
+dieselbe Anzeige ohne wanderndes Licht und ohne Konfetti.
+
 ## Beteiligte Dateien
 
 | Schicht | Datei |
 |---|---|
 | 1 Seite | `mein-konto.php`, `mitgliedschaft.php` |
 | 2 Seitenskript | `assets/js/pages/mein-konto.page.js`, `assets/js/pages/mitgliedschaft.page.js` |
+| 2 Komponente | `assets/js/components/ausweis-scan.js` (Animation während der Prüfung) |
 | Hilfsmittel | `assets/js/lib/bild.js` (verkleinert das Foto vor dem Upload) |
 | 3 Service | `assets/js/services/nachweise.js` |
 | 4 Endpunkt | `api/nachweise.php` |
 | Infrastruktur | `src/Ausweispruefung.php` (einzige Stelle mit einem KI-Aufruf) |
 | 5 Repository | `src/Repositories/NachweisRepository.php` |
 | 6 Tabelle | `nachweise` in `database/schema.sql` |
-| CSS | `assets/css/components/auth.css`, `assets/css/components/tarifkarte.css` |
+| CSS | `assets/css/components/auth.css`, `assets/css/components/tarifkarte.css`, `assets/css/components/ausweis-scan.css` |
 
 ## Datenform
 
@@ -118,6 +161,7 @@ Grund, warum er **nur** ohne hinterlegten Schlüssel greift und warum
 | Methode | Pfad | Zweck | Antwort |
 |---|---|---|---|
 | GET | `api/nachweise.php` | eigene Nachweise, auch abgelaufene | Nachweisstand |
+| POST | `api/nachweise.php` | prüfen und speichern | Nachweisstand, 201 — **409**, wenn schon ein gleich guter Nachweis dieser Art vorliegt |
 | POST | `api/nachweise.php` | Bild prüfen lassen bzw. Datum eintragen | 201, Nachweisstand |
 
 Fehlerfälle des POST, alle mit deutscher Meldung für das Formular:

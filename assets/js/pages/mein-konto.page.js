@@ -9,6 +9,7 @@
  * @see         assets/js/services/mitglieder.js
  * @see         assets/js/services/auswahl.js
  * @see         assets/js/services/mitgliedschaften.js
+ * @see         assets/js/components/ausweis-scan.js
  */
 
 import { $ } from '../lib/dom.js';
@@ -17,6 +18,7 @@ import { auswahlEntfernen, meineAuswahlLaden } from '../services/auswahl.js';
 import { standLaden } from '../services/mitgliedschaften.js';
 import { alleLaden as nachweiseLaden, demoEintragen, hochladen } from '../services/nachweise.js';
 import { formularAbsenden, meldungZeigen } from '../components/auth-formular.js';
+import { scanStarten } from '../components/ausweis-scan.js';
 
 const seite = $('#konto-seite');
 
@@ -165,6 +167,16 @@ if (seite) {
   const nachweisArt = $('#nachweis-art');
 
   /**
+   * Bis wann je Art schon ein gültiger Nachweis vorliegt.
+   *
+   * Schlüssel ist die Art, Wert das Ablaufdatum - oder null für
+   * unbefristet. Fehlt die Art, gibt es keinen gültigen Nachweis.
+   *
+   * @type {Record<string, string|null>}
+   */
+  let vorhandeneNachweise = {};
+
+  /**
    * Zeichnet die Liste der Nachweise und schaltet das Formular zwischen
    * Bild- und Datumsfeld um.
    *
@@ -173,6 +185,23 @@ if (seite) {
    */
   function nachweiseZeigen(stand) {
     const heute = new Date().toISOString().slice(0, 10);
+
+    // Je Art den besten noch gültigen Nachweis merken: unbefristet schlägt
+    // befristet, sonst gewinnt der, der am längsten gilt. Dieselbe Regel
+    // wie in NachweisRepository::gueltigenFindenNachArt().
+    vorhandeneNachweise = {};
+    stand.nachweise.forEach((nachweis) => {
+      if (nachweis.gueltigBis !== null && nachweis.gueltigBis < heute) {
+        return;
+      }
+
+      const bisher = vorhandeneNachweise[nachweis.art];
+
+      if (!(nachweis.art in vorhandeneNachweise)
+        || (bisher !== null && (nachweis.gueltigBis === null || nachweis.gueltigBis > bisher))) {
+        vorhandeneNachweise[nachweis.art] = nachweis.gueltigBis;
+      }
+    });
 
     $('#nachweis-leer').hidden = stand.nachweise.length > 0;
     $('#nachweis-liste').replaceChildren(...stand.nachweise.map((nachweis) => {
@@ -196,6 +225,43 @@ if (seite) {
     // Ohne Schlüssel gibt es nichts auszulesen, dann wird das Datum getippt.
     $('#nachweis-bild-feld').hidden = !stand.kiVerfuegbar;
     $('#nachweis-datum-feld').hidden = stand.kiVerfuegbar;
+
+    vorhandenenHinweisZeigen();
+  }
+
+  /**
+   * Sagt unter der Auswahl, ob für die gewählte Art schon ein gültiger
+   * Nachweis vorliegt - und sperrt den Button, wo ein weiterer Upload
+   * nichts ändern kann.
+   *
+   * Das ist nur die Bequemlichkeit. Die verbindliche Prüfung steht in
+   * api/nachweise.php, sonst könnte man sie mit der Konsole umgehen.
+   *
+   * @returns {void}
+   */
+  function vorhandenenHinweisZeigen() {
+    const hinweis = $('#nachweis-vorhanden');
+    const button = $('#nachweis-form button[type="submit"]');
+    const art = nachweisArt.value;
+
+    if (!(art in vorhandeneNachweise)) {
+      hinweis.hidden = true;
+      button.disabled = false;
+
+      return;
+    }
+
+    const bis = vorhandeneNachweise[art];
+
+    // Unbefristet gibt es nur beim Senior. Da kann kein zweiter Ausweis
+    // etwas verbessern, also bleibt der Button gesperrt.
+    hinweis.textContent = bis === null
+      ? 'Diesen Nachweis hast du schon hinterlegt, er gilt unbefristet. Ein weiterer Upload ändert nichts.'
+      : `Du hast dafür schon einen Nachweis bis ${datumAnzeigen(bis)}. `
+        + 'Lade nur einen hoch, der länger gilt - oder wähle eine andere Art.';
+
+    hinweis.hidden = false;
+    button.disabled = bis === null;
   }
 
   // Beim Seniorennachweis wird nicht das Ablaufdatum gebraucht, sondern das
@@ -204,6 +270,8 @@ if (seite) {
     $('#nachweis-datum-label').textContent = nachweisArt.value === 'senior'
       ? 'Geburtsdatum'
       : 'Gültig bis';
+
+    vorhandenenHinweisZeigen();
   });
 
   $('#nachweis-form').addEventListener('submit', async (ereignis) => {
@@ -220,14 +288,38 @@ if (seite) {
     }
 
     await formularAbsenden(formular, nachweisMeldung, async () => {
-      const stand = mitBild
-        ? await hochladen(nachweisArt.value, datei)
-        : await demoEintragen(nachweisArt.value, $('#nachweis-datum').value);
+      // Die Animation gibt es nur beim Bild-Upload: Nur der dauert, weil das
+      // Foto geprueft werden muss. Im Demo-Modus ist die Antwort sofort da,
+      // da waere ein Scanner reine Behauptung.
+      const scan = mitBild ? scanStarten(datei) : null;
+
+      let stand;
+
+      try {
+        stand = mitBild
+          ? await hochladen(nachweisArt.value, datei)
+          : await demoEintragen(nachweisArt.value, $('#nachweis-datum').value);
+      } catch (fehler) {
+        // Weg mit dem Overlay, sonst liegt es ueber der Fehlermeldung.
+        // formularAbsenden faengt den Fehler und zeigt ihn im Formular an.
+        scan?.abbrechen();
+
+        throw fehler;
+      }
+
+      // Erst Haken und Konfetti zu Ende laufen lassen, dann die Seite
+      // aktualisieren - sonst sieht man das Ergebnis hinter dem Overlay.
+      await scan?.abschliessen();
 
       nachweiseZeigen(stand);
       formular.reset();
       meldungZeigen(nachweisMeldung, 'Nachweis gespeichert. Der Preis steht dir ab sofort offen.', true);
     });
+
+    // formularAbsenden() gibt den Button am Ende immer wieder frei. Wo er
+    // gesperrt bleiben soll, weil schon ein unbefristeter Nachweis vorliegt,
+    // muss das danach noch einmal gesetzt werden.
+    vorhandenenHinweisZeigen();
   });
 
   $('#abmelden').addEventListener('click', async () => {
