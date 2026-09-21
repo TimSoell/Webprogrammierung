@@ -2,14 +2,15 @@
  * @file        assets/js/pages/mein-konto.page.js
  * @layer       2 – Seitenskript
  * @description Lädt die Stammdaten, die gemerkte Programm-Auswahl, die
- *              laufende Mitgliedschaft und die Nachweise des
- *              angemeldeten Mitglieds in die Seite und meldet über den
- *              Button "Abmelden" ab.
+ *              laufende Mitgliedschaft, die Nachweise und die angekündigten
+ *              Besuche des angemeldeten Mitglieds in die Seite und meldet
+ *              über den Button "Abmelden" ab.
  * @see         mein-konto.php
  * @see         assets/js/services/mitglieder.js
  * @see         assets/js/services/auswahl.js
  * @see         assets/js/services/mitgliedschaften.js
  * @see         assets/js/components/ausweis-scan.js
+ * @see         assets/js/services/auslastung.js
  */
 
 import { $ } from '../lib/dom.js';
@@ -19,6 +20,7 @@ import { standLaden } from '../services/mitgliedschaften.js';
 import { alleLaden as nachweiseLaden, demoEintragen, hochladen } from '../services/nachweise.js';
 import { formularAbsenden, meldungZeigen } from '../components/auth-formular.js';
 import { scanStarten } from '../components/ausweis-scan.js';
+import { auslastungLaden, besuchEintragen, besuchEntfernen } from '../services/auslastung.js';
 
 const seite = $('#konto-seite');
 
@@ -26,6 +28,8 @@ if (seite) {
   const meldung = $('#konto-meldung');
   const liste = $('#auswahl-liste');
   const auswahlMeldung = $('#auswahl-meldung');
+  const besuchListe = $('#besuch-liste');
+  const besuchMeldung = $('#besuch-meldung');
   const baseUrl = document.documentElement.dataset.baseUrl ?? '/';
 
   /**
@@ -322,6 +326,101 @@ if (seite) {
     vorhandenenHinweisZeigen();
   });
 
+  // --- Mein Besuch -----------------------------------------------------------
+
+  /**
+   * Macht aus '2026-09-21 18:00:00' die Anzeige '18:00'.
+   *
+   * Der Server schickt volle Zeitstempel. Für die Liste reicht die Uhrzeit,
+   * weil dort nur Besuche stehen, die noch bevorstehen.
+   *
+   * @param {string} zeitstempel  'YYYY-MM-DD HH:MM:SS'
+   * @returns {string}
+   */
+  const nurUhrzeit = (zeitstempel) => zeitstempel.slice(11, 16);
+
+  /**
+   * Baut eine Zeile der Besuchsliste.
+   *
+   * @param {{id: number, beginn: string, ende: string, art: string}} besuch
+   * @returns {HTMLLIElement}
+   */
+  const besuchZeile = (besuch) => {
+    const zeile = document.createElement('li');
+    zeile.className = 'besuch-eintrag';
+
+    const text = document.createElement('span');
+    text.textContent = besuch.art === 'jetzt'
+      ? `Eingecheckt, gezählt bis ${nurUhrzeit(besuch.ende)}`
+      : `Angekündigt für ${nurUhrzeit(besuch.beginn)} bis ${nurUhrzeit(besuch.ende)}`;
+
+    const knopf = document.createElement('button');
+    knopf.type = 'button';
+    knopf.className = 'besuch-entfernen';
+    knopf.textContent = 'Entfernen';
+    knopf.setAttribute('aria-label', `Besuch um ${nurUhrzeit(besuch.beginn)} entfernen`);
+
+    knopf.addEventListener('click', async () => {
+      try {
+        await besuchEntfernen(besuch.id);
+        await besucheAnzeigen();
+        meldungZeigen(besuchMeldung, 'Besuch entfernt.', true);
+      } catch (fehler) {
+        meldungZeigen(besuchMeldung, fehler.message);
+      }
+    });
+
+    zeile.append(text, knopf);
+
+    return zeile;
+  };
+
+  /**
+   * Lädt die offenen Besuche und schreibt sie in die Liste.
+   *
+   * @returns {Promise<void>}
+   */
+  async function besucheAnzeigen() {
+    const daten = await auslastungLaden();
+    const meine = daten.meine ?? [];
+
+    besuchListe.replaceChildren(...meine.map(besuchZeile));
+
+    if (meine.length === 0) {
+      const leer = document.createElement('li');
+      leer.className = 'besuch-leer';
+      leer.textContent = 'Kein Besuch eingetragen.';
+      besuchListe.append(leer);
+    }
+  }
+
+  $('#besuch-jetzt').addEventListener('click', async (event) => {
+    event.currentTarget.disabled = true;
+
+    try {
+      await besuchEintragen('jetzt');
+      await besucheAnzeigen();
+      meldungZeigen(besuchMeldung, 'Eingecheckt. Du zählst jetzt in die Auslastung.', true);
+    } catch (fehler) {
+      meldungZeigen(besuchMeldung, fehler.message);
+    } finally {
+      event.currentTarget.disabled = false;
+    }
+  });
+
+  $('#besuch-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    try {
+      await besuchEintragen('geplant', $('#besuch-zeit').value);
+      await besucheAnzeigen();
+      $('#besuch-form').reset();
+      meldungZeigen(besuchMeldung, 'Besuch eingetragen. Danke fürs Bescheidsagen.', true);
+    } catch (fehler) {
+      meldungZeigen(besuchMeldung, fehler.message);
+    }
+  });
+
   $('#abmelden').addEventListener('click', async () => {
     try {
       await abmelden();
@@ -356,5 +455,11 @@ if (seite) {
     await auswahlAnzeigen();
   } catch (fehler) {
     meldungZeigen(auswahlMeldung, fehler.message);
+  }
+
+  try {
+    await besucheAnzeigen();
+  } catch (fehler) {
+    meldungZeigen(besuchMeldung, fehler.message);
   }
 }
