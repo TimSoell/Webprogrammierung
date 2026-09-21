@@ -91,6 +91,15 @@
   grid-template-columns: 1fr 1fr;
 }
 
+/* 03-layout.css gibt JEDEM <section> 118px Innenabstand oben und unten.
+   Die linke Spalte ist ein <section>, die rechte ein <aside> - dadurch
+   begann der Text links 118px tiefer als der gelbe Kasten rechts. Hier
+   zurückgesetzt, damit beide Spalten oben auf einer Linie anfangen.
+   Den Abstand zum Seitenrand liefert .program-main. */
+.program-layout > section {
+  padding: 0;
+}
+
 .program-heading {
   margin: 0 0 18px;
   font: 800 clamp(2.9rem, 6vw, 5.6rem)/.85 var(--display);
@@ -102,33 +111,18 @@
   line-height: 1.65;
 }
 
-/* Gleiche Technik wie bei .stats: Linien durch gap auf eingefärbtem Raster. */
-.attributes {
+/* Die aufklappbaren Blöcke darunter stehen in components/merkmale.css. */
+
+/* --- Rechte Spalte -------------------------------------------------------- */
+/* Hinweiskasten und Coaches untereinander. Ohne diesen Rahmen würde der gelbe
+   Kasten allein die ganze Spaltenhöhe füllen - genau die große leere Fläche,
+   die es vorher gab. align-content hält beide oben zusammen. */
+.program-aside {
   display: grid;
-  gap: 1px;
-  margin-top: 35px;
-  background: var(--line);
+  align-content: start;
+  gap: 24px;
 }
 
-.attribute {
-  padding: 20px;
-  background: var(--ink);
-}
-
-.attribute strong {
-  display: block;
-  margin-bottom: 5px;
-  color: var(--lime);
-  font: 700 1.55rem var(--display);
-  text-transform: uppercase;
-}
-
-.attribute span {
-  color: var(--muted);
-  font-size: .84rem;
-}
-
-/* --- Hinweiskasten -------------------------------------------------------- */
 .schedule {
   padding: 28px;
   background: var(--lime);

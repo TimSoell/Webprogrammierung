@@ -32,5 +32,8 @@
 @import "components/join.css";
 @import "components/modal.css";
 @import "components/program-page.css";
+@import "components/merkmale.css";
+@import "components/coach-karte.css";
 @import "components/auth.css";
+@import "components/auswahl-liste.css";
 @import "components/locations.css";

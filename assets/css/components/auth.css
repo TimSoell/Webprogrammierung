@@ -39,10 +39,25 @@
 }
 
 /* --- Karte ----------------------------------------------------------------- */
+/* Mehrere Karten untereinander in der rechten Spalte. Ohne diesen Rahmen
+   landet die zweite Karte im Raster von .auth-inner links unter der
+   Überschrift statt rechts unter der ersten. */
+.auth-cards {
+  display: grid;
+  gap: 24px;
+}
+
 .auth-card {
   padding: 34px;
   border: 1px solid var(--line);
   background: var(--ink-soft);
+}
+
+/* Erklärzeile direkt unter einer Kartenüberschrift. */
+.auth-hint {
+  margin: -8px 0 18px;
+  color: var(--muted);
+  font-size: .8rem;
 }
 
 /* Klassen mit display würden das hidden-Attribut überstimmen.

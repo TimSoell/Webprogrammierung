@@ -1,7 +1,11 @@
 # assets/img/ — Bilder
 
-Aktuell leer. Alle Bilder kommen derzeit von Unsplash und sind direkt in
-CSS und HTML verlinkt.
+Die Hintergrundbilder kommen derzeit von Unsplash und sind direkt in CSS und
+HTML verlinkt. Eigene Dateien liegen bisher nur hier:
+
+- `schwitzkasten-logo.png` — das Logo in der Kopfzeile
+- `coaches/` — Porträtfotos für die Programmseiten, siehe die
+  [README dort](coaches/README.md)
 
 ## Wenn eigene Bilder dazukommen
 

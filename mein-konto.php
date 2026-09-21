@@ -38,27 +38,39 @@ require ROOT_PATH . '/partials/header.php';
         <h1 class="display auth-title">Mein<br>Konto.</h1>
       </div>
 
-      <div class="auth-card">
-        <h2 class="auth-heading">Stammdaten</h2>
+      <div class="auth-cards">
+        <div class="auth-card">
+          <h2 class="auth-heading">Stammdaten</h2>
 
-        <dl class="auth-data">
-          <div>
-            <dt>Vorname</dt>
-            <dd id="konto-vorname">…</dd>
-          </div>
-          <div>
-            <dt>Nachname</dt>
-            <dd id="konto-nachname">…</dd>
-          </div>
-          <div>
-            <dt>E-Mail-Adresse</dt>
-            <dd id="konto-email">…</dd>
-          </div>
-        </dl>
+          <dl class="auth-data">
+            <div>
+              <dt>Vorname</dt>
+              <dd id="konto-vorname">…</dd>
+            </div>
+            <div>
+              <dt>Nachname</dt>
+              <dd id="konto-nachname">…</dd>
+            </div>
+            <div>
+              <dt>E-Mail-Adresse</dt>
+              <dd id="konto-email">…</dd>
+            </div>
+          </dl>
 
-        <p class="auth-message" id="konto-meldung" role="alert"></p>
+          <p class="auth-message" id="konto-meldung" role="alert"></p>
 
-        <button class="button button--ghost" id="abmelden" type="button">Abmelden</button>
+          <button class="button button--ghost" id="abmelden" type="button">Abmelden</button>
+        </div>
+
+        <div class="auth-card">
+          <h2 class="auth-heading">Meine Auswahl</h2>
+          <p class="auth-hint">Was du dir auf den Programmseiten gemerkt hast.</p>
+
+          <!-- Füllt assets/js/pages/mein-konto.page.js aus api/auswahl.php. -->
+          <ul class="auswahl-liste" id="auswahl-liste"></ul>
+
+          <p class="auth-message" id="auswahl-meldung" role="alert"></p>
+        </div>
       </div>
 
     </div>

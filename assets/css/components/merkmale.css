@@ -1,0 +1,185 @@
+/**
+ * @file        assets/css/components/merkmale.css
+ * @layer       Komponente
+ * @description Die drei aufklappbaren Blöcke (Fokus, Level, Format) auf den
+ *              Programm-Detailseiten.
+ *
+ *              Ersetzt die früheren .attributes aus program-page.css. Die
+ *              Streifenoptik bleibt gleich - Linien entstehen durch gap auf
+ *              eingefärbtem Raster, nicht durch border.
+ *
+ *              Den Zustand "offen" hält allein aria-expanded am Schalter.
+ *              Es gibt keine zusätzliche Klasse dafür: ein Zustand, eine
+ *              Quelle. Das CSS liest ihn über [aria-expanded="true"] mit.
+ * @see         assets/js/components/programm-details.js
+ * @see         assets/css/components/program-page.css
+ */
+
+.merkmale {
+  display: grid;
+  gap: 1px;
+  margin-top: 35px;
+  background: var(--line);
+}
+
+/* Ladehinweis und Fehlermeldung, solange noch keine Blöcke drinstehen. */
+.merkmale:not(:has(.merkmal)) {
+  padding: 20px;
+  background: var(--ink);
+  color: var(--muted);
+  font-size: .84rem;
+}
+
+.merkmale--fehler {
+  color: var(--danger);
+}
+
+.merkmal {
+  background: var(--ink);
+}
+
+.merkmal-kopf {
+  margin: 0;
+}
+
+/* --- Kopfzeile zum Aufklappen --------------------------------------------- */
+.merkmal-schalter {
+  display: grid;
+  width: 100%;
+  align-items: center;
+  padding: 20px;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  gap: 5px 16px;
+  grid-template-areas:
+    "art     pfeil"
+    "aktuell pfeil";
+  grid-template-columns: 1fr auto;
+  text-align: left;
+}
+
+.merkmal-schalter:hover .merkmal-art,
+.merkmal-schalter:focus-visible .merkmal-art {
+  color: var(--lime-hover);
+}
+
+.merkmal-art {
+  grid-area: art;
+  color: var(--lime);
+  font: 700 1.55rem var(--display);
+  text-transform: uppercase;
+  transition: color .15s;
+}
+
+.merkmal-aktuell {
+  grid-area: aktuell;
+  color: var(--muted);
+  font-size: .84rem;
+}
+
+/* Pfeil aus zwei gedrehten Kanten - spart eine Bilddatei. */
+.merkmal-pfeil {
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid var(--lime);
+  border-bottom: 2px solid var(--lime);
+  margin-right: 4px;
+  grid-area: pfeil;
+  rotate: 45deg;
+  transition: rotate .2s;
+}
+
+.merkmal-schalter[aria-expanded="true"] .merkmal-pfeil {
+  rotate: -135deg;
+}
+
+/* --- Aufgeklappter Inhalt -------------------------------------------------- */
+.merkmal-inhalt {
+  padding: 0 20px 22px;
+}
+
+.merkmal-auswahl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.merkmal-option {
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  font: 600 .74rem/1 var(--body);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  transition: border-color .15s, color .15s;
+}
+
+.merkmal-option:hover {
+  border-color: var(--lime);
+  color: var(--paper);
+}
+
+.merkmal-option[aria-pressed="true"] {
+  border-color: var(--lime);
+  background: var(--lime);
+  color: var(--ink);
+}
+
+.merkmal-text {
+  margin: 0;
+  color: var(--muted);
+  font-size: .88rem;
+  line-height: 1.65;
+}
+
+/* --- Merken am Konto ------------------------------------------------------ */
+/* Steht unter den Blöcken, außerhalb von .merkmale - sonst würde es als
+   weitere Rasterzeile mit Trennlinie erscheinen. */
+.merken {
+  margin-top: 22px;
+}
+
+.merken-button[disabled] {
+  border-color: var(--line);
+  color: var(--muted);
+  cursor: default;
+}
+
+.merken-hinweis,
+.merken-meldung {
+  margin: 0;
+  color: var(--muted);
+  font-size: .8rem;
+  line-height: 1.5;
+}
+
+.merken-meldung:empty {
+  display: none;
+}
+
+.merken-meldung {
+  margin-top: 10px;
+}
+
+.merken-meldung--fehler {
+  color: var(--danger);
+}
+
+.merken-hinweis a {
+  color: var(--lime);
+  text-decoration: underline;
+}
+
+@media (max-width: 800px) {
+  .merkmal-schalter,
+  .merkmal-inhalt {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+}

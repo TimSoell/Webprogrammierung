@@ -1,0 +1,84 @@
+/**
+ * @file        assets/css/components/auswahl-liste.css
+ * @layer       Komponente
+ * @description Die Liste "Meine Auswahl" im Mitgliedsbereich: was sich ein
+ *              Mitglied auf den Programmseiten gemerkt hat.
+ *
+ *              Gleiche Technik wie .auth-data und .merkmale: Trennlinien
+ *              entstehen durch gap auf eingefärbtem Raster, nicht durch
+ *              border.
+ * @see         mein-konto.php
+ * @see         assets/js/pages/mein-konto.page.js
+ */
+
+.auswahl-liste {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: 1px;
+  background: var(--line);
+  list-style: none;
+}
+
+.auswahl-eintrag {
+  display: grid;
+  align-items: center;
+  padding: 16px 18px;
+  background: var(--ink);
+  column-gap: 16px;
+  grid-template-areas:
+    "programm entfernen"
+    "angaben  entfernen";
+  grid-template-columns: 1fr auto;
+}
+
+.auswahl-programm {
+  grid-area: programm;
+  color: var(--lime);
+  font: 700 1.3rem var(--display);
+  text-transform: uppercase;
+}
+
+.auswahl-programm:hover {
+  color: var(--lime-hover);
+}
+
+.auswahl-angaben {
+  margin: 2px 0 0;
+  grid-area: angaben;
+  color: var(--muted);
+  font-size: .8rem;
+}
+
+.auswahl-entfernen {
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  font: 600 .68rem/1 var(--body);
+  grid-area: entfernen;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  transition: border-color .15s, color .15s;
+}
+
+.auswahl-entfernen:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.auswahl-entfernen[disabled] {
+  cursor: default;
+  opacity: .5;
+}
+
+/* Hinweis, solange nichts gemerkt ist. Kein eigener Kasten, damit die
+   leere Liste nicht wie ein Fehler aussieht. */
+.auswahl-leer {
+  padding: 16px 18px;
+  background: var(--ink);
+  color: var(--muted);
+  font-size: .82rem;
+  line-height: 1.55;
+}
