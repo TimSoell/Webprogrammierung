@@ -84,10 +84,14 @@
   white-space: nowrap;
 }
 
+/* Buchbar ist der Normalfall: heller Text, sichtbarer Rand. Gesperrte
+   Gruppen weichen davon weiter unten ab. Die Grundregel steht bewusst
+   hier und nicht unter [data-gesperrt="nein"] - dieses Attribut setzt erst
+   das Seitenskript, vorher saehe die Leiste sonst kurz falsch aus. */
 .preisgruppe-option span {
   display: block;
   padding: 11px 18px;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(240, 239, 233, .3);
   color: var(--paper);
   font-size: .86rem;
   cursor: pointer;
@@ -405,20 +409,38 @@
 /* --- Gesperrte Preisgruppen ----------------------------------------------- */
 
 /* Ohne gültigen Nachweis lässt sich der ermäßigte Preis zwar ansehen, aber
-   nicht buchen. Das Schloss macht das sichtbar, ohne das Feld zu sperren -
-   wer wissen will, was der Preis wäre, darf hinschauen.
-   Der Haken daneben: Die eigentliche Sperre sitzt im Endpunkt, nicht hier. */
-.preisgruppe-option[data-gesperrt="ja"] span::after {
-  content: " 🔒";
-  font-size: .8em;
-}
+   nicht buchen. Gesperrt heißt deshalb: abgedunkelt und gestrichelt
+   umrandet - nicht unsichtbar und nicht gesperrt im Wortsinn. Wer wissen
+   will, was der Preis wäre, darf hinschauen und die Gruppe anklicken.
 
+   Warum zusätzlich gestrichelt und nicht nur blasser: Ein Strichmuster ist
+   auch dann zu erkennen, wenn Farben nicht unterschieden werden. Dieselbe
+   Überlegung wie beim Haken in der Leistungsliste weiter oben - die
+   Information darf nie allein an der Farbe hängen.
+
+   Den Grund nennt ohnehin die Aktionsleiste im Klartext ("Für den
+   ermäßigten Preis fehlt dein Nachweis"), und die eigentliche Sperre sitzt
+   im Endpunkt, nicht hier. */
 .preisgruppe-option[data-gesperrt="ja"] span {
+  border-style: dashed;
+  border-color: rgba(240, 239, 233, .2);
+  background: rgba(0, 0, 0, .3);
   color: var(--muted);
 }
 
-.preisgruppe-option[data-gesperrt="ja"] input:checked + span {
+/* Auch beim Überfahren kein Lime: Das würde Buchbarkeit versprechen,
+   die es ohne Nachweis nicht gibt. */
+.preisgruppe-option[data-gesperrt="ja"] span:hover {
   border-color: var(--muted);
-  background: transparent;
-  color: var(--muted);
+}
+
+/* Angeklickt, aber nicht buchbar: heller Rand und heller Text statt der
+   gefüllten Lime-Fläche. Man sieht, dass die Gruppe gewählt ist - aber
+   nicht, dass sie ginge. Der gestrichelte Rand bleibt. */
+.preisgruppe-option[data-gesperrt="ja"] input:checked + span {
+  border-style: dashed;
+  border-color: var(--paper);
+  background: rgba(0, 0, 0, .3);
+  color: var(--paper);
+  font-weight: 400;
 }
