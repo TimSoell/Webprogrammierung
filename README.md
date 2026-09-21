@@ -78,15 +78,37 @@ einspielen:
    Auswahlen aller Mitglieder, also nicht kurz vor einer Vorführung.
 
 **Umzug von `baseline`.** Bis September 2026 hieß die Datenbank `baseline`.
-Wer lokal noch damit arbeitet, kopiert sie einmal hinüber, statt neu
-einzuspielen — sonst sind die Testkonten weg:
+Wer lokal noch damit arbeitet und seine Testkonten behalten will, kopiert sie
+einmal hinüber, statt nur neu einzuspielen. Wem die Testkonten egal sind,
+reichen die zwei Dateien oben.
 
-```bash
-mysql -u root -e "CREATE DATABASE schwitzkasten CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
-mysqldump -u root baseline | mysql -u root schwitzkasten
+`mysql` liegt bei XAMPP nicht im PATH, deshalb stehen die Befehle mit vollem
+Pfad da. Ausführen im Projektordner; die Reihenfolge ist wichtig — die Kopie
+hat die neueren Tabellen noch nicht, die legt erst `schema.sql` an.
+
+Windows (XAMPP unter `C:\xampp`, in PowerShell oder `cmd`):
+
+```bat
+C:\xampp\mysql\bin\mysql.exe -u root -e "CREATE DATABASE schwitzkasten CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+cmd /c "C:\xampp\mysql\bin\mysqldump.exe -u root baseline | C:\xampp\mysql\bin\mysql.exe -u root schwitzkasten"
+cmd /c "C:\xampp\mysql\bin\mysql.exe -u root < database\schema.sql"
+cmd /c "C:\xampp\mysql\bin\mysql.exe -u root < database\seed.sql"
 ```
 
-Danach in `config/config.php` bei `'name'` `schwitzkasten` eintragen.
+`cmd /c` ist unter PowerShell nötig: PowerShell kennt `<` nicht und würde die
+Pipe mit `|` neu kodieren, wodurch Umlaute kaputtgehen.
+
+macOS (XAMPP unter `/Applications/XAMPP`):
+
+```bash
+/Applications/XAMPP/xamppfiles/bin/mysql -u root -e "CREATE DATABASE schwitzkasten CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+/Applications/XAMPP/xamppfiles/bin/mysqldump -u root baseline | /Applications/XAMPP/xamppfiles/bin/mysql -u root schwitzkasten
+/Applications/XAMPP/xamppfiles/bin/mysql -u root < database/schema.sql
+/Applications/XAMPP/xamppfiles/bin/mysql -u root < database/seed.sql
+```
+
+Danach in `config/config.php` bei `'name'` `schwitzkasten` eintragen — die
+Datei ist nicht in Git, die Änderung kommt also nicht mit dem Pull.
 `baseline` kann anschließend gelöscht werden.
 
 ---
