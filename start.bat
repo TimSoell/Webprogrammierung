@@ -12,10 +12,27 @@ REM ===========================================================================
 
 cd /d "%~dp0"
 
-REM PHP aus der XAMPP-Installation. Fehlt es dort, wird das PHP aus dem PATH
-REM benutzt - damit laeuft das Skript auch bei abweichendem Installationsort.
-set "PHP=C:\WebProgrammierung\XAMP\php\php.exe"
-if not exist "%PHP%" set "PHP=php"
+REM PHP aus der XAMPP-Installation. Der Installationsort ist im Team nicht
+REM ueberall gleich, deshalb werden die ueblichen Pfade der Reihe nach
+REM geprueft; zuletzt das PHP aus dem PATH.
+set "PHP="
+if exist "C:\xampp\php\php.exe" set "PHP=C:\xampp\php\php.exe"
+if not defined PHP if exist "C:\WebProgrammierung\XAMP\php\php.exe" set "PHP=C:\WebProgrammierung\XAMP\php\php.exe"
+if not defined PHP where php >nul 2>&1 && set "PHP=php"
+
+if not defined PHP (
+    echo Kein PHP gefunden. Entweder XAMPP nach C:\xampp installieren oder
+    echo php.exe in den PATH aufnehmen. Siehe README.md.
+    pause
+    exit /b 1
+)
+
+if not exist "config\config.php" (
+    echo Konfiguration fehlt. Einmalig ausfuehren:
+    echo     copy config\config.example.php config\config.php
+    pause
+    exit /b 1
+)
 
 echo BASELINE laeuft auf http://localhost:8000/   (Beenden mit Strg+C)
 "%PHP%" -S localhost:8000 -t .
