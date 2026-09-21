@@ -12,8 +12,9 @@ nutzen will, fotografiert dort seinen Ausweis und lädt ihn hoch. Das Bild
 wird ausgelesen, das Ergebnis gespeichert und **das Bild sofort verworfen**.
 
 Danach steht die passende Preisgruppe auf der Tarifseite zur Verfügung.
-Ohne Nachweis ist sie mit einem Schloss markiert: Man sieht, was der Preis
-wäre, kann ihn aber nicht buchen.
+Ohne Nachweis ist die Preisgruppe abgedunkelt und gestrichelt umrandet: Man
+sieht, was der Preis wäre, und darf die Gruppe auch anklicken — buchen lässt
+sie sich aber nicht. Den Grund nennt die Aktionsleiste im Klartext.
 
 Damit lässt sich die Mitgliedschaft vollständig online abschließen — bei
 anderen Studios muss man mit dem Ausweis an den Tresen. Das ist der Punkt
