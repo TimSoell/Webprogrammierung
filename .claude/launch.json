@@ -6,6 +6,12 @@
       "runtimeExecutable": "/Applications/XAMPP/xamppfiles/bin/php",
       "runtimeArgs": ["-S", "localhost:8000", "-t", "/Users/tim/Documents/Studium/GitHub Projekte/Webprogrammierung"],
       "port": 8000
+    },
+    {
+      "name": "schwitzkasten-windows",
+      "runtimeExecutable": "C:/xampp/php/php.exe",
+      "runtimeArgs": ["-S", "localhost:8001", "-t", "."],
+      "port": 8001
     }
   ]
 }
