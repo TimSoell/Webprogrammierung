@@ -18,7 +18,7 @@ return [
     'db' => [
         'host'     => 'localhost',
         'port'     => 3306,
-        'name'     => 'baseline',
+        'name'     => 'schwitzkasten',
         'user'     => 'root',
         'password' => '',
     ],

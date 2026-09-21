@@ -40,6 +40,28 @@ final class MitgliedRepository
     }
 
     /**
+     * Sucht die mitglieder.id zu einem Konto.
+     *
+     * Gebraucht von allen Endpunkten, die etwas Fachliches am Mitglied
+     * speichern: Die Login-Bibliothek kennt nur users.id, fachliche Tabellen
+     * verweisen aber auf mitglieder.id.
+     *
+     * @param int $userId  id des Kontos aus der Tabelle users
+     * @return int|null    null, wenn es zu dem Konto keine Stammdaten gibt
+     */
+    public function idFindenNachUserId(int $userId): ?int
+    {
+        $stmt = Database::connection()->prepare(
+            'SELECT id FROM mitglieder WHERE user_id = ?'
+        );
+        $stmt->execute([$userId]);
+
+        $id = $stmt->fetchColumn();
+
+        return $id === false ? null : (int) $id;
+    }
+
+    /**
      * Sucht die Stammdaten zu einem Konto.
      *
      * @param int $userId  id des Kontos aus der Tabelle users

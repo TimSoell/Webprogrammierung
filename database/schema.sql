@@ -16,9 +16,10 @@
 --              Alternativ auf der Kommandozeile:
 --                  mysql -u root < database/schema.sql
 --
--- STAND        Tabellen für das Feature Mitglieder-Login (ganz unten):
---              die acht users-Tabellen der Login-Bibliothek delight-im/auth
---              und unsere eigene Tabelle mitglieder.
+-- STAND        Feature Mitglieder-Login (Mitte): die acht users-Tabellen der
+--              Login-Bibliothek delight-im/auth und unsere Tabelle mitglieder.
+--              Feature Programm-Details (ganz unten): programme, merkmale
+--              und coaches.
 --              Die auskommentierte Tabelle in der Mitte zeigt die Konventionen.
 --
 --              Die Datei darf mehrfach eingespielt werden: CREATE ... IF NOT
@@ -227,6 +228,179 @@ CREATE TABLE IF NOT EXISTS `mitglieder` (
     CONSTRAINT `fk_mitglieder_users`
         FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
         ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+
+-- -----------------------------------------------------------------------------
+-- FEATURE PROGRAMM-DETAILS - Merkmale und Coaches der drei Programmseiten
+-- -----------------------------------------------------------------------------
+-- Was vorher fest in programme/strength.php, move.php und fight.php stand,
+-- kommt jetzt aus der Datenbank. Die Seiten selbst bleiben getrennte Dateien,
+-- nur ihr unterer Teil wird nachgeladen.
+--
+-- Drei Tabellen statt einer, weil ein Programm MEHRERE Merkmale und MEHRERE
+-- Coaches hat. Alles in eine Tabelle zu quetschen hiesse, Spalten wie
+-- level_1, level_2, level_3 anzulegen - und dann ist bei drei Schluss.
+--
+-- Siehe docs/decisions/ADR-0007-programm-details-aus-der-datenbank.md
+-- -----------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `programme` (
+    `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+
+    -- Verbindet die Zeile mit der Seite: programme/move.php fragt 'move' ab.
+    -- Steht in der URL und im Dateinamen, deshalb ohne Umlaute.
+    `slug`        VARCHAR(40)  NOT NULL,
+
+    `name`        VARCHAR(60)  NOT NULL,
+    `erstellt_am` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uniq_slug` (`slug`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+
+-- Die aufklappbaren Bloecke unter dem Text. Eine Zeile = eine Zeile im
+-- Aufklappbereich.
+--
+-- 'fokus' hat pro Programm genau EINEN Eintrag und ist reine Information.
+-- 'level' und 'format' haben MEHRERE - daraus werden die Schaltflaechen,
+-- zwischen denen Besucher waehlen. Die Seite erkennt den Unterschied an der
+-- Anzahl, nicht an einem zusaetzlichen Schalter.
+CREATE TABLE IF NOT EXISTS `merkmale` (
+    `id`           INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `programm_id`  INT UNSIGNED NOT NULL,
+
+    -- ENUM statt VARCHAR: Die Datenbank laesst dann gar keinen Tippfehler zu.
+    -- Neue Art? Hier ergaenzen UND in ProgrammRepository::ARTEN.
+    `art`          ENUM('fokus', 'level', 'format') NOT NULL,
+
+    -- Ueberschrift der Schaltflaeche, z. B. "Small Group".
+    `titel`        VARCHAR(80)  NOT NULL,
+
+    -- Der Text, der nach dem Aufklappen erscheint.
+    `beschreibung` TEXT         NOT NULL,
+
+    -- Reihenfolge innerhalb einer Art. Kleinere Zahl steht weiter oben.
+    `position`     TINYINT UNSIGNED NOT NULL DEFAULT 0,
+
+    `erstellt_am`  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (`id`),
+
+    -- Genau die Abfrage, die das Repository macht: alles zu einem Programm,
+    -- sortiert nach Art und Position.
+    KEY `idx_programm_art_position` (`programm_id`, `art`, `position`),
+
+    CONSTRAINT `fk_merkmale_programme`
+        FOREIGN KEY (`programm_id`) REFERENCES `programme` (`id`)
+        ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+
+-- Die Coaches im gelben Kasten rechts.
+CREATE TABLE IF NOT EXISTS `coaches` (
+    `id`           INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `programm_id`  INT UNSIGNED NOT NULL,
+
+    `name`         VARCHAR(80)  NOT NULL,
+
+    -- Die kursive Zeile unter dem Namen: welche Art Training diese Person macht.
+    `schwerpunkt`  VARCHAR(160) NOT NULL,
+
+    -- NUR der Dateiname, z. B. 'lena-brandt.jpg'. Der Ordner steht im
+    -- Repository, die vollstaendige URL baut erst die Seite mit BASE_URL
+    -- zusammen. So muss beim Verschieben des Ordners nichts in der
+    -- Datenbank geaendert werden.
+    `bild`         VARCHAR(160) NOT NULL,
+
+    -- Text fuer das alt-Attribut des Bildes (Pflicht, siehe assets/img/README.md).
+    `bild_alt`     VARCHAR(200) NOT NULL,
+
+    `position`     TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    `erstellt_am`  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (`id`),
+    KEY `idx_programm_position` (`programm_id`, `position`),
+
+    CONSTRAINT `fk_coaches_programme`
+        FOREIGN KEY (`programm_id`) REFERENCES `programme` (`id`)
+        ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+
+-- -----------------------------------------------------------------------------
+-- FEATURE GEMERKTE AUSWAHL - was ein Mitglied sich auf den Programmseiten merkt
+-- -----------------------------------------------------------------------------
+-- Wer angemeldet ist und auf einer Programmseite "Auswahl merken" klickt,
+-- bekommt hier eine Zeile. Nicht angemeldete Besucher behalten ihre Auswahl
+-- weiterhin nur im localStorage des Browsers.
+--
+-- EINE Zeile pro Mitglied und Programm, mit zwei Spalten statt zwei Zeilen.
+-- Das widerspricht nicht der Begruendung aus ADR-0007 gegen level_1, level_2:
+-- Dort ging es um eine unbekannte ANZAHL von Eintraegen. Hier sind es genau
+-- die Arten, die merkmale.art als ENUM ohnehin festlegt - eine vierte Art
+-- braeuchte so oder so eine Schema-Aenderung.
+--
+-- Siehe docs/decisions/ADR-0008-gemerkte-auswahl-am-konto.md
+-- -----------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `mitglied_auswahl` (
+    `id`           INT UNSIGNED NOT NULL AUTO_INCREMENT,
+
+    -- Zeigt auf mitglieder.id, NICHT auf users.id - dieselbe Regel wie fuer
+    -- alle fachlichen Tabellen, siehe Kommentar bei mitglieder oben.
+    `mitglied_id`  INT UNSIGNED NOT NULL,
+
+    `programm_id`  INT UNSIGNED NOT NULL,
+
+    -- NULL erlaubt: Ein Programm koennte irgendwann nur Level oder nur
+    -- Format anbieten. Beide NULL kommt nicht vor - der Endpunkt lehnt das ab.
+    `level_id`     INT UNSIGNED NULL,
+    `format_id`    INT UNSIGNED NULL,
+
+    `erstellt_am`  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    -- Wird bei jeder Aenderung automatisch neu gesetzt. Dadurch laesst sich
+    -- im Mitgliedsbereich spaeter nach "zuletzt geaendert" sortieren.
+    `geaendert_am` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                                       ON UPDATE CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (`id`),
+
+    -- Hoechstens eine gemerkte Auswahl je Mitglied und Programm. Genau darauf
+    -- stuetzt sich das INSERT ... ON DUPLICATE KEY UPDATE im Repository.
+    UNIQUE KEY `uniq_mitglied_programm` (`mitglied_id`, `programm_id`),
+
+    KEY `idx_level` (`level_id`),
+    KEY `idx_format` (`format_id`),
+
+    CONSTRAINT `fk_auswahl_mitglieder`
+        FOREIGN KEY (`mitglied_id`) REFERENCES `mitglieder` (`id`)
+        ON DELETE CASCADE,
+
+    CONSTRAINT `fk_auswahl_programme`
+        FOREIGN KEY (`programm_id`) REFERENCES `programme` (`id`)
+        ON DELETE CASCADE,
+
+    -- SET NULL statt CASCADE: Faellt ein einzelnes Level weg, soll die
+    -- gemerkte Zeile bleiben - nur eben ohne Level. Bei CASCADE waere auch
+    -- das gemerkte Format mit verschwunden.
+    CONSTRAINT `fk_auswahl_level`
+        FOREIGN KEY (`level_id`) REFERENCES `merkmale` (`id`)
+        ON DELETE SET NULL,
+
+    CONSTRAINT `fk_auswahl_format`
+        FOREIGN KEY (`format_id`) REFERENCES `merkmale` (`id`)
+        ON DELETE SET NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;

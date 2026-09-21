@@ -34,7 +34,7 @@ if not exist "config\config.php" (
     exit /b 1
 )
 
-echo BASELINE laeuft auf http://localhost:8000/   (Beenden mit Strg+C)
+echo SCHWITZKASTEN laeuft auf http://localhost:8000/   (Beenden mit Strg+C)
 REM router.php beantwortet Range-Anfragen, ohne die kein Video springen kann.
 "%PHP%" -S localhost:8000 -t . router.php
 pause

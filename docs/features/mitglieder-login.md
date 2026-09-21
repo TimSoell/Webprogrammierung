@@ -2,7 +2,7 @@
 
 **Status:** fertig
 **Verantwortlich:** Tim
-**Zuletzt geprüft:** 2026-09-16
+**Zuletzt geprüft:** 2026-09-21
 
 Umsetzung von Issue #8 „Mitglieder-Registrierung & Login“.
 
@@ -77,7 +77,7 @@ entfernt die Bibliothek vor dem Speichern, deshalb prüfen beide Seiten ohne sie
 ## Woher kommen die Daten aktuell
 
 **MySQL.** Vor dem ersten Test `database/schema.sql` einspielen (legt die
-Datenbank `baseline` samt Tabellen an). Testkonten legt man über die
+Datenbank `schwitzkasten` samt Tabellen an). Testkonten legt man über die
 Registrierung an, `seed.sql` darf keine Passwörter enthalten.
 
 ## Demo-Modus für „Passwort vergessen“
@@ -101,6 +101,10 @@ baut man in `api/passwort-reset.php` an der markierten Stelle ein.
   `Auth::nurFuerMitglieder();` aufrufen. Die Daten dann über einen Endpunkt
   laden, der `Auth::instanz()->isLoggedIn()` prüft.
 - Nach einem Passwort-Reset werden alle anderen Sitzungen des Kontos abgemeldet.
+- **`mein-konto.php` und `anmelden.page.js` gehören nicht mehr allein zu diesem
+  Feature.** Das Konto zeigt zusätzlich die Karte „Meine Auswahl", und nach dem
+  Anmelden wird eine lokal getroffene Programm-Auswahl übernommen — siehe
+  [Gemerkte Auswahl](gemerkte-auswahl.md). Wer hier etwas ändert, prüft beides.
 
 ## Was fehlt noch
 

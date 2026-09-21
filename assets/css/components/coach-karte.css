@@ -1,0 +1,94 @@
+/**
+ * @file        assets/css/components/coach-karte.css
+ * @layer       Komponente
+ * @description Die Coach-Karten unter dem Hinweiskasten auf den
+ *              Programm-Detailseiten: Gesicht, Name, Schwerpunkt.
+ *
+ *              Sie füllen den Platz, der rechts unter .schedule frei blieb.
+ *              Deshalb liegt der gelbe Kasten jetzt in .program-aside und
+ *              wächst nicht mehr über die ganze Spaltenhöhe.
+ * @see         assets/js/components/programm-details.js
+ * @see         assets/css/components/program-page.css
+ */
+
+.coaches {
+  padding: 28px;
+  border: 1px solid var(--line);
+}
+
+.coaches-titel {
+  margin: 0 0 20px;
+  font: 700 1.55rem var(--display);
+  text-transform: uppercase;
+}
+
+.coach-liste {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: 26px 18px;
+  grid-template-columns: repeat(3, 1fr);
+  list-style: none;
+}
+
+.coach-karte {
+  text-align: center;
+}
+
+/* Quadratisch und rund beschnitten, damit unterschiedlich zugeschnittene
+   Fotos trotzdem eine einheitliche Reihe ergeben. */
+.coach-bild {
+  display: block;
+  width: 100%;
+  margin: 0 auto 12px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Ersatz, wenn die Bilddatei fehlt: Initialen auf dunklem Grund.
+   Setzt das Skript, siehe coachBauen() in programm-details.js. */
+.coach-bild--ersatz {
+  display: grid;
+  background: var(--ink-soft);
+  color: var(--lime);
+  font: 700 1.6rem var(--display);
+  place-items: center;
+}
+
+.coach-name {
+  margin: 0 0 4px;
+  font-size: .86rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.coach-schwerpunkt {
+  margin: 0;
+  color: var(--muted);
+  font-size: .76rem;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+@media (max-width: 1000px) {
+  .coach-liste {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 800px) {
+  .coaches {
+    padding: 22px;
+  }
+
+  .coach-liste {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .coach-liste {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

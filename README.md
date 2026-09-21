@@ -62,16 +62,54 @@ Am Quelltext ändert das nichts: `BASE_URL` wird berechnet und stimmt in beiden
 Fällen. Weil aber entwickelt und vorgeführt auf unterschiedlichen Servern
 wird, gilt: **vor der Abgabe einmal über Apache prüfen.**
 
-### Datenbank (für den Mitglieder-Login)
+### Datenbank
 
-Startseite und Programmseiten laufen ohne Datenbank. Für Registrierung und
-Login braucht es sie:
+Nur die Startseite läuft ohne Datenbank. Login, Mitgliedsbereich und der
+untere Teil der Programmseiten (Merkmale, Coaches) brauchen sie:
 
 In XAMPP **MySQL** starten. Für phpMyAdmin zusätzlich **Apache** — das
 Startskript ersetzt Apache nur für die Projektseite, nicht für phpMyAdmin.
-Dann `http://localhost/phpmyadmin` öffnen und unter *Importieren* die Datei
-`database/schema.sql` einspielen. Sie legt die Datenbank `baseline` samt
-Tabellen an und darf beliebig oft eingespielt werden.
+Dann `http://localhost/phpmyadmin` öffnen und unter *Importieren* nacheinander
+einspielen:
+
+1. `database/schema.sql` — legt die Datenbank `schwitzkasten` samt Tabellen an
+   und darf beliebig oft eingespielt werden.
+2. `database/seed.sql` — füllt die Programmseiten. Löscht dabei die gemerkten
+   Auswahlen aller Mitglieder, also nicht kurz vor einer Vorführung.
+
+**Umzug von `baseline`.** Bis September 2026 hieß die Datenbank `baseline`.
+Wer lokal noch damit arbeitet und seine Testkonten behalten will, kopiert sie
+einmal hinüber, statt nur neu einzuspielen. Wem die Testkonten egal sind,
+reichen die zwei Dateien oben.
+
+`mysql` liegt bei XAMPP nicht im PATH, deshalb stehen die Befehle mit vollem
+Pfad da. Ausführen im Projektordner; die Reihenfolge ist wichtig — die Kopie
+hat die neueren Tabellen noch nicht, die legt erst `schema.sql` an.
+
+Windows (XAMPP unter `C:\xampp`, in PowerShell oder `cmd`):
+
+```bat
+C:\xampp\mysql\bin\mysql.exe -u root -e "CREATE DATABASE schwitzkasten CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+cmd /c "C:\xampp\mysql\bin\mysqldump.exe -u root baseline | C:\xampp\mysql\bin\mysql.exe -u root schwitzkasten"
+cmd /c "C:\xampp\mysql\bin\mysql.exe -u root < database\schema.sql"
+cmd /c "C:\xampp\mysql\bin\mysql.exe -u root < database\seed.sql"
+```
+
+`cmd /c` ist unter PowerShell nötig: PowerShell kennt `<` nicht und würde die
+Pipe mit `|` neu kodieren, wodurch Umlaute kaputtgehen.
+
+macOS (XAMPP unter `/Applications/XAMPP`):
+
+```bash
+/Applications/XAMPP/xamppfiles/bin/mysql -u root -e "CREATE DATABASE schwitzkasten CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+/Applications/XAMPP/xamppfiles/bin/mysqldump -u root baseline | /Applications/XAMPP/xamppfiles/bin/mysql -u root schwitzkasten
+/Applications/XAMPP/xamppfiles/bin/mysql -u root < database/schema.sql
+/Applications/XAMPP/xamppfiles/bin/mysql -u root < database/seed.sql
+```
+
+Danach in `config/config.php` bei `'name'` `schwitzkasten` eintragen — die
+Datei ist nicht in Git, die Änderung kommt also nicht mit dem Pull.
+`baseline` kann anschließend gelöscht werden.
 
 ---
 

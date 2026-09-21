@@ -31,3 +31,5 @@ Kein ADR für: Farbwerte, Textänderungen, das Anlegen einer einzelnen Datei.
 | [0004](ADR-0004-php-entwicklungsserver.md) | PHP-Entwicklungsserver als Standard-Startweg | angenommen |
 | [0005](ADR-0005-login-bibliothek.md) | Mitglieder-Login mit delight-im/auth über Composer | angenommen |
 | [0006](ADR-0006-router-fuer-entwicklungsserver.md) | Router-Skript für den PHP-Entwicklungsserver | angenommen |
+| [0007](ADR-0007-programm-details-aus-der-datenbank.md) | Programm-Details kommen aus der Datenbank | angenommen |
+| [0008](ADR-0008-gemerkte-auswahl-am-konto.md) | Gemerkte Auswahl liegt am Konto, nicht nur im Browser | angenommen |
