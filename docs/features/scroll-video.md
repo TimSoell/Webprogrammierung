@@ -63,11 +63,17 @@ JavaScript.
 | `faststart` | ja | Sonst stehen Dauer und Metadaten erst nach dem vollstaendigen Download fest |
 | Laenge | hoechstens rund 6 Sekunden | Laenger heisst bei „jedes Bild ein Keyframe" sehr grosse Dateien |
 | Groesse | moeglichst unter 3 MB | Die Datei muss vor dem Scrollen komplett geladen sein |
-| Bildrate | 24–25 fps | Mehr Bilder bringen beim Scrubben nichts, kosten aber Dateigroesse |
+| Bilder je Scrollweg | hoechstens rund 20 px Scrollweg pro Bild | Sonst sieht man jedes Einzelbild springen, egal wie gut der Rest ist |
 
 Ein Video mit nur einem Keyframe sieht beim normalen Abspielen voellig
 normal aus. Der Unterschied faellt erst beim Scrubben auf. Deshalb steht das
 hier: es ist nicht zu sehen, wenn man die Datei nur kurz abspielt.
+
+Die letzte Zeile ist die, die man am leichtesten uebersieht. Gerechnet wird
+mit dem Scrollweg des Abschnitts (Hoehe minus eine Fensterhoehe), nicht mit
+der Laenge des Videos. Beispiel Hero-Video: 220vh sind bei einem 900 px
+hohen Fenster rund 2000 px. Mit 30 Bildern waeren das 66 px pro Bild -
+deutlich sichtbares Springen. Mit 117 Bildern sind es 17 px.
 
 ### Datei umwandeln
 
@@ -85,20 +91,42 @@ ffmpeg -i original.mp4 -an -vf "scale=1280:-2,fps=25" -c:v libx264 -profile:v hi
 | `scale=1280:-2` | Breite 1280, Hoehe passend. Fuer eine Hintergrundflaeche reicht das |
 | `+faststart` | Metadaten an den Dateianfang |
 
-Die aktuelle Datei ist mit denselben Einstellungen entstanden, aber ohne
-ffmpeg: ueber AVFoundation, die Videobibliothek von macOS. Sie enthaelt nur
-das letzte Viertel des Originals (Commit `214e1e9`), also Bild 91 bis 120
-bzw. 3,79 s bis 5,04 s, in normaler Geschwindigkeit. Ergebnis: H.264 High,
-1280×720, 24 fps, 30 Bilder, 1,25 s, jedes Bild ein Keyframe, ohne Tonspur,
-Metadaten am Dateianfang, 0,49 MB. Ein Sprung dauert damit an jeder Stelle
-des Videos rund 3 ms, mit dem Original waren es je nach Position bis zu
-44 ms.
-
 Danach pruefen, ob die Datei klein genug geworden ist:
 
 ```bash
 ffprobe -v error -show_entries format=size,duration -show_entries stream=codec_name,nb_frames -of default=noprint_wrappers=1 assets/img/scroll-video.mp4
 ```
+
+### Zu wenige Bilder: Zwischenbilder berechnen
+
+Ist ein Video zu kurz fuer seinen Scrollweg, rechnet ffmpeg die fehlenden
+Bilder aus der Bewegung zwischen zwei echten Bildern aus
+(Bewegungsinterpolation). Die Laenge bleibt gleich, nur die Bildrate steigt -
+hier von 24 auf 96 fps, also viermal so viele Bilder:
+
+```bash
+ffmpeg -i kurz.mp4 -an -vf "tpad=stop=1:stop_mode=clone,minterpolate=fps=96:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1" -c:v libx264 -profile:v high -pix_fmt yuv420p -g 1 -crf 26 -movflags +faststart assets/img/scroll-video.mp4
+```
+
+| Teil | Bedeutung |
+|---|---|
+| `minterpolate=fps=96` | Zielbildrate. Faktor so waehlen, dass die 20 px aus der Tabelle oben passen |
+| `mi_mode=mci` ... | Bewegung schaetzen statt nur ueberblenden. Ueberblenden gibt Doppelbilder |
+| `tpad=stop=1:stop_mode=clone` | Ohne das fehlt am Ende das letzte echte Bild |
+
+Das funktioniert gut bei ruhiger Bewegung wie im Hero-Video. Bei schnellen
+Kamerafahrten koennen an Kanten Verzerrungen entstehen - dann die
+Zwischenbilder vorher einzeln ansehen. Die Datei wird etwa so viel groesser,
+wie Bilder dazukommen.
+
+### Die aktuelle Datei
+
+Enthaelt nur das letzte Viertel des Originals (Commit `214e1e9`), also Bild
+91 bis 120 bzw. 3,79 s bis 5,04 s. Diese 30 Bilder wurden mit dem Befehl oben
+auf 117 Bilder interpoliert. Ergebnis: H.264 High, 1280×720, 96 fps,
+117 Bilder, 1,22 s, jedes Bild ein Keyframe, ohne Tonspur, Metadaten am
+Dateianfang, 1,1 MB. Ein Sprung dauert damit an jeder Stelle des Videos
+rund 3 ms, mit dem Original waren es je nach Position bis zu 44 ms.
 
 ## Wie das Nachziehen funktioniert
 
@@ -106,10 +134,13 @@ Das Video wird nie abgespielt. Die Komponente setzt bei jedem Bild
 `video.currentTime` neu. Drei Dinge sorgen dafuer, dass das weich wirkt:
 
 - **Glaettung.** Ein Mausrad liefert grobe Spruenge. Statt direkt auf die
-  Zielzeit zu springen, legt das Video pro Bild nur einen Teil der
-  Reststrecke zurueck (`GLAETTUNG` in `scroll-video.js`).
-- **Scrollweg.** Die Hoehe des Abschnitts im CSS legt fest, wie viel
-  Videozeit auf einem Pixel Scrollweg liegt. Zu kurz = ruckelig.
+  Zielzeit zu springen, zieht das Video in kleinen Schritten nach
+  (`NACHZIEHZEIT` in `scroll-video.js`, 100 ms). Gerechnet wird mit der
+  vergangenen Zeit, nicht pro Bild - sonst wuerde ein 120-Hz-Bildschirm wie
+  beim MacBook Pro nur halb so stark glaetten wie ein 60-Hz-Bildschirm.
+- **Scrollweg und Bildanzahl.** Die Hoehe des Abschnitts im CSS und die
+  Anzahl der Bilder im Video legen fest, wie viele Pixel Scrollweg auf einem
+  Bild liegen. Zu viele = ruckelig, siehe Tabelle oben.
 - **Ein Sprung nach dem anderen.** Waehrend `video.seeking` laeuft, wird
   kein neuer Sprung angefordert. Sonst verwerfen sich die Spruenge
   gegenseitig.
