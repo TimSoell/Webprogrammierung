@@ -191,6 +191,28 @@ require ROOT_PATH . '/partials/header.php';
             <div class="ausweis-scan__konfetti" data-ausweis-scan-konfetti aria-hidden="true"></div>
           </div>
         </div>
+
+        <div class="auth-card">
+          <h2 class="auth-heading">Mein Besuch</h2>
+          <p class="auth-hint">Sag Bescheid, wann du kommst. Dein Besuch zählt sofort in die Auslastung auf der Startseite.</p>
+
+          <div class="besuch-aktionen">
+            <button class="button" id="besuch-jetzt" type="button">Jetzt einchecken</button>
+
+            <form class="besuch-form" id="besuch-form">
+              <label class="besuch-label" for="besuch-zeit">Oder für später ankündigen</label>
+              <div class="besuch-eingabe">
+                <input class="besuch-zeit" id="besuch-zeit" name="zeit" type="time" required>
+                <button class="button button--ghost" type="submit">Eintragen</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Füllt assets/js/pages/mein-konto.page.js aus api/auslastung.php. -->
+          <ul class="besuch-liste" id="besuch-liste"></ul>
+
+          <p class="auth-message" id="besuch-meldung" role="alert"></p>
+        </div>
       </div>
 
     </div>

@@ -87,23 +87,6 @@ require ROOT_PATH . '/partials/header.php';
       </div>
     </section>
 
-    <section class="scroll-video scroll-video--tour" data-studio-tour aria-label="Rundgang durch das Studio">
-      <div class="scroll-video-sticky">
-        <video muted playsinline preload="auto" aria-label="Rundgang durch den SCHWITZKASTEN Athletic Club">
-          <source src="<?= e(BASE_URL) ?>assets/img/studio-tour.mp4" type="video/mp4">
-          Dein Browser kann dieses Video nicht anzeigen.
-        </video>
-        <div class="scroll-video-overlay">
-          <div class="wrap">
-            <div class="scroll-video-copy">
-              <p class="eyebrow">Rundgang</p>
-              <h2>Dein<br><span>Revier.</span></h2>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <section class="light-section" id="programme">
       <div class="wrap">
         <div class="section-head">
@@ -162,6 +145,34 @@ require ROOT_PATH . '/partials/header.php';
       </div>
     </section>
 
+    <section class="auslastung" id="auslastung" aria-labelledby="auslastung-heading">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Live aus dem Studio</p>
+            <h2 class="display section-title" id="auslastung-heading">Wie voll<br><span>ist es?</span></h2>
+          </div>
+          <p class="section-lead">Die Kurve zeigt, wie viel an einem Tag wie heute üblicherweise los ist. Angekündigte Besuche kommen oben drauf — als Mitglied kannst du deinen im Konto eintragen.</p>
+        </div>
+
+        <div class="auslastung-jetzt" id="auslastung-jetzt" hidden>
+          <p class="auslastung-stufe" id="auslastung-stufe">…</p>
+          <p class="auslastung-zahl"><strong id="auslastung-personen">…</strong><span id="auslastung-prozent">…</span></p>
+        </div>
+
+        <!-- Das Diagramm wird von assets/js/components/auslastung-diagramm.js
+             als SVG hineingezeichnet. Ohne JavaScript bleibt die Meldung
+             darunter stehen. -->
+        <div class="auslastung-diagramm" id="auslastung-diagramm"></div>
+
+        <p class="auslastung-meldung" id="auslastung-meldung" role="status">Auslastung wird geladen …</p>
+
+        <ul class="auslastung-legende">
+          <li><i class="auslastung-punkt auslastung-punkt--basis"></i>Üblich zu dieser Zeit</li>
+          <li><i class="auslastung-punkt auslastung-punkt--gebucht"></i>Angekündigte Besuche</li>
+        </ul>
+      </div>
+    </section>
     <section class="join" id="mitgliedschaft">
       <div class="wrap join-inner">
         <div>

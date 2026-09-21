@@ -1,11 +1,18 @@
 /**
  * @file        assets/js/pages/locations.page.js
  * @layer       2 – Seitenskript
- * @description Erstellt die Leaflet-Karte und synchronisiert sie mit der
- *              interaktiven Liste der vier SCHWITZKASTEN Standorte.
+ * @description Erstellt die Leaflet-Karte, synchronisiert sie mit der
+ *              interaktiven Liste der vier SCHWITZKASTEN Standorte und
+ *              startet den scrollgesteuerten Studio-Rundgang darunter.
  * @see         locations.php
  * @see         https://leafletjs.com/
  */
+
+import { initScrollVideo } from '../components/scroll-video.js';
+
+// Der Rundgang unter der Karte. Die Komponente steigt von selbst aus,
+// wenn der Abschnitt fehlt - siehe assets/js/components/scroll-video.js.
+initScrollVideo('[data-studio-tour]');
 
 const locations = [
   {
