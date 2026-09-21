@@ -66,7 +66,11 @@
     grid-template-columns: 1fr;
   }
 
+  /* Untereinander statt nebeneinander: Drei Spalten passen am Handy nicht,
+     weil Wörter wie "Trainingsfläche" nicht umbrechen. Die Reihe würde
+     sonst über den Bildschirmrand ragen und seitliches Scrollen erzeugen. */
   .stats {
     margin-top: 55px;
+    grid-template-columns: 1fr;
   }
 }

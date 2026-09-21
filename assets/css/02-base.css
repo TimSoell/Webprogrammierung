@@ -15,8 +15,12 @@
   box-sizing: border-box;
 }
 
+/* overscroll-behavior: none schaltet das Nachfedern am Seitenrand ab
+   (Trackpad, Touch). Sonst lässt sich die Seite samt Kopfzeile über den
+   Rand hinausziehen, oben, unten und seitlich. */
 html {
   scroll-behavior: smooth;
+  overscroll-behavior: none;
 }
 
 body {

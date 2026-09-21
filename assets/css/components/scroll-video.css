@@ -19,7 +19,8 @@
   /* Ohne das würden die 118px aus 03-layout.css den Scrollweg verfälschen. */
   padding: 0;
   min-height: 320vh;
-  background: #202522;
+  /* Dieselbe Farbe wie die Kopfzeile, die über dem Abschnitt liegt. */
+  background: var(--ink);
   color: #f2f3ed;
 }
 
