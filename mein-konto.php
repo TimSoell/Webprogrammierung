@@ -65,6 +65,19 @@ require ROOT_PATH . '/partials/header.php';
         </div>
 
         <div class="auth-card">
+          <h2 class="auth-heading">Meine Termine</h2>
+          <p class="auth-hint">Deine gebuchten Kurse und Probetrainings. Stornieren geht bis zum Beginn.</p>
+
+          <!-- Füllt assets/js/components/meine-termine.js aus
+               api/kursbuchungen.php und api/probetrainings.php. -->
+          <div class="kalender" id="meine-termine" aria-live="polite">
+            <p class="kalender-leer">Termine werden geladen …</p>
+          </div>
+
+          <p class="auth-message" id="termine-meldung" role="alert"></p>
+        </div>
+
+        <div class="auth-card">
           <h2 class="auth-heading">Meine Auswahl</h2>
           <p class="auth-hint">Was du dir auf den Programmseiten gemerkt hast.</p>
 

@@ -23,6 +23,8 @@
 --              Feature Programm-Details: programme, merkmale und coaches.
 --              Feature Mitgliedschaften: tarife und mitgliedschaften.
 --              Feature Nachweise: nachweise (Ausweisprüfung, ohne Bilder).
+--              Feature Terminkalender: kurstermine, kursbuchungen,
+--              verfuegbarkeiten und probetrainings.
 --              Die auskommentierte Tabelle in der Mitte zeigt die Konventionen.
 --
 --              Die Datei darf mehrfach eingespielt werden: CREATE ... IF NOT
@@ -585,6 +587,153 @@ CREATE TABLE IF NOT EXISTS `nachweise` (
     CONSTRAINT `fk_nachweise_mitglieder`
         FOREIGN KEY (`mitglied_id`) REFERENCES `mitglieder` (`id`)
         ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+
+-- -----------------------------------------------------------------------------
+-- FEATURE TERMINKALENDER - Kurstermine und ihre Buchungen
+-- -----------------------------------------------------------------------------
+-- Kurstermine sind ein WOCHENPLAN, keine Liste fester Daten: "Move, Small
+-- Group, dienstags 18:00". Die konkreten Tage der nächsten zwei Wochen
+-- rechnet src/Terminplan.php daraus aus. Feste Daten wären nach zwei Wochen
+-- alle vorbei, und jemand müsste neue einspielen.
+--
+-- Gebucht wird dagegen ein KONKRETER Tag: kursbuchungen hat deshalb neben
+-- dem Wochenplan-Eintrag ein Datum.
+--
+-- Siehe docs/decisions/ADR-0013-terminkalender-wochenplan.md
+-- -----------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `kurstermine` (
+    `id`             INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `programm_id`    INT UNSIGNED NOT NULL,
+
+    -- Das Format ist nur Einordnung ("Small Group"), keine buchbare Kategorie.
+    -- Zeigt auf eine Zeile mit art = 'format' in merkmale.
+    `format_id`      INT UNSIGNED NOT NULL,
+
+    `coach_id`       INT UNSIGNED NOT NULL,
+
+    -- 1 = Montag ... 7 = Sonntag, wie PHPs date('N'). Bewusst nicht MySQLs
+    -- DAYOFWEEK(), das mit 1 = Sonntag anfängt.
+    `wochentag`      TINYINT UNSIGNED NOT NULL,
+    `beginn`         TIME         NOT NULL,
+    `dauer_minuten`  SMALLINT UNSIGNED NOT NULL DEFAULT 60,
+
+    -- 20 für Gruppenformate. Beim Einzelcoaching so viele, wie das Programm
+    -- Coaches hat - das setzt seed.sql.
+    `max_teilnehmer` TINYINT UNSIGNED  NOT NULL DEFAULT 20,
+
+    -- Plätze, die JEDE Woche schon vergeben sind (Stammgäste, die nicht über
+    -- die Website buchen). Belegt = Stammplätze + Buchungen. Dadurch lässt
+    -- sich "ausgebucht" auch ohne zwanzig Testkonten vorführen.
+    `stammplaetze`   TINYINT UNSIGNED  NOT NULL DEFAULT 0,
+
+    `erstellt_am`    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (`id`),
+    KEY `idx_programm` (`programm_id`),
+    KEY `idx_coach_wochentag` (`coach_id`, `wochentag`),
+
+    CONSTRAINT `fk_kurstermine_programme`
+        FOREIGN KEY (`programm_id`) REFERENCES `programme` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_kurstermine_merkmale`
+        FOREIGN KEY (`format_id`)   REFERENCES `merkmale` (`id`)  ON DELETE CASCADE,
+    CONSTRAINT `fk_kurstermine_coaches`
+        FOREIGN KEY (`coach_id`)    REFERENCES `coaches` (`id`)   ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+
+CREATE TABLE IF NOT EXISTS `kursbuchungen` (
+    `id`            INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `kurstermin_id` INT UNSIGNED NOT NULL,
+
+    -- Der konkrete Tag. Muss auf den Wochentag des Kurstermins fallen - das
+    -- prüft src/Terminplan.php, bevor gespeichert wird.
+    `datum`         DATE         NOT NULL,
+
+    `mitglied_id`   INT UNSIGNED NOT NULL,
+
+    -- Wie erfahren sich das Mitglied einschätzt. Dieselben drei Stufen wie
+    -- beim Probetraining.
+    `stufe`         ENUM('einsteiger', 'fortgeschritten', 'erfahren') NOT NULL,
+
+    `erstellt_am`   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (`id`),
+
+    -- Niemand bucht denselben Termin am selben Tag zweimal.
+    UNIQUE KEY `uniq_termin_datum_mitglied` (`kurstermin_id`, `datum`, `mitglied_id`),
+
+    KEY `idx_mitglied_datum` (`mitglied_id`, `datum`),
+
+    CONSTRAINT `fk_kursbuchungen_kurstermine`
+        FOREIGN KEY (`kurstermin_id`) REFERENCES `kurstermine` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_kursbuchungen_mitglieder`
+        FOREIGN KEY (`mitglied_id`)   REFERENCES `mitglieder` (`id`)  ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+
+-- -----------------------------------------------------------------------------
+-- FEATURE TERMINKALENDER - Probetraining
+-- -----------------------------------------------------------------------------
+-- Ein Probetraining ist ein Einzeltermin mit einem Coach, unabhängig von den
+-- Kursen. Wann ein Coach kann, steht als Wochenfenster in
+-- verfuegbarkeiten ("montags 10 bis 13 Uhr"). src/Terminplan.php schneidet
+-- daraus Termine zu je 60 Minuten und lässt die schon gebuchten weg.
+-- -----------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `verfuegbarkeiten` (
+    `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `coach_id`    INT UNSIGNED NOT NULL,
+
+    -- 1 = Montag ... 7 = Sonntag, wie bei kurstermine.
+    `wochentag`   TINYINT UNSIGNED NOT NULL,
+    `von`         TIME         NOT NULL,
+    `bis`         TIME         NOT NULL,
+
+    `erstellt_am` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (`id`),
+    KEY `idx_coach_wochentag` (`coach_id`, `wochentag`),
+
+    CONSTRAINT `fk_verfuegbarkeiten_coaches`
+        FOREIGN KEY (`coach_id`) REFERENCES `coaches` (`id`) ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+
+CREATE TABLE IF NOT EXISTS `probetrainings` (
+    `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `mitglied_id` INT UNSIGNED NOT NULL,
+    `coach_id`    INT UNSIGNED NOT NULL,
+
+    -- Beginn des 60-Minuten-Termins, Berliner Zeit.
+    `beginnt_am`  DATETIME     NOT NULL,
+
+    `stufe`       ENUM('einsteiger', 'fortgeschritten', 'erfahren') NOT NULL,
+    `erstellt_am` TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (`id`),
+
+    -- Ein Coach, eine Uhrzeit, ein Mensch. Klicken zwei Leute gleichzeitig
+    -- auf denselben Termin, weist die Datenbank den zweiten ab - das kann
+    -- keine Prüfung im PHP so sicher.
+    UNIQUE KEY `uniq_coach_beginn` (`coach_id`, `beginnt_am`),
+
+    KEY `idx_mitglied_beginn` (`mitglied_id`, `beginnt_am`),
+
+    CONSTRAINT `fk_probetrainings_mitglieder`
+        FOREIGN KEY (`mitglied_id`) REFERENCES `mitglieder` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_probetrainings_coaches`
+        FOREIGN KEY (`coach_id`)    REFERENCES `coaches` (`id`)    ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;

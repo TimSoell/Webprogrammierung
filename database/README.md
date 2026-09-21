@@ -51,6 +51,14 @@ das nicht.
 | `tarife` | Mitgliedschaften | Katalog, Inhalt aus `seed.sql`, siehe [ADR-0009](../docs/decisions/ADR-0009-mitgliedschaften-datenmodell.md) |
 | `mitgliedschaften` | Mitgliedschaften | abgeschlossene Verträge |
 | `nachweise` | Nachweise | Ergebnis der Ausweisprüfung, **ohne Bild**, siehe [ADR-0011](../docs/decisions/ADR-0011-ausweispruefung-mit-ki.md) |
+| `kurstermine` | Terminkalender | Wochenplan der Kurse, Inhalt aus `seed.sql`, siehe [ADR-0013](../docs/decisions/ADR-0013-terminkalender-wochenplan.md) |
+| `kursbuchungen` | Terminkalender | gebuchte Kurstermine, mit konkretem Datum |
+| `verfuegbarkeiten` | Terminkalender | Wochenfenster der Coaches fürs Probetraining, Inhalt aus `seed.sql` |
+| `probetrainings` | Terminkalender | gebuchte Probetrainings |
+
+**`seed.sql` neu einspielen löscht alle Buchungen.** Kursbuchungen und
+Probetrainings hängen über Fremdschlüssel an Programmen und Coaches, die
+`seed.sql` neu anlegt. Vor einer Vorführung also nicht neu einspielen.
 
 **`seed.sql` ist für die Tarife Pflicht, nicht optional.** Ohne sie ist
 `mitgliedschaft.php` leer — das ist die häufigste Fehlersuche an dieser Stelle.
