@@ -53,6 +53,33 @@ export function kurzesDatum(datum) {
 }
 
 /**
+ * Überschrift für einen Monat.
+ *
+ * @param {string} monat  'JJJJ-MM'
+ * @returns {string}      z. B. 'September 2026'
+ */
+export function monatUeberschrift(monat) {
+  const [jahr, nummer] = monat.split('-').map(Number);
+
+  return `${MONATE[nummer - 1]} ${jahr}`;
+}
+
+/**
+ * Der Monat davor oder danach.
+ *
+ * @param {string} monat     'JJJJ-MM'
+ * @param {number} schritte  -1 für den vorigen, 1 für den nächsten
+ * @returns {string}         'JJJJ-MM'
+ */
+export function monatVerschieben(monat, schritte) {
+  const [jahr, nummer] = monat.split('-').map(Number);
+  // Der Date-Konstruktor rechnet Monat 13 selbst in Januar des Folgejahres um.
+  const ziel = new Date(jahr, nummer - 1 + schritte, 1);
+
+  return `${ziel.getFullYear()}-${String(ziel.getMonth() + 1).padStart(2, '0')}`;
+}
+
+/**
  * @param {Date} tag
  * @returns {string}  'JJJJ-MM-TT' in der Zeitzone des Browsers
  */

@@ -152,4 +152,23 @@ final class KursbuchungRepository
         );
         $stmt->execute([$id, $mitgliedId]);
     }
+
+    /**
+     * Löscht alle Buchungen eines Mitglieds ab einem Tag. Gebraucht, wenn ein
+     * Tarifwechsel die Kurse ab dann nicht mehr abdeckt - siehe
+     * api/mitgliedschaften.php.
+     *
+     * @param int    $mitgliedId
+     * @param string $abDatum  'JJJJ-MM-TT', einschließlich
+     * @return int             so viele Buchungen wurden storniert
+     */
+    public function abDatumStornieren(int $mitgliedId, string $abDatum): int
+    {
+        $stmt = Database::connection()->prepare(
+            'DELETE FROM kursbuchungen WHERE mitglied_id = ? AND datum >= ?'
+        );
+        $stmt->execute([$mitgliedId, $abDatum]);
+
+        return $stmt->rowCount();
+    }
 }

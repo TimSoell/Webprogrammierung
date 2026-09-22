@@ -7,8 +7,10 @@
  *
  *              In der Datenbank stehen nur Wochenmuster: "dienstags 18 Uhr"
  *              (kurstermine) und "montags 10 bis 13 Uhr" (verfuegbarkeiten).
- *              Welche Tage das in den nächsten zwei Wochen sind, rechnet
- *              diese Klasse aus. Kein SQL - das bleibt in den Repositories.
+ *              Welche Tage das konkret sind, rechnet diese Klasse aus: für
+ *              Kurse der laufende und die zwei folgenden Monate, für
+ *              Probetrainings die nächsten zwei Wochen. Kein SQL - das
+ *              bleibt in den Repositories.
  *
  *              ZWEI AUFGABEN, EINE QUELLE
  *              Dieselben Methoden, die dem Browser die Termine liefern,
@@ -29,8 +31,14 @@ declare(strict_types=1);
 
 final class Terminplan
 {
-    /** So viele Tage im Voraus zeigt der Kalender und nimmt Buchungen an. */
+    /** So viele Tage im Voraus zeigt der Probetraining-Kalender und nimmt Buchungen an. */
     public const TAGE_VORAUS = 14;
+
+    /**
+     * So viele Monate nach dem laufenden zeigt der Kurskalender und nimmt
+     * Buchungen an. 2 heißt: im September bis Ende November.
+     */
+    public const MONATE_VORAUS = 2;
 
     /** Länge eines Probetrainings. Die Fenster werden in diese Stücke geschnitten. */
     public const PROBETRAINING_MINUTEN = 60;
@@ -57,7 +65,7 @@ final class Terminplan
     }
 
     /**
-     * Erster und letzter Tag des Zeitraums, den der Kalender zeigt.
+     * Erster und letzter Tag des Zeitraums, den der Probetraining-Kalender zeigt.
      *
      * @param DateTimeImmutable $jetzt
      * @return array{0: string, 1: string}  ['JJJJ-MM-TT', 'JJJJ-MM-TT'], beide einschließlich
@@ -71,21 +79,52 @@ final class Terminplan
     }
 
     /**
-     * Rollt einen Kurs-Wochenplan auf die konkreten Tage der nächsten zwei
-     * Wochen aus. Termine, die schon begonnen haben, fallen weg.
+     * Erster und letzter Monat, durch die man im Kurskalender blättern kann.
+     *
+     * @param DateTimeImmutable $jetzt
+     * @return array{0: string, 1: string}  ['JJJJ-MM', 'JJJJ-MM']
+     */
+    public static function kursMonate(DateTimeImmutable $jetzt): array
+    {
+        return [
+            $jetzt->format('Y-m'),
+            // 'first day of' zuerst: Am 31. ergäbe "+2 months" sonst einen
+            // Monat zu viel, weil es zum Beispiel keinen 31. November gibt.
+            $jetzt->modify('first day of this month')->modify('+' . self::MONATE_VORAUS . ' months')->format('Y-m'),
+        ];
+    }
+
+    /**
+     * Erster und letzter Tag eines Monats.
+     *
+     * @param string $monat  'JJJJ-MM', vorher gegen kursMonate() geprüft
+     * @return array{0: string, 1: string}  ['JJJJ-MM-TT', 'JJJJ-MM-TT'], beide einschließlich
+     */
+    public static function monatsZeitraum(string $monat): array
+    {
+        $erster = new DateTimeImmutable($monat . '-01', new DateTimeZone('Europe/Berlin'));
+
+        return [$erster->format('Y-m-d'), $erster->format('Y-m-t')];
+    }
+
+    /**
+     * Rollt einen Kurs-Wochenplan auf die konkreten Tage eines Zeitraums
+     * aus. Termine, die schon begonnen haben, fallen weg - auch wenn der
+     * Zeitraum früher anfängt.
      *
      * @param list<array{id: int|string, wochentag: int|string, beginn: string, dauer_minuten: int|string}> $wochenplan
      * @param DateTimeImmutable $jetzt
+     * @param string            $von  'JJJJ-MM-TT', einschließlich
+     * @param string            $bis  'JJJJ-MM-TT', einschließlich
      * @return list<array{terminId: int, datum: string, beginn: string, ende: string}>
      *         Nach Datum und Uhrzeit sortiert. beginn/ende als 'HH:MM'.
      */
-    public static function kursterminAusrollen(array $wochenplan, DateTimeImmutable $jetzt): array
+    public static function kursterminAusrollen(array $wochenplan, DateTimeImmutable $jetzt, string $von, string $bis): array
     {
         $termine = [];
+        $ende    = new DateTimeImmutable($bis, $jetzt->getTimezone());
 
-        for ($i = 0; $i < self::TAGE_VORAUS; $i++) {
-            $tag = $jetzt->setTime(0, 0)->modify("+{$i} days");
-
+        for ($tag = new DateTimeImmutable($von, $jetzt->getTimezone()); $tag <= $ende; $tag = $tag->modify('+1 day')) {
             foreach ($wochenplan as $zeile) {
                 if ((int) $zeile['wochentag'] !== (int) $tag->format('N')) {
                     continue;
@@ -113,7 +152,8 @@ final class Terminplan
     }
 
     /**
-     * Prüft, ob ein Kurstermin an diesem Tag stattfindet und noch buchbar ist.
+     * Prüft, ob ein Kurstermin an diesem Tag stattfindet und noch buchbar ist:
+     * nicht begonnen und nicht nach dem letzten Monat des Kalenders.
      *
      * @param array{id: int|string, wochentag: int|string, beginn: string, dauer_minuten: int|string} $zeile
      * @param string            $datum  'JJJJ-MM-TT' aus der Anfrage
@@ -122,7 +162,12 @@ final class Terminplan
      */
     public static function kursterminBuchbar(array $zeile, string $datum, DateTimeImmutable $jetzt): bool
     {
-        foreach (self::kursterminAusrollen([$zeile], $jetzt) as $termin) {
+        // Über den ganzen Zeitraum ausrollen, statt $datum zu zerlegen: So
+        // wird die Eingabe aus der Anfrage nur verglichen, nie geparst.
+        [, $letzterMonat] = self::kursMonate($jetzt);
+        [, $bis]          = self::monatsZeitraum($letzterMonat);
+
+        foreach (self::kursterminAusrollen([$zeile], $jetzt, $jetzt->format('Y-m-d'), $bis) as $termin) {
             if ($termin['datum'] === $datum) {
                 return true;
             }

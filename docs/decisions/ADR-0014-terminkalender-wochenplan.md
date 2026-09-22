@@ -1,6 +1,6 @@
 # ADR-0014 — Termine als Wochenplan, Buchungen mit Datum
 
-**Status:** angenommen
+**Status:** angenommen – Zeitraum der Kurse geändert durch [ADR-0015](ADR-0015-kurskalender-monate-und-tarif.md)
 **Datum:** 2026-09-21
 
 ## Kontext

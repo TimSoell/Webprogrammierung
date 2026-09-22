@@ -396,6 +396,24 @@
   line-height: 1.6;
 }
 
+/* Warnung, dass gebuchte Kurse storniert werden. Wie der Block "Das fällt
+   weg", aber als ganzer Satz. .modal-card > p davor, weil modal.css jedem
+   Absatz direkt in der Karte graue Schrift und eigenen Abstand gibt. */
+.modal-card > p.wechsel-storno {
+  margin: 0 0 24px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--danger);
+  background: #f6f5f0;
+  color: var(--ink);
+  font-size: .88rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.modal-card > p.wechsel-storno[hidden] {
+  display: none;
+}
+
 .wechsel-buttons {
   display: flex;
   flex-wrap: wrap;

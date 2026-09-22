@@ -2,16 +2,20 @@
 
 **Status:** fertig
 **Verantwortlich:** Jonny
-**Zuletzt geprüft:** 2026-09-21
+**Zuletzt geprüft:** 2026-09-22
 
 ## Was kann man damit
 
 Es gibt zwei Kalender und einen dritten Blick auf die eigenen Buchungen.
 
 **Kurstermine.** Auf jeder Kursseite öffnet der Button **„Termin buchen"** ein
-dunkles Fenster mit den nächsten zwei Wochen als **Kreisen**, einer pro Tag,
+dunkles Fenster mit einem **ganzen Monat** als **Kreisen**, einer pro Tag,
 darin nur die Tageszahl. Jedes Format findet zweimal pro Woche statt.
 
+- **Blättern:** Pfeile neben dem Monatsnamen, Wischen über den Kalender
+  (Finger oder Maus) oder zwei Finger waagerecht auf dem Touchpad. Es geht vom
+  laufenden Monat bis zwei Monate weiter (`Terminplan::MONATE_VORAUS`).
+  Vergangene Tage stehen blass und ohne Ring da.
 - **Kreis überfahren:** Darunter erscheinen die Kurse dieses Tages.
 - **Kreis anklicken:** Der Tag bleibt stehen, auch wenn die Maus auf dem Weg
   zu den Terminen über andere Kreise fährt.
@@ -23,6 +27,20 @@ darin nur die Tageszahl. Jedes Format findet zweimal pro Woche statt.
 Die Kreise zeigen auf einen Blick: Ring in Limette = Kurse, roter Ring =
 alles ausgebucht, gedämpft = keine Kurse, gefüllt = gewählter Tag, Punkt unter
 der Zahl = selbst gebucht.
+
+**Tarif.** Buchen kann nur, wer **am Tag des Kurses** einen Tarif mit Kursen
+hat (Kurs-Plan oder Premium), siehe
+[ADR-0015](../decisions/ADR-0015-kurskalender-monate-und-tarif.md). Ist man
+angemeldet, aber im gezeigten Monat sind keine Kurse im Tarif, steht über dem
+Kalender ein roter Hinweis mit **„Tarif anpassen"** (Link zu
+`mitgliedschaft.php`). An den Terminen fehlt dann der „Buchen"-Knopf. Der
+Hinweis sagt auch, ab wann ein Wechsel gilt: im laufenden Monat erst ab dem
+nächsten Ersten, in späteren Monaten rechtzeitig. Ohne Vertrag heißt es
+„Tarif wählen", die erste Wahl gilt sofort.
+
+Wechselt jemand auf einen Tarif ohne Kurse, werden seine Kurse ab dem
+nächsten Monatsersten **automatisch storniert**, siehe
+[mitgliedschaften.md](mitgliedschaften.md).
 
 **Probetraining.** Unter „Probetraining buchen" (Kopfzeile) und „Probetraining
 sichern" (Kursseiten) wählt man einen Coach, gibt seine Stufe an und nimmt
@@ -48,7 +66,7 @@ Einordnung, keine buchbare Kategorie.
 | 3 Service | `assets/js/services/kurstermine.js`, `probetrainings.js` |
 | 4 Endpunkt | `api/kurstermine.php`, `api/kursbuchungen.php`, `api/verfuegbarkeiten.php`, `api/probetrainings.php` |
 | 4 Unterbau | `src/Terminplan.php` (Termine ausrechnen und prüfen, ohne SQL) |
-| 5 Repository | `src/Repositories/KursterminRepository.php`, `KursbuchungRepository.php`, `ProbetrainingRepository.php` |
+| 5 Repository | `src/Repositories/KursterminRepository.php`, `KursbuchungRepository.php`, `ProbetrainingRepository.php`, `MitgliedschaftRepository.php` (`amTagFinden()` für die Tarifprüfung) |
 | 6 Tabelle | `kurstermine`, `kursbuchungen`, `verfuegbarkeiten`, `probetrainings` in `database/schema.sql` |
 | 6 Inhalte | Wochenplan und Verfügbarkeiten in `database/seed.sql` |
 | CSS | `assets/css/components/kalender.css`, `probetraining.css`, Variante in `modal.css` |
@@ -60,8 +78,8 @@ In der Datenbank stehen **Wochenmuster**, keine Einzeltermine — Begründung in
 
 | Tabelle | Beispielzeile | wird zu |
 |---|---|---|
-| `kurstermine` | Move · Small Group · Wochentag 2 · 18:00 · 60 Min. | jeder Dienstag der nächsten 14 Tage |
-| `verfuegbarkeiten` | Sofia Lindqvist · Wochentag 1 · 10:00–13:00 | Montag 10, 11, 12 Uhr, je 60 Min. |
+| `kurstermine` | Move · Small Group · Wochentag 2 · 18:00 · 60 Min. | jeder Dienstag des gezeigten Monats (laufender plus zwei weitere) |
+| `verfuegbarkeiten` | Sofia Lindqvist · Wochentag 1 · 10:00–13:00 | Montag 10, 11, 12 Uhr, je 60 Min., in den nächsten 14 Tagen |
 
 `wochentag` zählt **1 = Montag bis 7 = Sonntag**, wie PHPs `date('N')`. Nicht
 MySQLs `DAYOFWEEK()` nehmen — das beginnt mit 1 = Sonntag.
@@ -100,17 +118,29 @@ einem zweiten versuchen — das zweite bekommt „vollgeschwitzt".
 
 ## Datenform
 
-`termineLaden('move')`:
+`termineLaden('move', '2026-10')` (ohne Monat: der laufende):
 
-`von` und `bis` sind erster und letzter Tag des Kalenders, auch ohne Termin -
-daraus entstehen die Kreise. Sie kommen vom Server, damit Browser und Server
-beim selben „heute" anfangen.
+`von` und `bis` sind erster und letzter Tag des Monats, auch ohne Termin -
+daraus entstehen die Kreise. Sie kommen samt `heute` vom Server, damit Browser
+und Server dieselben Tage für vergangen halten. `ersterMonat` und
+`letzterMonat` begrenzen das Blättern.
+
+`tarif` ist `null`, wenn niemand angemeldet ist oder in diesem Monat kein
+Vertrag läuft. `wechselAb` ist der Tag, ab dem ein heute vorgemerkter
+Tarifwechsel gilt. Beides dient nur der Anzeige, die Sperre sitzt in
+`api/kursbuchungen.php`.
 
 ```json
 {
   "angemeldet": true,
-  "von": "2026-09-21",
-  "bis": "2026-10-04",
+  "monat": "2026-10",
+  "ersterMonat": "2026-09",
+  "letzterMonat": "2026-11",
+  "heute": "2026-09-22",
+  "von": "2026-10-01",
+  "bis": "2026-10-31",
+  "tarif": { "name": "Basisplan", "kurse": false },
+  "wechselAb": "2026-10-01",
   "termine": [
     {
       "terminId": 7, "datum": "2026-09-22", "beginn": "18:00", "ende": "19:00",
@@ -134,9 +164,9 @@ beim selben „heute" anfangen.
 
 | Methode | Pfad | Zweck | Antwort |
 |---|---|---|---|
-| GET | `api/kurstermine.php?slug=move` | Zeitraum, Termine, Belegung | siehe oben · 404 |
+| GET | `api/kurstermine.php?slug=move&monat=2026-10` | Monat, Termine, Belegung, Tarif | siehe oben · 400 Monat außerhalb · 404 |
 | GET | `api/kursbuchungen.php` | eigene kommende Kurse | `{ "buchungen": [...] }` |
-| POST | `api/kursbuchungen.php` | `{ terminId, datum, stufe }` | 201 · 400 · 409 voll oder doppelt |
+| POST | `api/kursbuchungen.php` | `{ terminId, datum, stufe }` | 201 · 400 · 403 Kurse nicht im Tarif · 409 voll oder doppelt |
 | DELETE | `api/kursbuchungen.php` | `{ id }` stornieren | `{ "storniert": true }` · 404 · 409 begonnen |
 | GET | `api/verfuegbarkeiten.php` | Coaches mit Verfügbarkeit | `{ "coaches": [...] }` |
 | GET | `api/verfuegbarkeiten.php?coach=13` | freie Termine | siehe oben · 404 |

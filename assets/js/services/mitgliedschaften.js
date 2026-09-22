@@ -32,6 +32,11 @@ import { getJson, postJson } from './api.js';
  * @property {string} wechselAb  Tag, ab dem ein jetzt vorgemerkter Wechsel
  *                               gelten würde, 'JJJJ-MM-TT'. Kommt vom Server,
  *                               damit Anzeige und Eintrag dasselbe Datum haben
+ * @property {number} kurseAbWechsel  gebuchte Kurse ab wechselAb. So viele
+ *                               würde ein Wechsel auf einen Tarif ohne Kurse
+ *                               automatisch stornieren
+ * @property {number} storniert  nach anpassen(): so viele Kurse wurden
+ *                               dabei storniert, sonst 0
  */
 
 /**
