@@ -55,7 +55,7 @@ $navItems = [
       <a class="nav-account" href="<?= e(BASE_URL . $kontoTarget) ?>"<?= ($activeNav ?? '') === 'konto' ? ' aria-current="page"' : '' ?>><?= e($kontoLabel) ?></a>
     </div>
 
-    <a class="button" href="<?= e(BASE_URL) ?>index.php#mitgliedschaft">Mitglied werden</a>
+    <a class="button" href="<?= e(BASE_URL) ?>mitgliedschaft.php">Mitglied werden</a>
 
     <button class="menu-button" id="menu-button" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="nav-links">MENU</button>
   </nav>

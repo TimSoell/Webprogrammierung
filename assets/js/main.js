@@ -15,18 +15,7 @@
  */
 
 import { initNav } from './components/nav.js';
-import { initModal } from './components/modal.js';
 import { initPreloader } from './components/preloader.js';
 
 initNav();
-
-// Das Anmeldefenster gibt es aktuell nur auf der Startseite. initModal()
-// beendet sich von selbst, wenn die Elemente auf der Seite fehlen - deshalb
-// kann der Aufruf hier trotzdem für alle Seiten stehen.
-initModal({
-  modalId: 'modal',
-  openId: 'open-modal',
-  closeId: 'close-modal',
-  focusId: 'name',
-});
 initPreloader();

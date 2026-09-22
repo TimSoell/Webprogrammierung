@@ -8,7 +8,6 @@ Seite eingebunden und existieren dadurch **genau einmal**.
 | `head.php` | `<head>` samt Titel, Schriften, CSS und JS. Öffnet `<body>` |
 | `header.php` | Kopfzeile mit Logo, Navigation und Aktionsbutton |
 | `footer.php` | Fußzeile. Schließt `</body>` und `</html>` |
-| `modal-anmeldung.php` | Overlay-Fenster für die Interessenten-Anmeldung |
 | `passwort-kriterien.php` | Liste der Passwort-Anforderungen unter einem Passwortfeld |
 | `kurskalender.php` | Fenster mit den Kursterminen, auf allen drei Kursseiten |
 
