@@ -24,7 +24,7 @@ if (!defined('BASE_URL')) {
       <div class="footer-app-boxes" aria-label="App-Links">
         <a class="store-badge badge-google" href="https://play.google.com/store/apps" target="_blank" rel="noopener noreferrer" aria-label="Google Play">
           <span class="badge-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 2.8v18.4c0 .5.6.8 1 .4l9.8-9.2-9.8-9.2c-.4-.4-1-.1-1 .4zm12.8 10.2 2.8 2.6-7.9 4.5 5.1-7.1zm3.8-3.5 2.9 1.7c1 .6 1 1.9 0 2.5l-2.9 1.7-3.3-3.8 3.3-3.8zm-3.8-1.8-2.8 2.6-5.1-7.1 7.9 4.5z" fill="currentColor"/></svg>
+            <img src="<?= e(BASE_URL) ?>assets/img/google-store-logo-transparent.png" alt="">
           </span>
           <span class="badge-copy">
             <small>ERHÄLTLICH BEI</small>
@@ -34,14 +34,20 @@ if (!defined('BASE_URL')) {
 
         <a class="store-badge badge-apple" href="https://www.apple.com/de/app-store/" target="_blank" rel="noopener noreferrer" aria-label="Apple App Store">
           <span class="badge-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M15.5 12.3c0-2.2 1.8-3.2 1.9-3.3-1-1.5-2.6-1.7-3.2-1.7-1.4-.1-2.7.8-3.4.8-.7 0-1.8-.8-2.9-.8-1.5 0-2.9.9-3.7 2.2-1.6 2.8-.4 6.9 1.1 9.2.8 1.1 1.6 2.3 2.8 2.3 1.1 0 1.5-.7 2.8-.7 1.3 0 1.7.7 2.8.7 1.2 0 1.9-1.1 2.7-2.2.8-1.3 1.2-2.5 1.2-2.6-.1-.1-2.3-.9-3.9-3.2zm-2.6-6.6c.6-.7 1-1.7.9-2.7-.9.1-1.9.6-2.5 1.3-.6.7-1.1 1.7-1 2.7 1 .1 1.9-.5 2.6-1.3z" fill="currentColor"/></svg>
+            <img src="<?= e(BASE_URL) ?>assets/img/apple-store-logo-transparent.png" alt="">
           </span>
           <span class="badge-copy">
-            <small>Download on the</small>
+            <small>ERHÄLTLICH BEI</small>
             <strong>App Store</strong>
           </span>
         </a>
       </div>
+
+      <nav class="footer-legal-links" aria-label="Rechtliche Informationen">
+        <a href="<?= e(BASE_URL) ?>agb.php">AGB</a>
+        <a href="<?= e(BASE_URL) ?>impressum.php">Impressum</a>
+        <a href="<?= e(BASE_URL) ?>datenschutz.php">Datenschutz</a>
+      </nav>
 
       <div class="footer-social-boxes" aria-label="Soziale Medien">
         <a class="social-link" href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
