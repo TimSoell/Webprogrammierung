@@ -120,8 +120,111 @@ header {
 
 /* --- Fußzeile ------------------------------------------------------------- */
 footer {
-  padding: 38px 0;
+  padding: 38px 0 26px;
   color: var(--muted);
+}
+
+.footer-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 26px;
+}
+
+.footer-app-boxes,
+.footer-social-boxes,
+.header-socials {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer-app-boxes,
+.footer-social-boxes {
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.store-badge,
+.social-link {
+  transition: transform .2s ease, opacity .2s ease, border-color .2s ease;
+}
+
+.store-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 194px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 12px;
+  background: rgba(17, 19, 19, .78);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .08);
+  color: var(--paper);
+  text-decoration: none;
+}
+
+.store-badge:hover,
+.social-link:hover {
+  transform: translateY(-1px);
+  opacity: .92;
+}
+
+.badge-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .06);
+}
+
+.badge-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.badge-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.05;
+}
+
+.badge-copy small {
+  color: rgba(240, 239, 233, .7);
+  font-size: .54rem;
+  letter-spacing: .08em;
+}
+
+.badge-copy strong {
+  color: var(--paper);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.badge-apple {
+  background: linear-gradient(135deg, rgba(245, 245, 245, .08), rgba(17, 19, 19, .9));
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 999px;
+  background: rgba(17, 19, 19, .78);
+  color: var(--paper);
+  text-decoration: none;
+}
+
+.social-link svg {
+  width: 18px;
+  height: 18px;
 }
 
 .footer-inner {
@@ -194,7 +297,21 @@ footer {
     display: none;
   }
 
+  .footer-meta {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .footer-app-boxes,
+  .footer-social-boxes {
+    justify-content: flex-start;
+  }
+
   .footer-inner {
     flex-direction: column;
+  }
+
+  .header-socials {
+    display: none;
   }
 }
