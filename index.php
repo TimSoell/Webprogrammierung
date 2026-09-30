@@ -3,7 +3,8 @@
  * @file        index.php
  * @layer       1 – Seite
  * @description Die Startseite. Scroll-Video, Hero, Studio-Vorstellung, die
- *              drei Programme, Philosophie und der Aufruf zur Mitgliedschaft.
+ *              drei Programme, Philosophie, die Bewertungen samt Fenster
+ *              "Alle Bewertungen" und der Aufruf zur Mitgliedschaft.
  *
  *              Diese Datei enthält bewusst NUR Inhalt und Struktur.
  *              Kein CSS, kein JavaScript, kein SQL. Das Aussehen liegt in
@@ -26,6 +27,10 @@ $pageTitle       = 'SCHWITZKASTEN — Athletic Club';
 $pageDescription = 'SCHWITZKASTEN Athletic Club — Dein neues Fitnessstudio in Köln. Strength, Move und Fight auf 1.200 m².';
 $pageScript      = 'index.page.js';
 $pageHasPreloader = true;
+
+// Entscheidet nur, ob im Fenster "Alle Bewertungen" das Formular oder der
+// Link zur Anmeldung steht. isLoggedIn() liest die Session, nicht die Datenbank.
+$angemeldet = Auth::instanz()->isLoggedIn();
 
 require ROOT_PATH . '/partials/head.php';
 require ROOT_PATH . '/partials/header.php';
@@ -180,6 +185,27 @@ require ROOT_PATH . '/partials/header.php';
         </ul>
       </div>
     </section>
+    <section class="light-section" id="bewertungen" aria-labelledby="bewertungen-heading">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Stimmen aus dem Club</p>
+            <h2 class="display section-title" id="bewertungen-heading">Was andere<br>sagen.</h2>
+          </div>
+          <p class="section-lead">Mitglieder und Gäste über ihr Training bei uns. Ungeschönt, auch wenn mal etwas nicht passt.</p>
+        </div>
+
+        <!-- Die Kacheln trägt assets/js/components/bewertungen.js ein. -->
+        <ul class="bewertungen-kacheln" id="bewertungen-kacheln"></ul>
+        <p class="bewertungen-meldung" id="bewertungen-meldung" role="status">Bewertungen werden geladen …</p>
+
+        <div class="bewertungen-fuss" id="bewertungen-fuss" hidden>
+          <p class="bewertungen-fuss-schnitt" id="bewertungen-fuss-schnitt"></p>
+          <button class="button button--dark" id="bewertungen-oeffnen" type="button">Alle Bewertungen</button>
+        </div>
+      </div>
+    </section>
+
     <section class="join" id="mitgliedschaft">
       <div class="wrap join-inner">
         <div>
@@ -194,6 +220,52 @@ require ROOT_PATH . '/partials/header.php';
     </section>
 
   </main>
+
+  <!-- Das Fenster "Alle Bewertungen". Öffnen und Schließen übernimmt
+       assets/js/components/modal.js, befüllt wird es von
+       assets/js/components/bewertungen.js. -->
+  <div class="modal" id="bewertungen-modal" role="dialog" aria-modal="true" aria-labelledby="bewertungen-modal-titel">
+    <div class="modal-card modal-card--bewertungen">
+      <button class="modal-close" id="bewertungen-schliessen" type="button" aria-label="Fenster schließen">×</button>
+
+      <h2 id="bewertungen-modal-titel">Alle Bewertungen.</h2>
+
+      <div class="bewertungen-schnitt" id="bewertungen-schnitt" hidden></div>
+
+<?php if ($angemeldet): ?>
+      <form class="bewertung-formular" id="bewertung-formular" novalidate>
+        <h3 class="bewertung-formular-titel">Deine Bewertung</h3>
+
+        <fieldset class="bewertung-wahl">
+          <legend>Sterne</legend>
+          <input type="radio" name="sterne" id="sterne-1" value="1">
+          <label for="sterne-1" aria-label="1 Stern">★</label>
+          <input type="radio" name="sterne" id="sterne-2" value="2">
+          <label for="sterne-2" aria-label="2 Sterne">★</label>
+          <input type="radio" name="sterne" id="sterne-3" value="3">
+          <label for="sterne-3" aria-label="3 Sterne">★</label>
+          <input type="radio" name="sterne" id="sterne-4" value="4">
+          <label for="sterne-4" aria-label="4 Sterne">★</label>
+          <input type="radio" name="sterne" id="sterne-5" value="5">
+          <label for="sterne-5" aria-label="5 Sterne">★</label>
+        </fieldset>
+
+        <label class="bewertung-formular-label" for="bewertung-text">Was hat dir gefallen, was nicht?</label>
+        <textarea class="bewertung-formular-text" id="bewertung-text" name="text" rows="4" maxlength="1000"></textarea>
+
+        <button class="button" type="submit">Bewertung abschicken</button>
+        <p class="bewertung-formular-meldung" id="bewertung-formular-meldung" aria-live="polite"></p>
+      </form>
+<?php else: ?>
+      <p class="bewertungen-hinweis">
+        Du willst selbst bewerten?
+        <a href="<?= e(BASE_URL) ?>anmelden.php">Melde dich an</a> - als Mitglied oder mit einem kostenlosen Konto.
+      </p>
+<?php endif; ?>
+
+      <ul class="bewertungen-liste" id="bewertungen-liste"></ul>
+    </div>
+  </div>
 
 <?php
 require ROOT_PATH . '/partials/footer.php';

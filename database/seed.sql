@@ -31,6 +31,7 @@
 --              Coaches. Mitgliedschaften: die vier Tarife des Studios - ohne
 --              sie ist die Seite mitgliedschaft.php leer. Terminkalender:
 --              der Wochenplan der Kurse und die Verfügbarkeiten der Coaches.
+--              Bewertungen: sechs Beispielbewertungen ohne Konto.
 --
 --              Konten für den Mitglieder-Login gehören nicht hierher, weil sie
 --              ein Passwort brauchen - die legt man über die Registrierung an.
@@ -511,3 +512,34 @@ FROM (
     UNION ALL SELECT 'David Ostermann', 5, '10:00:00', '13:00:00'
 ) AS t
 JOIN coaches c ON c.name = t.coach;
+
+
+-- -----------------------------------------------------------------------------
+-- FEATURE BEWERTUNGEN
+-- -----------------------------------------------------------------------------
+-- Beispielbewertungen ohne Konto (mitglied_id NULL). Nur sie werden gelöscht
+-- und neu angelegt - Bewertungen echter Konten bleiben stehen.
+--
+-- Die Bilder liefert das Team nach, siehe assets/img/bewertungen/README.md.
+-- Bis dahin zeigt die Seite die Initialen.
+DELETE FROM bewertungen WHERE mitglied_id IS NULL;
+
+INSERT INTO bewertungen (name, war_mitglied, sterne, text, bild, erstellt_am) VALUES
+    ('Ben W.', 1, 5,
+     'Move hat meinen Rücken gerettet. Nach acht Wochen Mobility sitze ich wieder ohne Schmerzen am Schreibtisch.',
+     'assets/img/bewertungen/ben-w.jpg', '2026-08-12 19:40:00'),
+    ('Aylin T.', 0, 3,
+     'Schönes Studio und nette Leute an der Theke. Parkplätze rund um die Venloer Straße sind aber ein Albtraum, ich komme inzwischen nur noch mit dem Rad.',
+     'assets/img/bewertungen/aylin-t.jpg', '2026-08-21 11:15:00'),
+    ('Marco S.', 1, 5,
+     '24/7 ist für mich als Schichtarbeiter der eigentliche Grund. Um drei Uhr nachts allein an der Hantelbank - gibt nichts Besseres.',
+     'assets/img/bewertungen/marco-s.jpg', '2026-08-30 03:20:00'),
+    ('Johanna K.', 1, 4,
+     'Geräte top, Recovery-Zone ist mein Lieblingsort. Abzug, weil es montags ab 18 Uhr richtig voll wird - die Auslastungsanzeige hilft aber, dem aus dem Weg zu gehen.',
+     'assets/img/bewertungen/johanna-k.jpg', '2026-09-09 21:05:00'),
+    ('Can Y.', 0, 5,
+     'Probetraining im Fight-Bereich gemacht. Kleine Gruppe, der Coach hatte Zeit für jeden. Ich überlege ernsthaft, zu wechseln.',
+     'assets/img/bewertungen/can-y.jpg', '2026-09-18 17:50:00'),
+    ('Lea M.', 1, 5,
+     'Seit einem halben Jahr im Strength-Programm. Lena korrigiert jede Wiederholung, ohne dass es sich wie Schule anfühlt. Zum ersten Mal ziehe ich ein Training wirklich durch.',
+     'assets/img/bewertungen/lea-m.jpg', '2026-09-24 08:10:00');
