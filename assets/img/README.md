@@ -6,6 +6,8 @@ HTML verlinkt. Eigene Dateien liegen bisher nur hier:
 - `schwitzkasten-logo.png` — das Logo in der Kopfzeile
 - `coaches/` — Porträtfotos für die Programmseiten, siehe die
   [README dort](coaches/README.md)
+- `bewertungen/` — KI-generierte Bilder zu den Beispielbewertungen auf der
+  Startseite, siehe die [README dort](bewertungen/README.md)
 
 ## Wenn eigene Bilder dazukommen
 
