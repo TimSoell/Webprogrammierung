@@ -89,14 +89,14 @@ bewertet hat. Name und Mitgliedsstatus ergänzt der Endpunkt selbst.
 aus `database/seed.sql` und haben keine `mitglied_id`. Nur sie löscht
 `seed.sql` beim erneuten Einspielen — Bewertungen echter Konten bleiben.
 
+Tabelle und Beispiele stehen seit 2026-09-30 in `schwitzkasten-dev` und in
+der Produktionsdatenbank. Eingespielt wurde jeweils nur der Abschnitt
+„FEATURE BEWERTUNGEN" aus `schema.sql` (samt der RLS-Zeile) und aus
+`seed.sql`. Fehlt die Tabelle, zeigt die Startseite an der Stelle nur
+„Die Bewertungen sind gerade nicht abrufbar."
+
 ## Was fehlt noch
 
-- **Vor dem Merge:** Tabelle und Beispiele auch in der
-  Produktionsdatenbank anlegen. In `schwitzkasten-dev` stehen sie seit
-  2026-09-30. Nur den Abschnitt „FEATURE BEWERTUNGEN" aus `schema.sql`
-  (samt der RLS-Zeile) und aus `seed.sql` ausführen, nicht die ganzen
-  Dateien. Fehlt die Tabelle, zeigt die Startseite an der Stelle nur
-  „Die Bewertungen sind gerade nicht abrufbar."
 - Die sechs Bilder in `assets/img/bewertungen/`
 - Bewertungen erscheinen sofort, ohne Freigabe. Für eine öffentliche
   Domain wäre eine Freigabe durch das Team zu überlegen.
