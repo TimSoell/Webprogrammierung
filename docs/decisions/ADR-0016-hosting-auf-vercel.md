@@ -1,6 +1,6 @@
 # ADR-0016 — Hosting auf Vercel mit der Laufzeit vercel-php
 
-**Status:** angenommen
+**Status:** angenommen, `X-Robots-Tag: noindex` ersetzt durch [ADR-0018](ADR-0018-indexierung-bei-google.md)
 **Datum:** 2026-09-30
 
 ## Kontext

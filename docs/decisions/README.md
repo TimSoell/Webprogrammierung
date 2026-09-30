@@ -40,5 +40,6 @@ Kein ADR für: Farbwerte, Textänderungen, das Anlegen einer einzelnen Datei.
 | [0013](ADR-0013-auslastung-und-besuche.md) | Auslastung als Summe aus fester Kurve und gezählten Besuchen | angenommen |
 | [0014](ADR-0014-terminkalender-wochenplan.md) | Termine als Wochenplan, Buchungen mit Datum | angenommen |
 | [0015](ADR-0015-kurskalender-monate-und-tarif.md) | Kurskalender monatsweise, Kurse nur mit passendem Tarif | angenommen |
-| [0016](ADR-0016-hosting-auf-vercel.md) | Hosting auf Vercel mit der Laufzeit vercel-php | angenommen |
+| [0016](ADR-0016-hosting-auf-vercel.md) | Hosting auf Vercel mit der Laufzeit vercel-php | angenommen, noindex ersetzt durch 0018 |
 | [0017](ADR-0017-postgresql-auf-supabase.md) | PostgreSQL bei Supabase, Sitzungen in der Datenbank | angenommen |
+| [0018](ADR-0018-indexierung-bei-google.md) | Die Seite darf bei Google erscheinen | angenommen |
