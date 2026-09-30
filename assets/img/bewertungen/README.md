@@ -5,8 +5,9 @@ Die Bilder erscheinen an zwei Stellen: **groß als Kachel** im Abschnitt
 im Fenster „Alle Bewertungen". Die Bilder sind KI-generiert und kommen aus
 dem Team.
 
-**Solange eine Datei fehlt, zeigt die Seite die Initialen des Namens** statt
-eines kaputten Bildsymbols. Die Seite funktioniert also auch ohne Bilder.
+**Solange eine Datei fehlt, wird die Kachel zur Zitat-Kachel** — ein großes
+Anführungszeichen statt des Fotos. Im Fenster steht dann ein kleiner Kreis
+mit den Initialen. Die Seite funktioniert also auch ohne Bilder.
 
 ## Welche Dateien erwartet werden
 
@@ -28,7 +29,9 @@ Johanna K.
 Anderer Name oder Dateiname? Dann in `seed.sql` ändern und neu einspielen —
 nicht im PHP oder JavaScript suchen, dort steht kein Dateiname.
 
-Bewertungen echter Konten haben kein Bild, dort stehen immer die Initialen.
+Bewertungen echter Konten bekommen später **kein Bild aus diesem Ordner**,
+sondern das Profilbild, das die Person selbst anlegt und freigibt (Feature
+von Philipp). Bis dahin erscheinen sie als Zitat-Kachel.
 
 ## Anforderungen an die Bilder
 

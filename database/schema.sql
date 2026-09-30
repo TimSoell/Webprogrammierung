@@ -836,8 +836,9 @@ CREATE TABLE IF NOT EXISTS bewertungen (
     text         varchar(1000) NOT NULL,
 
     -- Pfad relativ zur BASE_URL, z. B. 'assets/img/bewertungen/lea-m.jpg'.
-    -- Nur die Beispielbewertungen haben ein Bild, sonst zeigt die Karte
-    -- die Initialen.
+    -- Nur die Beispielbewertungen haben hier ein Bild. Bewertungen mit
+    -- Konto bekommen später das freigegebene Profilbild; ohne Bild zeigt
+    -- die Startseite eine Zitat-Kachel.
     bild         varchar(255)  NULL,
 
     erstellt_am  timestamp(0)  NOT NULL DEFAULT LOCALTIMESTAMP(0),

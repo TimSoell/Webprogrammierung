@@ -74,21 +74,33 @@
   object-fit: cover;
 }
 
-/* Ohne Bild: die Initialen groß im oberen Teil, über dem Text. */
-.bewertung-kachel-bild--ersatz {
-  display: grid;
-  padding-top: 70px;
-  color: var(--lime);
-  font: 800 6rem/1 var(--display);
-  place-items: start center;
-}
-
+/* Verlauf, damit der Text auf jedem Foto lesbar bleibt. */
 .bewertung-kachel::after {
   position: absolute;
   inset: 0;
   content: "";
   background: linear-gradient(0deg, color-mix(in srgb, var(--ink) 94%, transparent), transparent 75%);
   pointer-events: none;
+}
+
+/* Zitat-Kachel: kein Foto (kein Profilbild oder Datei fehlt). Statt der
+   Initialen steht oben ein großes Anführungszeichen, der Text wird größer. */
+.bewertung-kachel--zitat::after {
+  content: none;
+}
+
+.bewertung-kachel-zeichen {
+  position: absolute;
+  top: 10px;
+  left: 22px;
+  color: var(--lime);
+  font: 800 10rem/1 var(--display);
+}
+
+.bewertung-kachel--zitat .bewertung-kachel-text {
+  font-size: 1.05rem;
+  -webkit-line-clamp: 9;
+  line-clamp: 9;
 }
 
 .bewertung-kachel-inhalt {
