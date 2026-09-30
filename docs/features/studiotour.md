@@ -2,7 +2,7 @@
 
 **Status:** in Arbeit
 **Verantwortlich:** offen
-**Zuletzt geprueft:** 2026-09-21
+**Zuletzt geprueft:** 2026-09-30
 
 ## Was kann man damit
 
@@ -77,18 +77,26 @@ Video bis zu 112 ms, und beim Scrollen kamen nur 52 der 313 Bilder
 ueberhaupt auf den Bildschirm. Umgewandelt mit:
 
 ```bash
-ffmpeg -i hf_20260921_110742_c6c26f9d-b1f7-4c47-83aa-2ca04db5dbe7.mp4 -an -vf "scale=1280:-2,fps=24" -c:v libx264 -profile:v high -pix_fmt yuv420p -g 1 -crf 28 -movflags +faststart assets/img/studio-tour.mp4
+ffmpeg -i hf_20260921_110742_c6c26f9d-b1f7-4c47-83aa-2ca04db5dbe7.mp4 -an -vf "fps=24" -c:v libx264 -profile:v high -pix_fmt yuv420p -g 1 -crf 28 -movflags +faststart assets/img/studio-tour.mp4
 ```
 
-Ergebnis: H.264 High, 1280×720, 24 fps, 313 Bilder, 13,04 s, jedes Bild
-ein Keyframe, 5,2 MB. Ein Sprung dauert rund 3 ms.
+Ergebnis: H.264 High, **1920×1080**, 24 fps, 313 Bilder, 13,04 s, jedes
+Bild ein Keyframe, ohne Tonspur, 9,8 MB. Ein Sprung dauert im Mittel rund
+6 ms (Rohmaterial: 224 ms).
+
+Bis 2026-09-30 war die Datei auf 1280×720 verkleinert (5,2 MB). Sie wurde
+auf volle Aufloesung umgestellt, weil das Video bildschirmfuellend laeuft
+und auf grossen Monitoren sichtbar unscharf war.
 
 Abweichend vom Befehl in `scroll-video.md`:
 
+- Kein `scale=1280:-2` - die volle Aufloesung bleibt erhalten.
 - `fps=24` statt 25, weil das Rohmaterial 24 fps hat. Mit 25 wuerde ffmpeg
   einzelne Bilder doppelt einfuegen.
-- `-crf 28` statt 26, sonst waeren es 6,4 MB. Der Unterschied ist bei
-  dieser Kamerafahrt mit viel Bewegungsunschaerfe nicht zu sehen.
+- `-crf 28` statt 26. Verglichen wurden crf 22, 25 und 28 (17,4 / 13,1 /
+  9,8 MB). Der Unterschied ist bei dieser Kamerafahrt mit viel
+  Bewegungsunschaerfe nicht zu sehen (SSIM zum Rohmaterial 0,989 / 0,986 /
+  0,982), die Datei muss aber vor dem Scrollen komplett geladen sein.
 
 **Keine Zwischenbilder berechnet.** 313 Bilder auf rund 520vh Scrollweg sind
 bei einem 900 px hohen Fenster rund 15 px pro Bild - das reicht (Grenze

@@ -129,12 +129,23 @@ wie Bilder dazukommen.
 
 ### Die aktuelle Datei
 
-Enthaelt nur das letzte Viertel des Originals (Commit `214e1e9`), also Bild
-91 bis 120 bzw. 3,79 s bis 5,04 s. Diese 30 Bilder wurden mit dem Befehl oben
-auf 117 Bilder interpoliert. Ergebnis: H.264 High, 1280×720, 96 fps,
-117 Bilder, 1,22 s, jedes Bild ein Keyframe, ohne Tonspur, Metadaten am
-Dateianfang, 1,1 MB. Ein Sprung dauert damit an jeder Stelle des Videos
-rund 3 ms, mit dem Original waren es je nach Position bis zu 44 ms.
+`scroll-video.mp4` ist das Hero-Video der Startseite. Seit es nicht mehr
+scrollgesteuert ist, sondern einmal abspielt, gelten die Anforderungen oben
+dafuer nicht mehr: Beim normalen Abspielen wird nie gesprungen, deshalb
+braucht es weder jedes Bild als Keyframe noch Zwischenbilder.
+
+Seit 2026-09-30 ist es deshalb wieder der ganze Clip in voller Aufloesung:
+
+```bash
+ffmpeg -i original.mp4 -an -c:v libx264 -profile:v high -pix_fmt yuv420p -crf 22 -movflags +faststart assets/img/scroll-video.mp4
+```
+
+Ergebnis: H.264 High, 1920×1080, 24 fps, 5,04 s, ohne Tonspur, Metadaten
+am Dateianfang, 1,3 MB.
+
+Vorher enthielt die Datei nur das letzte Viertel des Originals (Commit
+`214e1e9`), auf 96 fps interpoliert, in 1280×720, 1,1 MB - passend zum
+frueheren Scrubben.
 
 ## Wie das Nachziehen funktioniert
 
