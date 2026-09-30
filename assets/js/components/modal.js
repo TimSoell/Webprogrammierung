@@ -7,12 +7,12 @@
  *              alle drei erwarten: über das X, über einen Klick neben das
  *              Fenster und über die Escape-Taste.
  *
- *              Die Komponente kennt den INHALT des Fensters nicht. Was im
- *              Formular passiert, steht in assets/js/pages/index.page.js.
- *              Dadurch lässt sich dieses Modal für jedes andere Fenster
- *              wiederverwenden.
+ *              Die Komponente kennt den INHALT des Fensters nicht. Was darin
+ *              passiert, steht im jeweiligen Seitenskript. Dadurch lässt
+ *              sich dieses Modal für jedes Fenster wiederverwenden - aktuell
+ *              Kurskalender und Tarifwechsel.
  * @see         assets/css/components/modal.css
- * @see         partials/modal-anmeldung.php
+ * @see         partials/kurskalender.php
  */
 
 import { $ } from '../lib/dom.js';

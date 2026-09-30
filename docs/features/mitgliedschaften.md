@@ -130,9 +130,15 @@ Der Tarifstand, wie ihn `services/mitgliedschaften.js` liefert:
                       "preisMonatlich": 44.90, "beginntAm": "2026-09-21", "endetAm": "2026-09-30",
                       "zugang": { "geraete": true, "wellness": true, "kurse": false } },
   "geplant":        { "tarif": "premium", "name": "Premium", "beginntAm": "2026-10-01", "…": "…" },
-  "wechselAb":      "2026-10-01"
+  "wechselAb":      "2026-10-01",
+  "kurseAbWechsel": 2,
+  "storniert":      0
 }
 ```
+
+`kurseAbWechsel`: gebuchte Kurse ab `wechselAb`, also so viele, wie ein
+Wechsel auf einen Tarif ohne Kurse stornieren würde. `storniert`: nach einem
+POST die Zahl der tatsächlich stornierten Kurse, sonst 0.
 
 `mitgliedschaft` und `geplant` sind einzeln `null`, wenn es sie nicht gibt.
 Kein Tarif gewählt zu haben ist kein Fehler: Man registriert sich zuerst und
@@ -181,7 +187,16 @@ Seite leer.
 - **Die Rückfrage beim Verlassen der Seite ist die des Browsers.** Ihren
   Wortlaut können wir nicht bestimmen, das erlauben Browser seit Jahren nicht
   mehr. Sie erscheint außerdem nur, wenn auf der Seite vorher geklickt wurde.
-- Die Zugangsrechte werden noch von niemandem abgefragt. Das passiert erst,
-  wenn es Kurse (`zugang_kurse`) oder einen Wellness-Bereich gibt.
+- Von den Zugangsrechten fragt bisher nur der Kurskalender `zugang_kurse` ab,
+  und zwar für den Tag des Kurses, siehe
+  [ADR-0015](../decisions/ADR-0015-kurskalender-monate-und-tarif.md).
+  `zugang_geraete` und `zugang_wellness` prüft noch niemand.
+- **Ein Wechsel auf einen Tarif ohne Kurse storniert Kurse.** Gilt ab dem
+  nächsten Monatsersten ein Tarif ohne Kurse (nach einem Wechsel oder einer
+  Rücknahme), löscht der Endpunkt alle Kursbuchungen ab diesem Tag. Das
+  Bestätigungsfenster warnt vorher mit der Anzahl (`kurseAbWechsel` aus dem
+  GET), die Erfolgsmeldung nennt danach die tatsächlich stornierten
+  (`storniert` aus dem POST). Nimmt man den Wechsel zurück, kommen die Kurse
+  nicht wieder.
 - **Eine verworfene Vormerkung ist nicht nachvollziehbar** — sie wird beim
   Ersetzen gelöscht. Für ein Abrechnungssystem bräuchte es ein Protokoll.

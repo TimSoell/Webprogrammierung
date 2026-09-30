@@ -71,6 +71,32 @@ final class MitgliedschaftRepository
     }
 
     /**
+     * Sucht den Vertrag, der an einem bestimmten Tag gilt - auch einen
+     * vorgemerkten. Der Kurskalender fragt damit, ob an einem Tag in einem
+     * späteren Monat Kurse im Tarif enthalten sind.
+     *
+     * @param int    $mitgliedId  mitglieder.id
+     * @param string $datum       'JJJJ-MM-TT'
+     * @return array<string, mixed>|null  null, wenn an dem Tag kein Vertrag läuft
+     */
+    public function amTagFinden(int $mitgliedId, string $datum): ?array
+    {
+        $stmt = Database::connection()->prepare(
+            'SELECT ' . self::SPALTEN . '
+               FROM mitgliedschaften m
+               JOIN tarife t ON t.id = m.tarif_id
+              WHERE m.mitglied_id = ?
+                AND m.beginnt_am <= ?
+                AND (m.endet_am IS NULL OR m.endet_am >= ?)
+              ORDER BY m.beginnt_am DESC, m.id DESC
+              LIMIT 1'
+        );
+        $stmt->execute([$mitgliedId, $datum, $datum]);
+
+        return $stmt->fetch() ?: null;
+    }
+
+    /**
      * Sucht den vorgemerkten Wechsel eines Mitglieds - den Vertrag, der erst
      * in der Zukunft beginnt.
      *

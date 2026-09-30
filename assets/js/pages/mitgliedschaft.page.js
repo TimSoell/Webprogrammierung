@@ -76,6 +76,8 @@ if (seite) {
     mitgliedschaft: null,
     geplant: null,
     wechselAb: '',
+    kurseAbWechsel: 0,
+    storniert: 0,
 
     // Gäste sehen alle Preise, dürfen aber ohnehin nichts abschließen.
     // Für Angemeldete überschreibt der Server diese Liste.
@@ -164,6 +166,11 @@ if (seite) {
 
     const rechte = (von, nach) => Object.keys(LEISTUNGEN).filter((recht) => !von[recht] && nach[recht]);
 
+    // Enthält der Tarif ab dem nächsten Monatsersten keine Kurse, storniert
+    // der Server alle Kurse ab dann. Bei einer Rücknahme gilt ab dann wieder
+    // der laufende Tarif. Bei der Erstwahl kann es noch keine Buchungen geben.
+    const kurseDanach = art === 'erstwahl' || (art === 'ruecknahme' ? laufend.zugang.kurse : ziel.zugang.kurse);
+
     return {
       art,
       ziel,
@@ -172,6 +179,7 @@ if (seite) {
       gewinnt: rechte(vorher, nachher),
       verliert: rechte(nachher, vorher),
       gueltigAb: art === 'wechsel' ? stand.wechselAb : null,
+      storno: kurseDanach ? 0 : stand.kurseAbWechsel,
     };
   }
 
@@ -305,7 +313,22 @@ if (seite) {
       }));
     });
 
+    const storno = $('#wechsel-storno');
+    storno.hidden = was.storno === 0;
+    storno.textContent = was.storno === 0 ? '' : `Ab ${datumAnzeigen(stand.wechselAb)} sind in deinem Tarif keine Kurse `
+      + `enthalten. ${kurseText(was.storno)} ab diesem Tag ${was.storno === 1 ? 'wird' : 'werden'} automatisch storniert.`;
+
     bestaetigen.textContent = was.art === 'ruecknahme' ? 'Wechsel zurücknehmen' : 'Verbindlich ändern';
+  }
+
+  /**
+   * 'Dein gebuchter Kurs' oder 'Deine 3 gebuchten Kurse'.
+   *
+   * @param {number} anzahl  mindestens 1
+   * @returns {string}
+   */
+  function kurseText(anzahl) {
+    return anzahl === 1 ? 'Dein gebuchter Kurs' : `Deine ${anzahl} gebuchten Kurse`;
   }
 
   /**
@@ -395,7 +418,12 @@ if (seite) {
         ruecknahme: `Zurückgenommen. Dein ${was.ziel.name} läuft unverändert weiter.`,
       };
 
-      meldungZeigen(meldung, erfolg[was.art], true);
+      // Die Zahl kommt aus der Antwort - storniert hat der Server, nicht wir.
+      const storno = stand.storniert > 0
+        ? ` ${kurseText(stand.storniert)} ab ${datumAnzeigen(stand.wechselAb)} ${stand.storniert === 1 ? 'wurde' : 'wurden'} storniert.`
+        : '';
+
+      meldungZeigen(meldung, erfolg[was.art] + storno, true);
     } catch (fehler) {
       // 401: Die Sitzung ist abgelaufen, seit die Seite geladen wurde.
       if (fehler.status === 401) {

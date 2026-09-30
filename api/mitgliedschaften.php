@@ -4,8 +4,8 @@
  * @layer       4 – API-Endpunkt
  * @description Den eigenen Tarifstand lesen und ändern.
  *
- *                GET   -> { mitgliedschaft, geplant, wechselAb }
- *                POST  { tarif, preisgruppe } -> derselbe Stand danach
+ *                GET   -> { mitgliedschaft, geplant, wechselAb, kurseAbWechsel, ... }
+ *                POST  { tarif, preisgruppe } -> derselbe Stand danach, dazu storniert
  *
  *              Beides nur für angemeldete Mitglieder, sonst 401.
  *
@@ -24,10 +24,19 @@
  *              eigentliche Regel des Features:
  *              docs/decisions/ADR-0010-tarifwechsel-zum-monatsersten.md
  *
+ *              KURSE STORNIEREN
+ *              Enthält der Tarif, der nach einem Wechsel oder einer
+ *              Rücknahme ab wechselAb gilt, keine Kurse, werden alle
+ *              gebuchten Kurse ab diesem Tag storniert. Wie viele das wären,
+ *              steht vorher in kurseAbWechsel (für die Warnung im
+ *              Bestätigungsfenster), wie viele es waren, danach in storniert.
+ *              Siehe docs/decisions/ADR-0015-kurskalender-monate-und-tarif.md
+ *
  *              Kündigen gibt es bewusst nicht - siehe
  *              docs/features/mitgliedschaften.md, Abschnitt "Was fehlt noch".
  * @see         assets/js/services/mitgliedschaften.js
  * @see         src/Repositories/MitgliedschaftRepository.php
+ * @see         src/Repositories/KursbuchungRepository.php
  * @see         src/Repositories/TarifRepository.php
  */
 
@@ -35,6 +44,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/../src/bootstrap.php';
 
+use Repositories\KursbuchungRepository;
 use Repositories\MitgliedRepository;
 use Repositories\MitgliedschaftRepository;
 use Repositories\NachweisRepository;
@@ -63,6 +73,7 @@ try {
     $mitgliedschaften = new MitgliedschaftRepository();
     $nachweise        = new NachweisRepository();
     $tarife           = new TarifRepository();
+    $kursbuchungen    = new KursbuchungRepository();
 
     /**
      * Welche Preisgruppen dieses Mitglied wählen darf.
@@ -148,17 +159,45 @@ try {
      * was heute gilt, was vorgemerkt ist und ab wann ein neuer Wechsel
      * wirksam würde.
      */
-    $standAntworten = static function (int $status) use ($mitgliedschaften, $mitgliedId, $alsAntwort, $erlaubtePreisgruppen): void {
+    $standAntworten = static function (int $status, int $storniert = 0) use ($mitgliedschaften, $kursbuchungen, $mitgliedId, $alsAntwort, $erlaubtePreisgruppen): void {
+        $wechselAb = $mitgliedschaften->naechsterWechseltermin();
+
         Api::antworten([
             'mitgliedschaft' => $alsAntwort($mitgliedschaften->aktiveFinden($mitgliedId)),
             'geplant'        => $alsAntwort($mitgliedschaften->geplanteFinden($mitgliedId)),
-            'wechselAb'      => $mitgliedschaften->naechsterWechseltermin(),
+            'wechselAb'      => $wechselAb,
+
+            // So viele Kurse würde ein Wechsel auf einen Tarif ohne Kurse
+            // stornieren. Die Seite warnt damit im Bestätigungsfenster.
+            'kurseAbWechsel' => count($kursbuchungen->fuerMitgliedFinden($mitgliedId, $wechselAb)),
+
+            // Nur nach einem POST ungleich 0: so viele wurden gerade storniert.
+            'storniert'      => $storniert,
 
             // Damit die Seite die Preisgruppen sperren kann, für die noch
             // kein Nachweis vorliegt. Die eigentliche Sperre sitzt im POST
             // unten - hier geht es nur um die Anzeige.
             'erlaubtePreisgruppen' => $erlaubtePreisgruppen(),
         ], $status);
+    };
+
+    /**
+     * Storniert die Kurse ab dem nächsten Monatsersten, wenn der Tarif, der
+     * dann gilt, keine Kurse mehr enthält. Läuft nach jeder Änderung und
+     * fragt den Stand danach ab - so ist egal, ob gewechselt oder eine
+     * Vormerkung zurückgenommen wurde.
+     *
+     * @return int  so viele Buchungen wurden storniert
+     */
+    $kurseAufraeumen = static function () use ($mitgliedschaften, $kursbuchungen, $mitgliedId): int {
+        $ab      = $mitgliedschaften->naechsterWechseltermin();
+        $vertrag = $mitgliedschaften->amTagFinden($mitgliedId, $ab);
+
+        if ($vertrag !== null && (bool) $vertrag['zugang_kurse']) {
+            return 0;
+        }
+
+        return $kursbuchungen->abDatumStornieren($mitgliedId, $ab);
     };
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -225,12 +264,14 @@ try {
             // wird verworfen.
             $mitgliedschaften->vormerkungZuruecknehmen($mitgliedId);
 
-            $standAntworten(200);
+            // Auch eine Rücknahme kann Kurse kosten: vorgemerkt war der
+            // Kurs-Plan, zurück geht es auf den Basisplan.
+            $standAntworten(200, $kurseAufraeumen());
         }
 
         $mitgliedschaften->wechselVormerken($mitgliedId, (int) $tarif['id'], $preisgruppe, (float) $preis);
 
-        $standAntworten(201);
+        $standAntworten(201, $kurseAufraeumen());
     }
 
     Api::fehler(405, 'Methode nicht erlaubt.');

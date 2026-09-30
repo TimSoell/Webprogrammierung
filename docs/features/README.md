@@ -26,6 +26,7 @@ kommt: „Wo muss ich anfassen, wenn ich am Kursplan etwas ändern will?"
 | [Gemerkte Auswahl](gemerkte-auswahl.md) | fertig | Jonny |
 | [Mitgliedschaften](mitgliedschaften.md) | in Arbeit | Felix |
 | [Nachweise](nachweise.md) | in Arbeit | Felix |
+| [Terminkalender](terminkalender.md) | fertig | Jonny |
 
 Der Aufbau eines Features ist am Beispiel-Feature beschrieben — siehe
 [`../ARCHITECTURE.md`](../ARCHITECTURE.md).

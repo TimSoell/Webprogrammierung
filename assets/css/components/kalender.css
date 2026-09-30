@@ -1,0 +1,660 @@
+/**
+ * @file        assets/css/components/kalender.css
+ * @layer       Komponente
+ * @description Die Terminkalender: Kurstermine im Fenster auf den
+ *              Kursseiten, freie Probetraining-Termine und "Meine Termine"
+ *              im Profil. Dazu die Auswahl der Stufe.
+ *
+ *              FARBEN
+ *              Alle drei Kalender stehen auf dunklem Grund, wie die restliche
+ *              Website - der Kurskalender in einem dunklen Fenster (Variante
+ *              .modal-card--kalender in modal.css). Die Farben laufen über
+ *              Variablen (--k-...), damit eine spätere Variante sie an einer
+ *              Stelle umstellen kann.
+ *
+ *              KREISE
+ *              Der Kurskalender zeigt einen Monat, die Tage als Kreise mit
+ *              der Tageszahl. Ring in Limette = Kurse, rot = alles
+ *              ausgebucht, gefüllt = gewählter Tag, Punkt = selbst gebucht,
+ *              blass ohne Ring = schon vorbei. Darüber Monatsname mit
+ *              Pfeilen zum Blättern und, falls Kurse nicht im Tarif sind,
+ *              der Hinweis .kalender-hinweis.
+ *
+ *              AUFKLAPPEN
+ *              .termin-details erscheint beim Überfahren (:hover), bei Fokus
+ *              per Tastatur (:focus-within) und nach einem Klick
+ *              (.termin--offen). .termin-aktion - Stufe und "Buchen" - nur
+ *              nach dem Klick. Das Skript setzt nur die Klasse, sichtbar
+ *              macht das CSS.
+ * @see         assets/js/components/kurskalender.js
+ * @see         assets/js/pages/probetraining.page.js
+ * @see         assets/js/components/meine-termine.js
+ */
+
+/* --- Farben je nach Untergrund -------------------------------------------- */
+.kalender {
+  --k-linie: var(--line);
+  --k-leise: var(--muted);
+  --k-flaeche: var(--ink-soft);
+  --k-akzent: var(--lime);
+  --k-warnung: var(--danger);
+
+  display: grid;
+  gap: 22px;
+}
+
+.kalender-datum {
+  margin: 0 0 8px;
+  font: 700 1.25rem var(--display);
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+
+.kalender-leer {
+  margin: 0;
+  color: var(--k-leise);
+  font-size: .88rem;
+}
+
+/* --- Kurskalender: Hinweis zum Tarif ---------------------------------------- */
+/* Wie .auth-message: roter Strich links. Daneben der Weg zur Mitgliedschaft. */
+.kalender-hinweis {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-left: 3px solid var(--k-warnung);
+  background: var(--k-flaeche);
+  gap: 14px 22px;
+}
+
+.kalender-hinweis-text p {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.kalender-hinweis-titel {
+  font-weight: 700;
+}
+
+.kalender-hinweis .kalender-hinweis-zusatz {
+  margin-top: 4px;
+  color: var(--k-leise);
+  font-size: .84rem;
+}
+
+.kalender-hinweis-link {
+  flex-shrink: 0;
+  min-height: 42px;
+}
+
+/* --- Kurskalender: ein Monat, ein Kreis pro Tag ----------------------------- */
+.kalender-monatsansicht {
+  display: grid;
+  gap: 22px;
+  /* Senkrecht scrollt der Browser, waagerecht wischt das Skript den Monat
+     weiter. user-select: Beim Wischen mit der Maus sonst blaue Markierung. */
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.kalender-monatskopf {
+  display: grid;
+  align-items: center;
+  gap: 12px;
+  grid-template-columns: auto 1fr auto;
+}
+
+.kalender-monat {
+  margin: 0;
+  color: var(--k-akzent);
+  font: 700 1.5rem/1 var(--display);
+  letter-spacing: .04em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.kalender-blaettern {
+  display: grid;
+  width: 40px;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 1px solid var(--k-linie);
+  background: none;
+  color: var(--paper);
+  cursor: pointer;
+  font: 400 1.6rem/1 var(--body);
+  place-items: center;
+  transition: border-color .15s, color .15s;
+}
+
+.kalender-blaettern:hover:not([disabled]),
+.kalender-blaettern:focus-visible {
+  border-color: var(--k-akzent);
+  color: var(--k-akzent);
+}
+
+/* Am Anfang und Ende des Kalenders: sichtbar, aber erkennbar ohne Wirkung. */
+.kalender-blaettern[disabled] {
+  cursor: default;
+  opacity: .3;
+}
+
+/* Beim Blättern bleibt der alte Monat stehen, bis der neue geladen ist. */
+.kalender--laedt .kalender-monatsansicht,
+.kalender--laedt .kalender-tagesansicht {
+  opacity: .45;
+  pointer-events: none;
+  transition: opacity .15s;
+}
+
+.kalender-raster {
+  display: grid;
+  gap: 10px;
+}
+
+/* Der neue Monat gleitet aus der Richtung herein, in die gewischt wurde. */
+.kalender-raster--von-rechts {
+  animation: kalender-von-rechts .25s ease-out;
+}
+
+.kalender-raster--von-links {
+  animation: kalender-von-links .25s ease-out;
+}
+
+@keyframes kalender-von-rechts {
+  from { opacity: 0; transform: translateX(32px); }
+}
+
+@keyframes kalender-von-links {
+  from { opacity: 0; transform: translateX(-32px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kalender-raster--von-rechts,
+  .kalender-raster--von-links {
+    animation: none;
+  }
+}
+
+.kalender-woche {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(7, 1fr);
+  justify-items: center;
+}
+
+.kalender-wochentag {
+  color: var(--k-leise);
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.kalender-kreis {
+  position: relative;
+  display: grid;
+  width: 52px;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 1px solid var(--k-linie);
+  border-radius: 50%;
+  background: none;
+  color: var(--k-leise);
+  cursor: pointer;
+  font: 700 1.2rem/1 var(--display);
+  place-items: center;
+  transition: background-color .15s, border-color .15s, color .15s;
+}
+
+/* Tage mit Kursen: Ring in der Akzentfarbe, Zahl hell. */
+.kalender-kreis--termine {
+  border-color: var(--k-akzent);
+  color: var(--paper);
+}
+
+/* Alles an dem Tag ausgebucht: roter Ring, Zahl gedämpft. */
+.kalender-kreis--voll {
+  border-color: var(--k-warnung);
+  color: var(--k-leise);
+}
+
+.kalender-kreis:hover,
+.kalender-kreis:focus-visible {
+  background: var(--k-flaeche);
+  outline: 2px solid var(--k-akzent);
+  outline-offset: 3px;
+}
+
+/* Der angeklickte Tag. Steht fest, bis ein anderer angeklickt wird. */
+.kalender-kreis[aria-pressed="true"] {
+  border-color: var(--lime);
+  background: var(--lime);
+  color: var(--ink);
+}
+
+/* Punkt unter der Zahl: an diesem Tag hat man selbst etwas gebucht. */
+.kalender-kreis--gebucht::after {
+  position: absolute;
+  bottom: 7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--lime);
+  content: "";
+}
+
+.kalender-kreis--gebucht[aria-pressed="true"]::after {
+  background: var(--ink);
+}
+
+/* Platzhalter für Tage aus dem Nachbarmonat - hält die Spalten. */
+.kalender-kreis--leer {
+  visibility: hidden;
+}
+
+/* Schon vorbei: nur noch die Zahl, ohne Ring und ohne Klick. */
+.kalender-kreis--vergangen {
+  border-color: transparent;
+  cursor: default;
+  opacity: .35;
+}
+
+.kalender-kreis--vergangen:hover {
+  background: none;
+  outline: 0;
+}
+
+.kalender-legende {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  color: var(--k-leise);
+  font-size: .74rem;
+  gap: 6px 18px;
+}
+
+.kalender-legende-eintrag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.kalender-legende-eintrag::before {
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--k-akzent);
+  border-radius: 50%;
+  content: "";
+}
+
+.kalender-legende-eintrag--voll::before {
+  border-color: var(--k-warnung);
+}
+
+.kalender-legende-eintrag--gebucht::before {
+  width: 5px;
+  height: 5px;
+  border: 0;
+  background: var(--lime);
+}
+
+/* Die Termine des gewählten (oder überfahrenen) Tages.
+   min-height, damit das Fenster beim Überfahren der Kreise nicht bei jedem
+   Tag seine Höhe ändert - Tage ohne Kurse sind sonst viel niedriger. */
+.kalender-tagesansicht {
+  min-height: 220px;
+  padding-top: 22px;
+  border-top: 1px solid var(--k-linie);
+}
+
+/* --- Liste der Termine eines Tages ---------------------------------------- */
+/* Linien durch gap auf eingefärbtem Raster, wie bei .merkmale. */
+.termine {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--k-linie);
+  gap: 1px;
+  background: var(--k-linie);
+  list-style: none;
+}
+
+.termin {
+  position: relative;
+  background: var(--k-flaeche);
+}
+
+.termin-kopf {
+  display: grid;
+  width: 100%;
+  align-items: center;
+  padding: 12px 14px;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  gap: 12px;
+  grid-template-columns: 7.5rem 1fr auto auto;
+  text-align: left;
+}
+
+.termin-kopf:hover .termin-titel,
+.termin-kopf:focus-visible .termin-titel {
+  text-decoration: underline;
+}
+
+.termin-zeit {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  /* "19:30–20:30" nie umbrechen - lieber rückt der Formatname nach rechts. */
+  white-space: nowrap;
+}
+
+.termin-titel {
+  font-weight: 500;
+}
+
+.termin-plaetze {
+  color: var(--k-leise);
+  font-size: .85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.termin-marke {
+  padding: 4px 8px;
+  background: var(--lime);
+  color: var(--ink);
+  font: 700 .64rem/1 var(--body);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.termin--voll .termin-marke {
+  background: var(--k-warnung);
+  color: #fff;
+}
+
+.termin--voll .termin-zeit,
+.termin--voll .termin-titel {
+  opacity: .55;
+}
+
+/* --- Aufgeklappt ----------------------------------------------------------- */
+.termin-details {
+  display: none;
+  padding: 0 14px 16px;
+  gap: 22px;
+  grid-template-columns: 1fr 1fr;
+}
+
+/* Beim Überfahren SCHWEBT die Info unter dem Termin, statt die Liste
+   auseinanderzuschieben. Sonst passiert Folgendes: Man fährt mit der Maus
+   nach unten, der obere Termin klappt beim Verlassen zu, alles darunter
+   rutscht nach oben - und der Klick trifft einen anderen Termin als den,
+   auf den man gezielt hat.
+   pointer-events: none, damit die Karte die Termine darunter nicht
+   verdeckt: Die Maus "fällt durch" und erreicht den nächsten Termin. */
+.termin:hover .termin-details,
+.termin:focus-within .termin-details {
+  position: absolute;
+  z-index: 2;
+  top: 100%;
+  right: -1px;
+  left: -1px;
+  display: grid;
+  padding-top: 14px;
+  border: 1px solid var(--k-linie);
+  background: var(--k-flaeche);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, .18);
+  pointer-events: none;
+}
+
+/* Nach dem Klick steht der Termin ganz normal in der Liste - mit Platz für
+   Stufe und "Buchen". Muss nach der Regel oben stehen, damit sie gewinnt. */
+.termin--offen .termin-details,
+.termin--offen:hover .termin-details,
+.termin--offen:focus-within .termin-details {
+  position: static;
+  display: grid;
+  padding-top: 0;
+  border: 0;
+  box-shadow: none;
+  pointer-events: auto;
+}
+
+.termin-infos p {
+  margin: 0 0 4px;
+  font-size: .84rem;
+  line-height: 1.45;
+}
+
+.termin-coach {
+  font-weight: 700;
+}
+
+.termin-schwerpunkt {
+  color: var(--k-leise);
+  font-style: italic;
+}
+
+.termin-infos .termin-beschreibung {
+  margin-top: 10px;
+  color: var(--k-leise);
+}
+
+/* Stufe und "Buchen" erst nach dem Klick - Überfahren allein bucht nichts. */
+.termin-aktion {
+  display: none;
+}
+
+.termin--offen .termin-aktion {
+  display: block;
+}
+
+.termin-label {
+  margin: 0 0 8px;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* --- Stufe wählen --------------------------------------------------------- */
+.stufen-auswahl {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  gap: 6px;
+}
+
+.stufe-option {
+  padding: 8px 12px;
+  border: 1px solid var(--k-linie, var(--line));
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font: 600 .72rem/1 var(--body);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.stufe-option:hover {
+  border-color: var(--k-akzent, var(--lime));
+}
+
+.stufe-option[aria-pressed="true"] {
+  border-color: var(--lime);
+  background: var(--lime);
+  color: var(--ink);
+}
+
+/* --- Rückmeldungen --------------------------------------------------------- */
+.kalender-meldung {
+  margin: 10px 0 0;
+  font-size: .84rem;
+  line-height: 1.5;
+}
+
+.kalender-meldung:empty {
+  display: none;
+}
+
+.kalender-meldung a {
+  text-decoration: underline;
+}
+
+.kalender-meldung--voll {
+  color: var(--k-warnung, var(--danger));
+  font-weight: 700;
+}
+
+.kalender-meldung--erfolg {
+  color: var(--k-akzent, var(--lime));
+  font-weight: 700;
+}
+
+.termin-aktion > .kalender-meldung:first-child {
+  margin-top: 0;
+}
+
+/* --- Meine Termine im Profil ----------------------------------------------- */
+.meine-termine {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: 1px;
+  background: var(--k-linie);
+  list-style: none;
+}
+
+.mein-termin {
+  display: grid;
+  align-items: center;
+  padding: 12px 14px;
+  background: var(--ink);
+  gap: 4px 14px;
+  grid-template-areas:
+    "zeit art       stornieren"
+    "text text      stornieren";
+  grid-template-columns: auto 1fr auto;
+}
+
+.mein-termin-zeit {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  grid-area: zeit;
+}
+
+.mein-termin-art {
+  justify-self: start;
+  padding: 3px 7px;
+  background: var(--lime);
+  color: var(--ink);
+  font: 700 .62rem/1 var(--body);
+  grid-area: art;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* Probetraining anders markiert, damit man es in der Liste sofort erkennt. */
+.mein-termin--probetraining .mein-termin-art {
+  background: var(--paper);
+}
+
+.mein-termin-text {
+  display: grid;
+  gap: 2px;
+  grid-area: text;
+}
+
+.mein-termin-titel {
+  font-weight: 500;
+}
+
+.mein-termin-zusatz {
+  color: var(--k-leise);
+  font-size: .8rem;
+}
+
+.mein-termin-stornieren {
+  padding: 7px 12px;
+  border: 1px solid var(--k-linie);
+  background: none;
+  color: var(--k-leise);
+  cursor: pointer;
+  font: 600 .68rem/1 var(--body);
+  grid-area: stornieren;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.mein-termin-stornieren:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.mein-termin-stornieren[disabled] {
+  cursor: default;
+  opacity: .5;
+}
+
+.kalender-leer a {
+  color: var(--k-akzent);
+  text-decoration: underline;
+}
+
+/* --- Aufruf auf der Kursseite ---------------------------------------------- */
+.kurskalender-aufruf {
+  margin-top: 22px;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  /* Sieben Kreise nebeneinander auf 375 px: kleiner und enger. */
+  .kalender-woche,
+  .kalender-raster {
+    gap: 6px;
+  }
+
+  .kalender-kreis {
+    width: 38px;
+    font-size: 1rem;
+  }
+
+  .kalender-kreis--gebucht::after {
+    bottom: 4px;
+  }
+
+  /* Hinweis und Button untereinander statt nebeneinander. */
+  .kalender-hinweis {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* Uhrzeit, ein langer Formatname und "18/20" passen auf 375 px nicht in
+     eine Zeile - der Name bekommt deshalb eine eigene. */
+  .termin-kopf {
+    gap: 4px 12px;
+    grid-template-areas:
+      "zeit  plaetze"
+      "titel titel"
+      "marke marke";
+    grid-template-columns: 1fr auto;
+  }
+
+  .termin-zeit    { grid-area: zeit; }
+  .termin-plaetze { grid-area: plaetze; }
+  .termin-titel   { grid-area: titel; }
+
+  .termin-marke {
+    justify-self: start;
+    grid-area: marke;
+  }
+
+  .termin-details {
+    grid-template-columns: 1fr;
+  }
+}

@@ -160,6 +160,9 @@ require ROOT_PATH . '/partials/header.php';
           </div>
         </div>
 
+        <!-- Nur sichtbar, wenn der Wechsel gebuchte Kurse storniert. -->
+        <p class="wechsel-storno" id="wechsel-storno" hidden></p>
+
         <div class="wechsel-buttons">
           <button class="button button--dark" id="wechsel-abbrechen" type="button">Abbrechen</button>
           <button class="button" id="wechsel-bestaetigen" type="button">Verbindlich ändern</button>

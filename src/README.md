@@ -9,6 +9,7 @@ Seiten und Endpunkten eingebunden.
 | `Database.php` | Die eine PDO-Verbindung zur Datenbank |
 | `Auth.php` | Die eine Instanz der Login-Bibliothek, Regeln für E-Mail und Passwort |
 | `Api.php` | JSON-Rumpf lesen und antworten, für die Endpunkte in `api/` |
+| `Terminplan.php` | Aus Wochenplänen konkrete Termine rechnen und angefragte Termine prüfen, ohne SQL |
 | `Repositories/` | Datenzugriff. Der einzige Ort mit SQL |
 
 ## Autoloader

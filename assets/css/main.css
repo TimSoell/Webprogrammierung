@@ -42,4 +42,7 @@
 @import "components/studio-info.css";
 @import "components/auslastung.css";
 @import "components/tarifkarte.css";
+@import "components/kalender.css";
+@import "components/probetraining.css";
 @import "components/ausweis-scan.css";
+@import "components/legal.css";

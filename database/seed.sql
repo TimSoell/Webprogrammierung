@@ -19,14 +19,16 @@
 --              bleiben unangetastet.
 --
 -- ACHTUNG      Das DELETE unten löscht über ON DELETE CASCADE auch die
---              gemerkten Auswahlen der Mitglieder (Tabelle mitglied_auswahl).
+--              gemerkten Auswahlen der Mitglieder (Tabelle mitglied_auswahl)
+--              und alle gebuchten Kurse und Probetrainings.
 --              Beim Vorführen also NICHT kurz vorher neu einspielen, sonst
 --              ist der Mitgliedsbereich leer. Beim Entwickeln ist es egal,
 --              da stehen ohnehin nur Testkonten drin.
 --
 -- STAND        Programm-Details: drei Programme, ihre Merkmale und je drei
 --              Coaches. Mitgliedschaften: die vier Tarife des Studios - ohne
---              sie ist die Seite mitgliedschaft.php leer.
+--              sie ist die Seite mitgliedschaft.php leer. Terminkalender:
+--              der Wochenplan der Kurse und die Verfügbarkeiten der Coaches.
 --
 --              Konten für den Mitglieder-Login gehören nicht hierher, weil sie
 --              ein Passwort brauchen - die legt man über die Registrierung an.
@@ -419,3 +421,92 @@ INSERT INTO `auslastung_basis` (`wochentag`, `stunde`, `personen`) VALUES
     (7, 23, 6)
 ON DUPLICATE KEY UPDATE `personen` = VALUES(`personen`);
 
+
+-- -----------------------------------------------------------------------------
+-- FEATURE TERMINKALENDER
+-- -----------------------------------------------------------------------------
+-- Kein eigenes DELETE nötig: Das DELETE FROM programme oben löscht über
+-- ON DELETE CASCADE auch kurstermine, kursbuchungen, verfuegbarkeiten und
+-- probetrainings. ACHTUNG, das heißt auch: Neu einspielen löscht alle
+-- gebuchten Kurse und Probetrainings der Mitglieder.
+--
+-- Programm, Format und Coach werden über ihre Namen nachgeschlagen, nicht
+-- über ids - die ändern sich bei jedem Neueinspielen.
+-- COLLATE in den Vergleichen, weil die Spalten der Hilfstabelle sonst eine
+-- andere Sortierung haben als die Tabellen und MySQL den Vergleich ablehnt.
+
+-- --- Kurstermine: jedes Format zweimal pro Woche -----------------------------
+-- wochentag: 1 = Montag ... 7 = Sonntag
+-- stammplaetze: jede Woche schon vergeben. Drei Termine sind damit immer
+-- ausgebucht, zwei haben genau noch einen Platz frei - beides lässt sich so
+-- jederzeit vorführen.
+--
+-- max_teilnehmer: 20 - außer beim Einzelcoaching. Dort betreut ein Coach eine
+-- Person, es gibt also höchstens so viele Plätze wie das Programm Coaches hat.
+-- Die Zahl wird gezählt, nicht fest eingetragen: Kommt ein Coach dazu, stimmt
+-- sie nach dem nächsten Einspielen von selbst.
+INSERT INTO `kurstermine`
+    (`programm_id`, `format_id`, `coach_id`, `wochentag`, `beginn`, `dauer_minuten`,
+     `max_teilnehmer`, `stammplaetze`)
+SELECT p.`id`, m.`id`, c.`id`, t.wochentag, t.beginn, t.dauer,
+       CASE WHEN t.format = 'Einzelcoaching'
+            THEN (SELECT COUNT(*) FROM `coaches` alle WHERE alle.`programm_id` = p.`id`)
+            ELSE 20
+       END,
+       t.stamm
+FROM (
+              SELECT 'strength' AS slug, 'Freies Training' AS format, 'Lena Brandt'     AS coach, 1 AS wochentag, '07:00:00' AS beginn, 60 AS dauer,  8 AS stamm
+    UNION ALL SELECT 'strength', 'Freies Training', 'Lena Brandt',     3, '07:00:00', 60,  6
+    UNION ALL SELECT 'strength', 'Einzelcoaching',  'Mika Özdemir',    2, '17:00:00', 60,  1
+    UNION ALL SELECT 'strength', 'Einzelcoaching',  'Mika Özdemir',    4, '17:00:00', 60,  3
+    UNION ALL SELECT 'strength', 'Small Group',     'Jonas Reiter',    2, '19:00:00', 60, 12
+    UNION ALL SELECT 'strength', 'Small Group',     'Jonas Reiter',    5, '18:00:00', 60, 19
+
+    UNION ALL SELECT 'move',     'Small Group',     'Sofia Lindqvist', 1, '18:00:00', 60, 14
+    UNION ALL SELECT 'move',     'Small Group',     'Sofia Lindqvist', 4, '18:00:00', 60,  9
+    UNION ALL SELECT 'move',     'Freies Workout',  'Tobias Krüger',   3, '12:00:00', 60,  5
+    UNION ALL SELECT 'move',     'Freies Workout',  'Tobias Krüger',   6, '10:00:00', 60, 11
+    UNION ALL SELECT 'move',     'Morgenroutine',   'Amelie Fuchs',    2, '07:00:00', 30, 16
+    UNION ALL SELECT 'move',     'Morgenroutine',   'Amelie Fuchs',    4, '07:00:00', 30, 20
+
+    UNION ALL SELECT 'fight',    'Gruppenkurs',     'Nuri Yilmaz',     1, '19:30:00', 60, 17
+    UNION ALL SELECT 'fight',    'Gruppenkurs',     'Nuri Yilmaz',     3, '19:30:00', 60, 20
+    UNION ALL SELECT 'fight',    'Pratzentraining', 'Clara Vogt',      2, '18:00:00', 30,  7
+    UNION ALL SELECT 'fight',    'Pratzentraining', 'Clara Vogt',      5, '17:00:00', 30, 10
+    UNION ALL SELECT 'fight',    'Konditionsrunde', 'David Ostermann', 4, '19:00:00', 60, 13
+    UNION ALL SELECT 'fight',    'Konditionsrunde', 'David Ostermann', 6, '11:00:00', 60, 19
+) AS t
+JOIN `programme` p ON p.`slug` = t.slug COLLATE utf8mb4_unicode_ci
+JOIN `merkmale`  m ON m.`programm_id` = p.`id` AND m.`art` = 'format'
+                  AND m.`titel` = t.format COLLATE utf8mb4_unicode_ci
+JOIN `coaches`   c ON c.`programm_id` = p.`id`
+                  AND c.`name` = t.coach COLLATE utf8mb4_unicode_ci;
+
+
+-- --- Verfügbarkeiten der Coaches für Probetrainings --------------------------
+-- Aus jedem Fenster werden Termine zu je 60 Minuten: 09:00-12:00 ergibt
+-- 09:00, 10:00 und 11:00. Die Fenster überschneiden sich absichtlich nicht
+-- mit den Kursen desselben Coaches - das prüft der Code nicht.
+INSERT INTO `verfuegbarkeiten` (`coach_id`, `wochentag`, `von`, `bis`)
+SELECT c.`id`, t.wochentag, t.von, t.bis
+FROM (
+              SELECT 'Lena Brandt' AS coach, 1 AS wochentag, '09:00:00' AS von, '12:00:00' AS bis
+    UNION ALL SELECT 'Lena Brandt',     4, '15:00:00', '18:00:00'
+    UNION ALL SELECT 'Mika Özdemir',    1, '14:00:00', '17:00:00'
+    UNION ALL SELECT 'Mika Özdemir',    3, '10:00:00', '13:00:00'
+    UNION ALL SELECT 'Jonas Reiter',    3, '16:00:00', '19:00:00'
+    UNION ALL SELECT 'Jonas Reiter',    6, '10:00:00', '13:00:00'
+    UNION ALL SELECT 'Sofia Lindqvist', 2, '10:00:00', '13:00:00'
+    UNION ALL SELECT 'Sofia Lindqvist', 5, '14:00:00', '17:00:00'
+    UNION ALL SELECT 'Tobias Krüger',   1, '10:00:00', '12:00:00'
+    UNION ALL SELECT 'Tobias Krüger',   4, '13:00:00', '16:00:00'
+    UNION ALL SELECT 'Amelie Fuchs',    3, '08:00:00', '11:00:00'
+    UNION ALL SELECT 'Amelie Fuchs',    5, '09:00:00', '12:00:00'
+    UNION ALL SELECT 'Nuri Yilmaz',     2, '14:00:00', '17:00:00'
+    UNION ALL SELECT 'Nuri Yilmaz',     6, '12:00:00', '15:00:00'
+    UNION ALL SELECT 'Clara Vogt',      1, '15:00:00', '18:00:00'
+    UNION ALL SELECT 'Clara Vogt',      4, '10:00:00', '13:00:00'
+    UNION ALL SELECT 'David Ostermann', 3, '14:00:00', '17:00:00'
+    UNION ALL SELECT 'David Ostermann', 5, '10:00:00', '13:00:00'
+) AS t
+JOIN `coaches` c ON c.`name` = t.coach COLLATE utf8mb4_unicode_ci;
