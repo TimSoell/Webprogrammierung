@@ -74,5 +74,9 @@ Beides funktioniert. Wer keinen Schlüssel hat, kann trotzdem alles am
 Projekt entwickeln und vorführen. Einzelheiten:
 [`docs/features/nachweise.md`](../docs/features/nachweise.md).
 
+Eingetragen wird der Schlüssel am sichersten per Skript statt von Hand:
+`schluessel-setzen.bat` (Windows, Doppelklick) oder `./schluessel-setzen.sh`
+(macOS, Linux).
+
 **Der Schlüssel wird nie weitergegeben und nie committet.** Er steht nur in
 der eigenen `config.php`, und die steht in `.gitignore`.
