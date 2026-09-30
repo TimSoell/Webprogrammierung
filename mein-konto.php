@@ -35,61 +35,50 @@ require ROOT_PATH . '/partials/header.php';
   <main class="auth" id="konto-seite" data-abgemeldet="<?= e(BASE_URL) ?>index.php" data-login="<?= e(BASE_URL) ?>anmelden.php">
     <div class="wrap auth-inner">
 
-      <div class="auth-intro">
-        <p class="eyebrow">Mitgliederbereich</p>
-        <h1 class="display auth-title">Mein<br>Konto.</h1>
-      </div>
+      <h1 class="konto-visually-hidden">Mein Konto</h1>
 
       <div class="auth-cards">
-        <div class="auth-card">
-          <h2 class="auth-heading">Stammdaten</h2>
+        <div class="auth-card konto-uebersicht">
+          <section class="konto-stammdaten" aria-labelledby="konto-stammdaten-titel">
+            <h2 class="auth-heading" id="konto-stammdaten-titel">Stammdaten</h2>
 
-          <dl class="auth-data">
-            <div>
-              <dt>Vorname</dt>
-              <dd id="konto-vorname">…</dd>
+            <dl class="auth-data">
+              <div>
+                <dt>Vorname</dt>
+                <dd id="konto-vorname">…</dd>
+              </div>
+              <div>
+                <dt>Nachname</dt>
+                <dd id="konto-nachname">…</dd>
+              </div>
+              <div>
+                <dt>E-Mail-Adresse</dt>
+                <dd id="konto-email">…</dd>
+              </div>
+            </dl>
+
+            <p class="auth-message" id="konto-meldung" role="alert"></p>
+
+            <button class="button button--ghost" id="abmelden" type="button">Abmelden</button>
+          </section>
+
+          <section class="konto-termine" aria-labelledby="konto-termine-titel">
+            <h2 class="auth-heading" id="konto-termine-titel">Meine Termine</h2>
+            <p class="auth-hint">Deine gebuchten Kurse und Probetrainings. Stornieren geht bis zum Beginn.</p>
+
+            <!-- Füllt assets/js/components/meine-termine.js aus
+                 api/kursbuchungen.php und api/probetrainings.php. -->
+            <div class="kalender" id="meine-termine" aria-live="polite">
+              <p class="kalender-leer">Termine werden geladen …</p>
             </div>
-            <div>
-              <dt>Nachname</dt>
-              <dd id="konto-nachname">…</dd>
-            </div>
-            <div>
-              <dt>E-Mail-Adresse</dt>
-              <dd id="konto-email">…</dd>
-            </div>
-          </dl>
 
-          <p class="auth-message" id="konto-meldung" role="alert"></p>
-
-          <button class="button button--ghost" id="abmelden" type="button">Abmelden</button>
-        </div>
-
-        <div class="auth-card">
-          <h2 class="auth-heading">Meine Termine</h2>
-          <p class="auth-hint">Deine gebuchten Kurse und Probetrainings. Stornieren geht bis zum Beginn.</p>
-
-          <!-- Füllt assets/js/components/meine-termine.js aus
-               api/kursbuchungen.php und api/probetrainings.php. -->
-          <div class="kalender" id="meine-termine" aria-live="polite">
-            <p class="kalender-leer">Termine werden geladen …</p>
-          </div>
-
-          <p class="auth-message" id="termine-meldung" role="alert"></p>
-        </div>
-
-        <div class="auth-card">
-          <h2 class="auth-heading">Meine Auswahl</h2>
-          <p class="auth-hint">Was du dir auf den Programmseiten gemerkt hast.</p>
-
-          <!-- Füllt assets/js/pages/mein-konto.page.js aus api/auswahl.php. -->
-          <ul class="auswahl-liste" id="auswahl-liste"></ul>
-
-          <p class="auth-message" id="auswahl-meldung" role="alert"></p>
+            <p class="auth-message" id="termine-meldung" role="alert"></p>
+          </section>
         </div>
 
         <!-- Welcher der beiden Blöcke sichtbar ist, entscheidet das
              Seitenskript: Ohne gewählten Tarif gibt es nichts anzuzeigen. -->
-        <div class="auth-card">
+        <div class="auth-card konto-mitgliedschaft">
           <h2 class="auth-heading">Mitgliedschaft</h2>
 
           <dl class="auth-data" id="konto-tarif-daten" hidden>
@@ -126,10 +115,32 @@ require ROOT_PATH . '/partials/header.php';
           <a class="button button--ghost" href="<?= e(BASE_URL) ?>mitgliedschaft.php">Tarife ansehen</a>
         </div>
 
+        <div class="auth-card konto-besuch">
+          <h2 class="auth-heading">Mein Besuch</h2>
+          <p class="auth-hint">Sag Bescheid, wann du kommst. Dein Besuch zählt sofort in die Auslastung auf der Startseite.</p>
+
+          <div class="besuch-aktionen">
+            <button class="button" id="besuch-jetzt" type="button">Jetzt einchecken</button>
+
+            <form class="besuch-form" id="besuch-form">
+              <label class="besuch-label" for="besuch-zeit">Oder für später ankündigen</label>
+              <div class="besuch-eingabe">
+                <input class="besuch-zeit" id="besuch-zeit" name="zeit" type="time" required>
+                <button class="button button--ghost" type="submit">Eintragen</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Füllt assets/js/pages/mein-konto.page.js aus api/auslastung.php. -->
+          <ul class="besuch-liste" id="besuch-liste"></ul>
+
+          <p class="auth-message" id="besuch-meldung" role="alert"></p>
+        </div>
+
         <!-- Nachweise für die ermäßigten Preise. Was hier hochgeladen wird,
              wird ausgelesen und sofort verworfen - das Bild landet nie auf
              der Festplatte. Siehe api/nachweise.php. -->
-        <div class="auth-card">
+        <div class="auth-card konto-nachweise">
           <h2 class="auth-heading">Nachweise</h2>
           <p class="auth-hint">
             Schüler-, Studierenden- und Seniorenpreise gelten nur mit Nachweis.
@@ -205,26 +216,14 @@ require ROOT_PATH . '/partials/header.php';
           </div>
         </div>
 
-        <div class="auth-card">
-          <h2 class="auth-heading">Mein Besuch</h2>
-          <p class="auth-hint">Sag Bescheid, wann du kommst. Dein Besuch zählt sofort in die Auslastung auf der Startseite.</p>
+        <div class="auth-card konto-auswahl">
+          <h2 class="auth-heading">Meine Auswahl</h2>
+          <p class="auth-hint">Was du dir auf den Programmseiten gemerkt hast.</p>
 
-          <div class="besuch-aktionen">
-            <button class="button" id="besuch-jetzt" type="button">Jetzt einchecken</button>
+          <!-- Füllt assets/js/pages/mein-konto.page.js aus api/auswahl.php. -->
+          <ul class="auswahl-liste" id="auswahl-liste"></ul>
 
-            <form class="besuch-form" id="besuch-form">
-              <label class="besuch-label" for="besuch-zeit">Oder für später ankündigen</label>
-              <div class="besuch-eingabe">
-                <input class="besuch-zeit" id="besuch-zeit" name="zeit" type="time" required>
-                <button class="button button--ghost" type="submit">Eintragen</button>
-              </div>
-            </form>
-          </div>
-
-          <!-- Füllt assets/js/pages/mein-konto.page.js aus api/auslastung.php. -->
-          <ul class="besuch-liste" id="besuch-liste"></ul>
-
-          <p class="auth-message" id="besuch-meldung" role="alert"></p>
+          <p class="auth-message" id="auswahl-meldung" role="alert"></p>
         </div>
       </div>
 

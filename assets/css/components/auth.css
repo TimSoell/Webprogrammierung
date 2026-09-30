@@ -28,13 +28,27 @@
 }
 
 #konto-seite .auth-inner {
-  gap: 40px;
+  gap: 0;
   grid-template-columns: minmax(0, 1fr);
 }
 
 #konto-seite .auth-cards {
-  align-items: start;
+  align-items: stretch;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+#konto-seite {
+  padding-top: calc(var(--header-height) + 24px);
+}
+
+.konto-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
 }
 
 .auth-title {
@@ -61,6 +75,23 @@
   padding: 34px;
   border: 1px solid var(--line);
   background: var(--ink-soft);
+}
+
+#konto-seite .auth-card {
+  min-width: 0;
+  padding: 28px;
+}
+
+#konto-seite .konto-uebersicht {
+  display: grid;
+  gap: 32px;
+  grid-column: span 2;
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+}
+
+#konto-seite .konto-stammdaten,
+#konto-seite .konto-termine {
+  min-width: 0;
 }
 
 /* Klassen mit display würden das hidden-Attribut überstimmen.
@@ -302,11 +333,25 @@
   #konto-seite .auth-cards {
     grid-template-columns: minmax(0, 1fr);
   }
+
+  #konto-seite .konto-uebersicht {
+    gap: 32px;
+    grid-column: auto;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #konto-seite .auth-card {
+    padding: 24px;
+  }
 }
 
 @media (min-width: 801px) and (max-width: 1100px) {
   #konto-seite .auth-cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #konto-seite .konto-mitgliedschaft {
+    grid-column: span 2;
   }
 }
 
