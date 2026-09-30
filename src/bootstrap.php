@@ -139,6 +139,11 @@ require ROOT_PATH . '/vendor/autoload.php';
 // Siehe docs/decisions/ADR-0017-postgresql-auf-supabase.md
 session_set_save_handler(new SitzungsSpeicher(), true);
 
+// Kein Skript im Projekt braucht das Sitzungs-Cookie. HttpOnly verhindert,
+// dass eingeschleustes JavaScript es auslesen und die Sitzung übernehmen
+// kann - so empfiehlt es auch die Login-Bibliothek.
+ini_set('session.cookie_httponly', '1');
+
 // Startet die Session. Das muss vor jeder Ausgabe passieren, weil dabei ein
 // Cookie gesetzt wird - deshalb hier und nicht erst in partials/header.php.
 Auth::instanz();
