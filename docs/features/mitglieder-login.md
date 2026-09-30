@@ -15,8 +15,10 @@ Beim Tippen des Passworts hakt die Seite ab, welche Anforderungen schon erfüllt
 sind. Wer sein Passwort vergessen hat, fordert einen Link an und legt damit ein
 neues fest.
 
-Nach dem Login heißt der Button **„Mein Konto“**. Dort stehen die Stammdaten
-und der Button zum Abmelden.
+Nach dem Login heißt der Button **„Mein Konto“**. Dort stehen die Stammdaten,
+der Name mit Profilbild und der Button zum Abmelden. Das Profilbild kann als
+JPEG ausgewählt werden; es wird im Browser verkleinert und am Mitgliedskonto
+gespeichert.
 
 ## Beteiligte Dateien
 
@@ -39,7 +41,7 @@ und der Button zum Abmelden.
 Was `angemeldetesMitgliedLaden()` zurückgibt:
 
 ```json
-{ "vorname": "Erika", "nachname": "Mustermann", "email": "erika@beispiel.de" }
+{ "vorname": "Erika", "nachname": "Mustermann", "email": "erika@beispiel.de", "profilbild": null }
 ```
 
 Im Fehlerfall wie überall: `{ "error": "Text für das Formular" }`.
@@ -55,6 +57,7 @@ schicken, sonst antwortet der Endpunkt mit 415. Das ist der Schutz vor CSRF
 | POST | `api/mitglieder.php` | registrieren, danach angemeldet | 201 `{ "id": 7 }` · 400 · 409 E-Mail vergeben |
 | GET | `api/sitzung.php` | wer ist angemeldet | Stammdaten · 401 |
 | POST | `api/sitzung.php` | anmelden | `{ "angemeldet": true }` · 401 · 429 |
+| PUT | `api/sitzung.php` | Profilbild speichern | `{ "gespeichert": true }` · 400 · 401 |
 | DELETE | `api/sitzung.php` | abmelden | `{ "angemeldet": false }` |
 | POST | `api/passwort-reset.php` | Link anfordern | `{ "nachricht": "…", "demoLink"?: "…" }` · 429 |
 | PUT | `api/passwort-reset.php` | neues Passwort setzen | `{ "geaendert": true }` · 400 |
