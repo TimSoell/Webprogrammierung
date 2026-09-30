@@ -1,8 +1,9 @@
 /**
  * @file        assets/js/components/bewertungen.js
  * @layer       2 – Komponente
- * @description Die Bewertungen auf der Startseite: Bildkacheln im Abschnitt
- *              #bewertungen und das Fenster "Alle Bewertungen" mit
+ * @description Die Bewertungen auf der Startseite: das Karussell aus
+ *              Bildkacheln im Abschnitt #bewertungen (drei zu sehen, mit
+ *              Pfeilen weiterzudrehen) und das Fenster "Alle Bewertungen" mit
  *              Durchschnitt, allen Karten und - für Angemeldete - dem
  *              Formular zum Bewerten.
  *
@@ -27,9 +28,6 @@ import { $, $$ } from '../lib/dom.js';
 import { monatUeberschrift } from '../lib/datum.js';
 import { initModal } from './modal.js';
 import { bewertungAbgeben, bewertungenLaden } from '../services/bewertungen.js';
-
-/** So viele Bewertungen stehen als Kachel auf der Startseite. */
-const KACHELN = 3;
 
 /**
  * Element mit Klasse und Text - textContent, nie innerHTML.
@@ -212,6 +210,60 @@ export function initBewertungen() {
     closeId: 'bewertungen-schliessen',
   });
 
+  // --- Karussell ------------------------------------------------------------
+  // Die Kacheln liegen in einer quer scrollenden Liste (scroll-snap in
+  // bewertungen.css). Wischen und Touchpad funktionieren dadurch von selbst,
+  // die Pfeile blättern um eine Kachel. Weich scrollt das CSS, nicht dieses
+  // Skript - so gilt dort auch "Bewegung reduzieren" des Systems.
+  const pfeile = $('#bewertungen-pfeile');
+
+  /**
+   * Blättert um eine Kachel. Am Ende geht es wieder von vorn los, am Anfang
+   * zum Ende - das Karussell dreht sich.
+   *
+   * @param {1|-1} richtung  1 = weiter, -1 = zurück
+   * @returns {void}
+   */
+  const blaettern = (richtung) => {
+    const kachel = kacheln.firstElementChild;
+
+    if (!kachel) {
+      return;
+    }
+
+    // Gerechnet wird in Kacheln, nicht in Pixeln: Wer zweimal schnell
+    // klickt, bevor das Gleiten fertig ist, landet trotzdem sauber auf
+    // einer Kachel statt irgendwo dazwischen.
+    const schritt = kachel.getBoundingClientRect().width + parseFloat(getComputedStyle(kacheln).columnGap);
+    const letzte = Math.round((kacheln.scrollWidth - kacheln.clientWidth) / schritt);
+    let ziel = Math.round(kacheln.scrollLeft / schritt) + richtung;
+
+    if (ziel > letzte) {
+      ziel = 0;
+    } else if (ziel < 0) {
+      ziel = letzte;
+    }
+
+    kacheln.scrollTo({ left: ziel * schritt });
+  };
+
+  /**
+   * Zeigt die Pfeile nur, wenn nicht alle Kacheln auf einmal zu sehen sind -
+   * bei drei Bewertungen auf dem Desktop gibt es nichts zu blättern.
+   *
+   * @returns {void}
+   */
+  const pfeileAnpassen = () => {
+    pfeile.hidden = kacheln.scrollWidth <= kacheln.clientWidth + 2;
+  };
+
+  $('#bewertungen-zurueck').addEventListener('click', () => blaettern(-1));
+  $('#bewertungen-weiter').addEventListener('click', () => blaettern(1));
+
+  // Beim Drehen des Handys oder Ändern der Fensterbreite passen mal drei,
+  // mal nur eine Kachel hinein.
+  new ResizeObserver(pfeileAnpassen).observe(kacheln);
+
   /**
    * Durchschnitt und Anzahl - kurz unter den Kacheln, groß im Fenster.
    *
@@ -243,9 +295,9 @@ export function initBewertungen() {
    * Lädt alle Bewertungen und zeigt sie an - beim Öffnen der Seite und
    * nach dem Abschicken einer neuen.
    *
-   * Als Kachel stehen zuerst Bewertungen mit Bild: Die Kacheln leben vom
-   * Foto. Bilder haben bisher nur die Beispiele aus seed.sql, später
-   * kommen die freigegebenen Profilbilder dazu.
+   * Ins Karussell kommen alle Bewertungen, die mit Bild zuerst: Die Kacheln
+   * leben vom Foto. Bilder haben bisher nur die Beispiele aus seed.sql,
+   * später kommen die freigegebenen Profilbilder dazu.
    *
    * @returns {Promise<void>}
    */
@@ -255,8 +307,9 @@ export function initBewertungen() {
       const mitBild = bewertungen.filter((b) => b.bild !== null);
       const ohneBild = bewertungen.filter((b) => b.bild === null);
 
-      kacheln.replaceChildren(...[...mitBild, ...ohneBild].slice(0, KACHELN).map((b) => kachelBauen(b, baseUrl)));
+      kacheln.replaceChildren(...[...mitBild, ...ohneBild].map((b) => kachelBauen(b, baseUrl)));
       liste.replaceChildren(...bewertungen.map((b) => karteBauen(b, baseUrl)));
+      pfeileAnpassen();
 
       if (bewertungen.length === 0) {
         meldung.textContent = 'Noch keine Bewertungen.';

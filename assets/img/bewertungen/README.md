@@ -23,8 +23,8 @@ Die Dateinamen stehen in der Spalte `bewertungen.bild` (siehe
 | Aylin T. | `aylin-t.jpg` |
 | Ben W. | `ben-w.jpg` |
 
-Auf der Startseite stehen davon die **drei neuesten** — Lea M., Can Y. und
-Johanna K.
+Auf der Startseite stehen alle im Karussell. Zuerst zu sehen sind die
+**drei neuesten** — Lea M., Can Y. und Johanna K.
 
 Anderer Name oder Dateiname? Dann in `seed.sql` ändern und neu einspielen —
 nicht im PHP oder JavaScript suchen, dort steht kein Dateiname.

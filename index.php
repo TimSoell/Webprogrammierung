@@ -192,10 +192,18 @@ require ROOT_PATH . '/partials/header.php';
             <p class="eyebrow">Stimmen aus dem Club</p>
             <h2 class="display section-title" id="bewertungen-heading">Was andere<br>sagen.</h2>
           </div>
+
+          <!-- Blättern im Karussell. Erscheint nur, wenn nicht alle Kacheln
+               auf einmal zu sehen sind - das entscheidet bewertungen.js. -->
+          <div class="bewertungen-pfeile" id="bewertungen-pfeile" hidden>
+            <button class="bewertungen-pfeil" id="bewertungen-zurueck" type="button" aria-label="Vorherige Bewertung">←</button>
+            <button class="bewertungen-pfeil" id="bewertungen-weiter" type="button" aria-label="Nächste Bewertung">→</button>
+          </div>
         </div>
 
-        <!-- Die Kacheln trägt assets/js/components/bewertungen.js ein. -->
-        <ul class="bewertungen-kacheln" id="bewertungen-kacheln"></ul>
+        <!-- Die Kacheln trägt assets/js/components/bewertungen.js ein. Die
+             Liste scrollt quer: drei Kacheln zu sehen, der Rest daneben. -->
+        <ul class="bewertungen-kacheln" id="bewertungen-kacheln" aria-label="Bewertungen, zum Blättern quer scrollen"></ul>
         <p class="bewertungen-meldung" id="bewertungen-meldung" role="status">Bewertungen werden geladen …</p>
 
         <div class="bewertungen-fuss" id="bewertungen-fuss" hidden>
