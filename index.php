@@ -2,7 +2,7 @@
 /**
  * @file        index.php
  * @layer       1 – Seite
- * @description Die Startseite. Scroll-Video, Hero, Studio-Vorstellung, die
+ * @description Die Startseite. Hero-Video, Hero, Studio-Vorstellung, die
  *              drei Programme, Philosophie, die Bewertungen samt Fenster
  *              "Alle Bewertungen" und der Aufruf zur Mitgliedschaft.
  *
@@ -38,7 +38,7 @@ require ROOT_PATH . '/partials/header.php';
 
   <main id="top">
 
-    <section class="scroll-video" data-scroll-video aria-label="Training in Bewegung">
+    <section class="scroll-video scroll-video--einmal" data-hero-video aria-label="Training in Bewegung">
       <div class="scroll-video-sticky">
         <video muted playsinline preload="auto" aria-label="Training im SCHWITZKASTEN Athletic Club">
           <source src="<?= e(BASE_URL) ?>assets/img/scroll-video.mp4" type="video/mp4">

@@ -2,23 +2,37 @@
  * @file        assets/js/pages/index.page.js
  * @layer       2 – Seitenskript
  * @description Verhalten, das es NUR auf der Startseite gibt: das
- *              scrollgesteuerte Hero-Video, das Auslastungsdiagramm und
- *              die Bewertungen.
+ *              Hero-Video, das beim Laden einmal abläuft, das
+ *              Auslastungsdiagramm und die Bewertungen.
  *
  *              Eingebunden wird die Datei über die Variable $pageScript
  *              in index.php - nicht über main.js.
  * @see         index.php
- * @see         assets/js/components/scroll-video.js
  */
 
 import { $ } from '../lib/dom.js';
-import { initScrollVideo } from '../components/scroll-video.js';
 import { diagrammZeichnen } from '../components/auslastung-diagramm.js';
 import { initBewertungen } from '../components/bewertungen.js';
 import { auslastungLaden } from '../services/auslastung.js';
 
-initScrollVideo('[data-scroll-video]');
 initBewertungen();
+
+// --- Hero-Video --------------------------------------------------------------
+
+const heroVideo = $('[data-hero-video] video');
+
+// Bei "weniger Bewegung" bleibt das erste Einzelbild stehen.
+if (heroVideo && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const preloader = $('[data-preloader]');
+
+  // main.js läuft vor diesem Skript. Steht der Preloader noch, würde das
+  // Video hinter ihm ablaufen - also erst starten, wenn er ausgeblendet ist.
+  if (preloader) {
+    preloader.addEventListener('transitionend', () => heroVideo.play(), { once: true });
+  } else {
+    heroVideo.play();
+  }
+}
 
 // --- Auslastungsdiagramm -----------------------------------------------------
 
