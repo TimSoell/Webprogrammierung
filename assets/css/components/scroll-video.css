@@ -121,3 +121,17 @@
     min-height: 500svh;
   }
 }
+
+/* --- Variante: einmal abspielen -------------------------------------------
+  Das Hero-Video der Startseite läuft beim Laden einmal von selbst ab
+  (index.page.js). Es braucht deshalb keinen Scrollweg: der Abschnitt ist
+  genau eine Bildschirmhöhe hoch. */
+.scroll-video--einmal {
+  min-height: 100vh;
+}
+
+@media (max-width: 800px) {
+  .scroll-video--einmal {
+    min-height: 100svh;
+  }
+}

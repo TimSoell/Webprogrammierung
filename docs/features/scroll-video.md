@@ -2,7 +2,7 @@
 
 **Status:** in Arbeit
 **Verantwortlich:** offen
-**Zuletzt geprueft:** 2026-09-21
+**Zuletzt geprueft:** 2026-09-30
 
 ## Was kann man damit
 
@@ -10,12 +10,20 @@ Beim Scrollen durch den Abschnitt wird das Video passend zur Scrollposition
 vorwaerts und rueckwaerts abgespielt. Das Video bleibt dabei im sichtbaren
 Bereich stehen und wird nach dem Abschnitt wieder normal verlassen.
 
+**Startseite:** Das Hero-Video in `index.php` ist nicht mehr scrollgesteuert.
+Es laeuft beim Laden einmal von selbst ab (`index.page.js`, erst nachdem der
+Preloader ausgeblendet ist) und bleibt dann auf dem letzten Bild stehen. Der
+Abschnitt nutzt dafuer nur noch das Aussehen dieser Komponente, mit der
+Variante `.scroll-video--einmal` (eine Bildschirmhoehe, kein Scrollweg).
+Scrollgesteuert ist nur noch die Studiotour, siehe
+[`studiotour.md`](studiotour.md).
+
 ## Beteiligte Dateien
 
 | Schicht | Datei |
 |---|---|
-| 1 Seite | `index.php` |
-| 2 Seitenskript | `assets/js/pages/index.page.js` |
+| 1 Seite | `locations.php` (Studiotour), `index.php` (nur Aussehen) |
+| 2 Seitenskript | `assets/js/pages/locations.page.js`, `assets/js/pages/index.page.js` |
 | 2 Komponente | `assets/js/components/scroll-video.js` |
 | CSS | `assets/css/components/scroll-video.css` |
 | Mediendatei | `assets/img/scroll-video.mp4` |
