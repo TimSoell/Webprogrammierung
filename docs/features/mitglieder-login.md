@@ -2,7 +2,7 @@
 
 **Status:** fertig
 **Verantwortlich:** Tim
-**Zuletzt geprüft:** 2026-09-21
+**Zuletzt geprüft:** 2026-09-30
 
 Umsetzung von Issue #8 „Mitglieder-Registrierung & Login“.
 
@@ -16,7 +16,10 @@ sind. Wer sein Passwort vergessen hat, fordert einen Link an und legt damit ein
 neues fest.
 
 Nach dem Login heißt der Button **„Mein Konto“**. Dort stehen die Stammdaten
-und der Button zum Abmelden.
+mit einem runden Profilbild-Platz (bis es Profilbilder gibt: neutrales
+Personen-Symbol) und oben rechts der Link zum Abmelden. Das Aussehen der
+Kontoseite folgt dem Entwurf des Teams vom 2026-09-30 und steht in
+`assets/css/components/konto.css`.
 
 ## Beteiligte Dateien
 
@@ -32,7 +35,7 @@ und der Button zum Abmelden.
 | 5 Repository | `src/Repositories/MitgliedRepository.php` |
 | 5 Bibliothek | `vendor/delight-im/auth`, siehe [ADR-0005](../decisions/ADR-0005-login-bibliothek.md) |
 | 6 Tabelle | `mitglieder` und `users`, `users_*` in `database/schema.sql` |
-| CSS | `assets/css/components/auth.css`, Button in `assets/css/03-layout.css` |
+| CSS | `assets/css/components/auth.css`, Button in `assets/css/03-layout.css`, Kontoseite zusätzlich `assets/css/components/konto.css` |
 
 ## Datenform
 
