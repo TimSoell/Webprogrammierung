@@ -1,8 +1,8 @@
 /**
  * @file        assets/css/components/hero.css
  * @layer       Komponente
- * @description Der große Einstiegsbereich der Startseite mit Bild, Überschrift
- *              und Scroll-Hinweis.
+ * @description Der große Einstiegsbereich der Startseite mit Bild und
+ *              Überschrift.
  *
  *              Nur für die Startseite. Der Einstiegsbereich der Programmseiten
  *              ist eine eigene Komponente (components/program-page.css),
@@ -27,18 +27,6 @@
     linear-gradient(90deg, rgba(10, 12, 11, .9) 0%, rgba(10, 12, 11, .52) 48%, rgba(10, 12, 11, .2) 100%),
     url("https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=2000&q=85") center 35%/cover;
   filter: saturate(.78);
-}
-
-/* Der dekorative Kreis rechts unten. */
-.hero::after {
-  position: absolute;
-  right: 8%;
-  bottom: 11%;
-  width: 170px;
-  height: 170px;
-  content: "";
-  border: 1px solid rgba(216, 255, 56, .65);
-  border-radius: 50%;
 }
 
 .hero-content {
@@ -77,23 +65,6 @@
   line-height: 1.55;
 }
 
-.scroll-note {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #b4b8ad;
-  font-size: .7rem;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-}
-
-.scroll-note i {
-  display: block;
-  width: 42px;
-  height: 1px;
-  background: var(--lime);
-}
-
 @media (max-width: 800px) {
   .hero,
   .hero-content {
@@ -111,9 +82,5 @@
   .hero-bottom {
     align-items: start;
     flex-direction: column;
-  }
-
-  .scroll-note {
-    display: none;
   }
 }
