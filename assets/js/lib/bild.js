@@ -30,12 +30,12 @@ const MAX_KANTE = 1600;
  *          weil der Endpunkt genau das erwartet
  * @throws {Error}  wenn die Datei kein lesbares Bild ist
  */
-export async function verkleinern(datei) {
+export async function verkleinern(datei, maxKante = MAX_KANTE) {
   const bild = await laden(datei);
 
   // Nur verkleinern, nie vergrößern: Ein kleines Foto wird durch Hochrechnen
   // nicht lesbarer, nur größer.
-  const faktor = Math.min(1, MAX_KANTE / Math.max(bild.width, bild.height));
+  const faktor = Math.min(1, maxKante / Math.max(bild.width, bild.height));
   const flaeche = document.createElement('canvas');
 
   flaeche.width = Math.round(bild.width * faktor);

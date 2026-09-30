@@ -15,7 +15,7 @@
  */
 
 import { $ } from '../lib/dom.js';
-import { abmelden, angemeldetesMitgliedLaden } from '../services/mitglieder.js';
+import { abmelden, angemeldetesMitgliedLaden, profilbildSpeichern } from '../services/mitglieder.js';
 import { auswahlEntfernen, meineAuswahlLaden } from '../services/auswahl.js';
 import { standLaden } from '../services/mitgliedschaften.js';
 import { alleLaden as nachweiseLaden, demoEintragen, hochladen } from '../services/nachweise.js';
@@ -23,6 +23,7 @@ import { formularAbsenden, meldungZeigen } from '../components/auth-formular.js'
 import { meineTermineAufbauen } from '../components/meine-termine.js';
 import { scanStarten } from '../components/ausweis-scan.js';
 import { auslastungLaden, besuchEintragen, besuchEntfernen } from '../services/auslastung.js';
+import { verkleinern } from '../lib/bild.js';
 
 const seite = $('#konto-seite');
 
@@ -33,6 +34,11 @@ if (seite) {
   const besuchListe = $('#besuch-liste');
   const besuchMeldung = $('#besuch-meldung');
   const baseUrl = document.documentElement.dataset.baseUrl ?? '/';
+  const profilbildUpload = $('#konto-profil-upload');
+  const profilbildAuswaehlen = $('#konto-profil-auswaehlen');
+  const profilbild = $('#konto-profilbild');
+  const profilInitialen = $('#konto-profil-initialen');
+  const profilName = $('#konto-profil-name');
 
   /**
    * Baut eine Zeile der Liste "Meine Auswahl".
@@ -432,10 +438,47 @@ if (seite) {
     }
   });
 
+  profilbildUpload.addEventListener('change', async () => {
+    const datei = profilbildUpload.files[0];
+
+    if (!datei) {
+      return;
+    }
+
+    profilbildAuswaehlen.disabled = true;
+    meldungZeigen(meldung, 'Profilbild wird gespeichert …');
+
+    try {
+      const { daten } = await verkleinern(datei, 512);
+      await profilbildSpeichern(daten);
+      profilbild.src = `data:image/jpeg;base64,${daten}`;
+      profilbild.alt = `Profilbild von ${profilName.textContent}`;
+      profilbild.hidden = false;
+      profilInitialen.hidden = true;
+      meldungZeigen(meldung, 'Profilbild gespeichert.', true);
+    } catch (fehler) {
+      meldungZeigen(meldung, fehler.message);
+    } finally {
+      profilbildUpload.value = '';
+      profilbildAuswaehlen.disabled = false;
+    }
+  });
+
+  profilbildAuswaehlen.addEventListener('click', () => profilbildUpload.click());
+
   try {
     const mitglied = await angemeldetesMitgliedLaden();
 
     // textContent statt innerHTML: Namen sind Nutzereingaben.
+    const vollerName = `${mitglied.vorname} ${mitglied.nachname}`.trim();
+    profilName.textContent = vollerName;
+    profilInitialen.textContent = `${[...mitglied.vorname][0] ?? ''}${[...mitglied.nachname][0] ?? ''}`;
+    if (mitglied.profilbild) {
+      profilbild.src = `data:image/jpeg;base64,${mitglied.profilbild}`;
+      profilbild.alt = `Profilbild von ${vollerName}`;
+      profilbild.hidden = false;
+      profilInitialen.hidden = true;
+    }
     $('#konto-vorname').textContent = mitglied.vorname;
     $('#konto-nachname').textContent = mitglied.nachname;
     $('#konto-email').textContent = mitglied.email;

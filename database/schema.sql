@@ -216,6 +216,7 @@ CREATE TABLE IF NOT EXISTS mitglieder (
 
     vorname     varchar(100) NOT NULL,
     nachname    varchar(100) NOT NULL,
+    profilbild  bytea,
     erstellt_am timestamp(0) NOT NULL DEFAULT LOCALTIMESTAMP(0),
 
     CONSTRAINT uniq_user_id UNIQUE (user_id),
@@ -225,6 +226,8 @@ CREATE TABLE IF NOT EXISTS mitglieder (
         FOREIGN KEY (user_id) REFERENCES users (id)
         ON DELETE CASCADE
 );
+
+ALTER TABLE mitglieder ADD COLUMN IF NOT EXISTS profilbild bytea;
 
 
 -- -----------------------------------------------------------------------------
