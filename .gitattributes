@@ -1,0 +1,18 @@
+# =============================================================================
+# @file        .gitattributes
+# @layer       Infrastruktur
+# @description Legt die Zeilenenden fest - unabhängig davon, wie Git auf dem
+#              jeweiligen Rechner eingestellt ist. Im Team arbeiten Mac und
+#              Windows am selben Repository.
+#
+#              Ohne diese Datei kann ein Windows-Rechner start.sh mit CRLF
+#              einchecken, und auf jedem Mac bricht das Skript danach mit
+#              "bad interpreter" ab.
+# @see         README.md
+# =============================================================================
+
+# Textdateien liegen im Repository immer mit LF.
+* text=auto eol=lf
+
+# Windows-Skripte brauchen CRLF, sonst verschluckt cmd.exe einzelne Zeilen.
+*.bat text eol=crlf

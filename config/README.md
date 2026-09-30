@@ -21,7 +21,8 @@ eintragen. Das gibt es nur im Team, per Passwortmanager – nicht per Chat.
 Host und Benutzer stehen schon richtig in der Vorlage.
 
 Fehlt die Datei, zeigt jede Seite einen deutlichen Hinweis statt eines
-kryptischen PHP-Fehlers.
+kryptischen PHP-Fehlers. Ebenso, wenn ihr ein Wert aus der Vorlage fehlt –
+`src/bootstrap.php` vergleicht lokal bei jedem Aufruf beide Dateien.
 
 ## Auf Vercel
 
@@ -57,7 +58,8 @@ Zwei Gründe:
 2. In `config.umgebung.php` mit einer Umgebungsvariable ergänzen und die
    Variable in Vercel anlegen.
 3. Im Team ansagen — jede Person muss ihn in ihrer eigenen `config.php`
-   nachtragen.
+   nachtragen. Wer es vergisst, bekommt beim nächsten Start einen Hinweis
+   mit dem Namen des fehlenden Werts.
 
 ## Der Schlüssel für die Ausweisprüfung
 
@@ -71,6 +73,10 @@ Zwei Gründe:
 Beides funktioniert. Wer keinen Schlüssel hat, kann trotzdem alles am
 Projekt entwickeln und vorführen. Einzelheiten:
 [`docs/features/nachweise.md`](../docs/features/nachweise.md).
+
+Eingetragen wird der Schlüssel am sichersten per Skript statt von Hand:
+`schluessel-setzen.bat` (Windows, Doppelklick) oder `./schluessel-setzen.sh`
+(macOS, Linux).
 
 **Der Schlüssel wird nie weitergegeben und nie committet.** Er steht nur in
 der eigenen `config.php`, und die steht in `.gitignore`.

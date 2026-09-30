@@ -49,6 +49,37 @@ if (!is_file($configFile)) {
 /** @var array{db: array{host: string, port: int, name: string, user: string, password: string}, ki: array{api_key: string, modell: string}, debug: bool, demo_reset_link: bool} $config */
 $config = require $configFile;
 
+// config.php liegt nicht in Git. Kommt in der Vorlage ein Wert dazu, bekommt
+// ihn niemand per Pull - die Seite läuft dann mit veralteten Werten und
+// scheitert irgendwo mittendrin. Deshalb lokal gegen die Vorlage prüfen.
+if (!$aufVercel) {
+    $vorlage = require ROOT_PATH . '/config/config.example.php';
+    $fehlend = [];
+
+    foreach ($vorlage as $schluessel => $wert) {
+        if (!array_key_exists($schluessel, $config)) {
+            $fehlend[] = $schluessel;
+            continue;
+        }
+        if (is_array($wert)) {
+            foreach (array_keys($wert) as $unterschluessel) {
+                if (!array_key_exists($unterschluessel, (array) $config[$schluessel])) {
+                    $fehlend[] = $schluessel . '.' . $unterschluessel;
+                }
+            }
+        }
+    }
+
+    if ($fehlend !== []) {
+        http_response_code(500);
+        exit(
+            'config/config.php ist veraltet, es fehlt: ' . implode(', ', $fehlend)
+            . '. Bitte config/config.example.php erneut nach config/config.php '
+            . 'kopieren und das Passwort wieder eintragen. Siehe README.md.'
+        );
+    }
+}
+
 /**
  * Dieselbe Konfiguration für Klassen wie Database und Auth, die keinen
  * Zugriff auf die Variable $config haben.
