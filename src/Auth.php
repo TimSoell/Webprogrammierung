@@ -16,9 +16,9 @@
  *              "Passwort vergessen". Warum diese Bibliothek:
  *              docs/decisions/ADR-0005-login-bibliothek.md
  *
- *              Die Datenbankverbindung baut die Bibliothek erst auf, wenn sie
- *              sie wirklich braucht. Wer nicht angemeldet ist, löst keine aus -
- *              Startseite und Programmseiten laufen weiterhin ohne MySQL.
+ *              Die Bibliothek benutzt dieselbe Datenbankverbindung wie alle
+ *              Repositories (src/Database.php). Eine eigene zweite Verbindung
+ *              pro Seitenaufruf wäre auf Vercel verschenkte Zeit.
  *
  *              Verwendung:
  *                  Auth::instanz()->isLoggedIn()     in Kopfzeile und Endpunkten
@@ -30,7 +30,6 @@
 declare(strict_types=1);
 
 use Delight\Auth\Auth as LoginBibliothek;
-use Delight\Db\PdoDsn;
 
 final class Auth
 {
@@ -57,22 +56,10 @@ final class Auth
             return self::$instanz;
         }
 
-        /** @var array $config */
-        $config = require ROOT_PATH . '/config/config.php';
-        $db     = $config['db'];
-
-        // PdoDsn statt fertiger PDO-Verbindung: So verbindet sich die
-        // Bibliothek erst beim ersten echten Datenbankzugriff.
-        $dsn = new PdoDsn(
-            sprintf('mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4', $db['host'], $db['port'], $db['name']),
-            $db['user'],
-            $db['password']
-        );
-
         // Vierter Parameter: Drosselung von Fehlversuchen an/aus.
         // Beim Entwickeln aus, sonst sperrt sich das Team nach fünf
         // Test-Registrierungen für zwölf Stunden selbst aus.
-        self::$instanz = new LoginBibliothek($dsn, null, null, !$config['debug']);
+        self::$instanz = new LoginBibliothek(Database::connection(), null, null, !CONFIG['debug']);
 
         return self::$instanz;
     }

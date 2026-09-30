@@ -76,18 +76,27 @@ entfernt die Bibliothek vor dem Speichern, deshalb prüfen beide Seiten ohne sie
 
 ## Woher kommen die Daten aktuell
 
-**MySQL.** Vor dem ersten Test `database/schema.sql` einspielen (legt die
-Datenbank `schwitzkasten` samt Tabellen an). Testkonten legt man über die
-Registrierung an, `seed.sql` darf keine Passwörter enthalten.
+**PostgreSQL bei Supabase.** Die Tabellen legt `database/schema.sql` an.
+Testkonten legt man über die Registrierung an, `seed.sql` darf keine
+Passwörter enthalten.
+
+**Sitzungen liegen in der Datenbank** (Tabelle `sitzungen`), nicht als Datei –
+auf Vercel wäre der Login sonst beim nächsten Klick weg. Siehe
+[ADR-0017](../decisions/ADR-0017-postgresql-auf-supabase.md).
 
 ## Demo-Modus für „Passwort vergessen“
 
-XAMPP verschickt keine E-Mails. Der Link zum Zurücksetzen landet deshalb
+Das Projekt verschickt keine E-Mails. Der Link zum Zurücksetzen landet
+deshalb
 
-1. immer im Server-Log, beim Start über `./start.sh` direkt im Terminal
-   (Zeile beginnt mit `[Demo-Mail]`),
-2. zusätzlich auf der Seite, solange in `config/config.php` `'debug' => true`
-   steht.
+1. immer im Server-Log (Zeile beginnt mit `[Demo-Mail]`) – lokal im
+   Terminal von `./start.sh`, auf Vercel unter *Logs*,
+2. zusätzlich auf der Seite, solange `'demo_reset_link' => true` gesetzt ist
+   (auf Vercel: `DEMO_RESET_LINK=1`).
+
+**In Produktion ist der Schalter aus.** Sonst könnte jeder, der eine
+E-Mail-Adresse kennt, das Passwort dieses Kontos ändern. Lokal und in der
+Preview ist er an.
 
 Der Link ist 60 Minuten gültig und funktioniert nur einmal. Echten Mailversand
 baut man in `api/passwort-reset.php` an der markierten Stelle ein.
@@ -96,7 +105,9 @@ baut man in `api/passwort-reset.php` an der markierten Stelle ein.
 
 - **Drosselung** ist mit `'debug' => true` aus. Mit `false`: Login nach 20
   Fehlversuchen pro Stunde je IP gesperrt, höchstens 5 Registrierungen pro
-  12 Stunden je IP. Beim Vorführen also nicht zu oft registrieren.
+  12 Stunden je IP. Beim Vorführen also nicht zu oft registrieren. Auf
+  Vercel ist sie an; die echte IP holt `src/bootstrap.php` aus
+  `X-Forwarded-For`, sonst teilten sich alle Besucher einen Zähler.
 - **Geschützte Seite bauen:** direkt nach `bootstrap.php`
   `Auth::nurFuerMitglieder();` aufrufen. Die Daten dann über einen Endpunkt
   laden, der `Auth::instanz()->isLoggedIn()` prüft.

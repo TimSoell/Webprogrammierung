@@ -9,11 +9,13 @@
  *                PUT   { selector, token, passwort, passwortWiederholung }
  *                      -> neues Passwort mit dem Link aus Schritt 1 setzen
  *
- *              DEMO-MODUS: XAMPP hat keinen Mailserver. Statt einer E-Mail
- *              landet der Link im Server-Log (beim Start über ./start.sh
- *              direkt im Terminal). Solange in config/config.php
- *              'debug' => true steht, schickt der Endpunkt ihn zusätzlich
- *              als "demoLink" mit, damit die Seite ihn anzeigen kann.
+ *              DEMO-MODUS: Das Projekt verschickt (noch) keine E-Mails.
+ *              Statt einer E-Mail landet der Link im Server-Log (lokal im
+ *              Terminal von start.sh, auf Vercel in den Runtime Logs).
+ *              Solange 'demo_reset_link' => true gesetzt ist, schickt der
+ *              Endpunkt ihn zusätzlich als "demoLink" mit, damit die Seite
+ *              ihn anzeigen kann. In Produktion ist das aus - sonst könnte
+ *              jeder, der eine E-Mail-Adresse kennt, das Konto übernehmen.
  *              Echter Mailversand wird später genau an der markierten
  *              Stelle unten eingebaut.
  * @see         assets/js/services/mitglieder.js
@@ -74,7 +76,7 @@ try {
             'nachricht' => 'Falls es ein Konto mit dieser Adresse gibt, ist der Link zum Zurücksetzen unterwegs. Er ist 60 Minuten gültig.',
         ];
 
-        if ($config['debug'] && $link !== null) {
+        if ($config['demo_reset_link'] && $link !== null) {
             $antwort['demoLink'] = $link;
         }
 

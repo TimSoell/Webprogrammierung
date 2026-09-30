@@ -2,13 +2,14 @@
 /**
  * @file        src/Database.php
  * @layer       Infrastruktur (Unterbau für Schicht 5 - Repositories)
- * @description Stellt die EINE Verbindung zur MySQL-Datenbank bereit.
+ * @description Stellt die EINE Verbindung zur PostgreSQL-Datenbank bei
+ *              Supabase bereit.
  *
  *              Diese Klasse ist die einzige Stelle im Projekt, die eine
  *              PDO-Verbindung aufbaut. Repositories fragen sie hier ab,
  *              statt selbst "new PDO(...)" zu schreiben.
- *              Einzige Ausnahme: Die Login-Bibliothek baut über src/Auth.php
- *              ihre eigene Verbindung auf - ebenfalls erst bei Bedarf.
+ *              Auch die Login-Bibliothek bekommt über src/Auth.php genau
+ *              diese Verbindung - pro Seitenaufruf gibt es also nur eine.
  *
  *              Verwendung in einem Repository:
  *                  $pdo = Database::connection();
@@ -21,9 +22,16 @@
  *              Anwendung offen für SQL-Injection.
  *
  *              Die Verbindung wird erst beim ersten Aufruf aufgebaut
- *              ("lazy"). Solange kein Repository Daten braucht, muss
- *              MySQL in XAMPP nicht laufen.
+ *              ("lazy"). Weil die Sitzungen in der Datenbank liegen
+ *              (src/SitzungsSpeicher.php), passiert das aber auf jeder Seite.
+ *
+ *              Verbunden wird über den Pooler von Supabase im Session-Modus
+ *              (Port 5432). Die direkte Adresse db.<projekt>.supabase.co ist
+ *              im kostenlosen Plan nur über IPv6 erreichbar, der
+ *              Transaktions-Modus (Port 6543) kann keine Prepared Statements,
+ *              und die braucht die Login-Bibliothek.
  * @see         docs/ARCHITECTURE.md
+ * @see         docs/decisions/ADR-0017-postgresql-auf-supabase.md
  * @see         database/schema.sql
  */
 
@@ -51,14 +59,13 @@ final class Database
             return self::$connection;
         }
 
-        /** @var array $config */
-        $config = require ROOT_PATH . '/config/config.php';
-        $db     = $config['db'];
+        $db = CONFIG['db'];
 
-        // charset=utf8mb4 ist wichtig, damit Umlaute und Emojis korrekt
-        // gespeichert werden. Ohne das gibt es später "Krafttraining fÃ¼r ...".
+        // sslmode=require: Die Verbindung läuft über das offene Internet,
+        // also nie unverschlüsselt. Umlaute brauchen keinen eigenen Schalter -
+        // PostgreSQL bei Supabase arbeitet durchgehend mit UTF-8.
         $dsn = sprintf(
-            'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
+            'pgsql:host=%s;port=%d;dbname=%s;sslmode=require',
             $db['host'],
             $db['port'],
             $db['name']
@@ -73,17 +80,18 @@ final class Database
                 // nicht zusätzlich noch die numerischen Schlüssel.
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
 
-                // Echte Prepared Statements von MySQL benutzen statt sie in
-                // PHP nachzubauen. Sicherer und schneller.
+                // Echte Prepared Statements der Datenbank benutzen statt sie
+                // in PHP nachzubauen. Sicherer und schneller.
                 PDO::ATTR_EMULATE_PREPARES   => false,
             ]);
         } catch (PDOException $e) {
             // Die Originalmeldung enthält unter Umständen das DB-Passwort,
             // deshalb wird sie nicht an den Browser weitergereicht.
             throw new RuntimeException(
-                'Keine Verbindung zur Datenbank möglich. Läuft MySQL in XAMPP, '
-                . 'und stimmen die Daten in config/config.php? '
-                . 'Existiert die Datenbank "' . $db['name'] . '"?',
+                'Keine Verbindung zur Datenbank möglich. Stimmen die Daten in '
+                . 'config/config.php (auf Vercel: die Umgebungsvariablen DB_*)? '
+                . 'Ist das Supabase-Projekt pausiert? Ist pdo_pgsql in der php.ini '
+                . 'eingeschaltet?',
                 0,
                 $e
             );

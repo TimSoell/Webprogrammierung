@@ -4,10 +4,12 @@
  * @layer       Infrastruktur
  * @description Startpunkt jeder Seite. Wird als ERSTE Zeile jeder .php-Seite
  *              eingebunden und erledigt vier Dinge:
- *                1. Konfiguration laden (config/config.php)
+ *                1. Konfiguration laden (lokal config/config.php, auf
+ *                   Vercel aus Umgebungsvariablen)
  *                2. ROOT_PATH definieren  -> Pfade im DATEISYSTEM (require)
  *                3. BASE_URL  definieren  -> Pfade im BROWSER (href/src)
- *                4. Session starten (für den Mitglieder-Login)
+ *                4. Session starten (für den Mitglieder-Login), gespeichert
+ *                   in der Datenbank
  *
  *              Warum BASE_URL berechnet wird und nicht fest eingetragen ist:
  *              Bei fünf Personen liegt das Projekt bei jedem woanders im
@@ -23,8 +25,18 @@ declare(strict_types=1);
 /** Absoluter Pfad zum Projektordner im Dateisystem (ohne / am Ende). */
 define('ROOT_PATH', dirname(__DIR__));
 
+// --- Läuft das hier auf Vercel? --------------------------------------------
+// Vercel setzt diese Variable in jeder Funktion. Lokal ist sie leer.
+// Siehe docs/decisions/ADR-0016-hosting-auf-vercel.md
+$aufVercel = getenv('VERCEL') === '1';
+
 // --- Konfiguration laden ---------------------------------------------------
-$configFile = ROOT_PATH . '/config/config.php';
+// Lokal steht sie in config/config.php (nicht im Repository). Auf Vercel gibt
+// es diese Datei nicht - dort kommen dieselben Werte aus den
+// Umgebungsvariablen des Projekts, siehe config/config.umgebung.php.
+$configFile = $aufVercel
+    ? ROOT_PATH . '/config/config.umgebung.php'
+    : ROOT_PATH . '/config/config.php';
 
 if (!is_file($configFile)) {
     http_response_code(500);
@@ -34,22 +46,52 @@ if (!is_file($configFile)) {
     );
 }
 
-/** @var array{db: array{host: string, port: int, name: string, user: string, password: string}, debug: bool} $config */
+/** @var array{db: array{host: string, port: int, name: string, user: string, password: string}, ki: array{api_key: string, modell: string}, debug: bool, demo_reset_link: bool} $config */
 $config = require $configFile;
+
+/**
+ * Dieselbe Konfiguration für Klassen wie Database und Auth, die keinen
+ * Zugriff auf die Variable $config haben.
+ */
+define('CONFIG', $config);
 
 // --- Fehleranzeige ---------------------------------------------------------
 // Während der Entwicklung sollen Fehler sichtbar sein, sonst sucht man ewig.
 error_reporting(E_ALL);
 ini_set('display_errors', $config['debug'] ? '1' : '0');
 
+// --- Zeitzone --------------------------------------------------------------
+// Lokal kommt Europe/Berlin aus der php.ini von XAMPP, auf Vercel wäre es
+// UTC - und "heute" oder "jetzt" läge dort ein bis zwei Stunden daneben.
+// Die Datenbank rechnet ebenfalls in Berliner Zeit, siehe database/schema.sql.
+date_default_timezone_set('Europe/Berlin');
+
 // --- BASE_URL berechnen ----------------------------------------------------
 // Beispiel: Projekt liegt unter C:/xampp/htdocs/Webprogrammierung
 //           DOCUMENT_ROOT ist   C:/xampp/htdocs
 //           -> BASE_URL wird    /Webprogrammierung/
+// Auf Vercel liegt das Projekt immer ganz oben auf der Domain.
 $projectPath  = str_replace('\\', '/', ROOT_PATH);
 $documentRoot = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT'] ?? ''), '/');
 
-define('BASE_URL', rtrim(str_replace($documentRoot, '', $projectPath), '/') . '/');
+define('BASE_URL', $aufVercel ? '/' : rtrim(str_replace($documentRoot, '', $projectPath), '/') . '/');
+
+// --- Hinter dem Proxy von Vercel -------------------------------------------
+if ($aufVercel) {
+    // PHP sieht als Absender den Proxy, nicht den Besucher. Ohne diese Zeile
+    // teilen sich alle Besucher EINEN Zähler der Login-Drosselung und sperren
+    // sich gegenseitig aus. Vercel überschreibt X-Forwarded-For selbst mit der
+    // echten Adresse - von außen lässt sich der Wert nicht fälschen.
+    $weitergeleitet = (string) ($_SERVER['HTTP_X_FORWARDED_FOR'] ?? '');
+
+    if ($weitergeleitet !== '') {
+        $_SERVER['REMOTE_ADDR'] = trim(explode(',', $weitergeleitet)[0]);
+    }
+
+    // Die Seite ist dort nur über HTTPS erreichbar, also soll das
+    // Sitzungs-Cookie auch nie über eine unverschlüsselte Verbindung gehen.
+    ini_set('session.cookie_secure', '1');
+}
 
 // --- Ausgabe-Hilfsfunktion --------------------------------------------------
 /**
@@ -91,7 +133,12 @@ spl_autoload_register(static function (string $class): void {
 require ROOT_PATH . '/vendor/autoload.php';
 
 // --- Session und Login -----------------------------------------------------
+// Sitzungen liegen in der Datenbank statt als Datei: Auf Vercel teilen sich
+// die Aufrufe keine Festplatte, der Login wäre beim nächsten Klick weg.
+// Lokal gilt dasselbe, damit sich beide Umgebungen gleich verhalten.
+// Siehe docs/decisions/ADR-0017-postgresql-auf-supabase.md
+session_set_save_handler(new SitzungsSpeicher(), true);
+
 // Startet die Session. Das muss vor jeder Ausgabe passieren, weil dabei ein
 // Cookie gesetzt wird - deshalb hier und nicht erst in partials/header.php.
-// Eine Datenbankverbindung entsteht dabei nicht, siehe src/Auth.php.
 Auth::instanz();
