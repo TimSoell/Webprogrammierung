@@ -4,6 +4,9 @@ Die Hintergrundbilder kommen derzeit von Unsplash und sind direkt in CSS und
 HTML verlinkt. Eigene Dateien liegen bisher nur hier:
 
 - `schwitzkasten-logo.png` — das Logo in der Kopfzeile
+- `favicon.png` — das Logo quadratisch, 192 × 192 px, für den Browser-Tab
+- `apple-touch-icon.png` — das Logo auf Weiß, 180 × 180 px, für den
+  Homescreen von iPhone und iPad
 - `coaches/` — Porträtfotos für die Programmseiten, siehe die
   [README dort](coaches/README.md)
 
