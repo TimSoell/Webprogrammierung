@@ -47,6 +47,7 @@ if (!defined('BASE_URL')) {
         <a href="<?= e(BASE_URL) ?>agb.php">AGB</a>
         <a href="<?= e(BASE_URL) ?>impressum.php">Impressum</a>
         <a href="<?= e(BASE_URL) ?>datenschutz.php">Datenschutz</a>
+        <button type="button" class="footer-cookie-link" data-cookie-einstellungen>Cookie-Einstellungen</button>
       </nav>
 
       <div class="footer-social-boxes" aria-label="Soziale Medien">
@@ -66,5 +67,6 @@ if (!defined('BASE_URL')) {
       <span>© <?= date('Y') ?> SCHWITZKASTEN Athletic Club</span>
     </div>
   </footer>
+<?php require ROOT_PATH . '/partials/cookie-banner.php'; ?>
 </body>
 </html>

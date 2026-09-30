@@ -9,6 +9,7 @@ Seite eingebunden und existieren dadurch **genau einmal**.
 | `header.php` | Kopfzeile mit Logo, Navigation und Aktionsbutton |
 | `footer.php` | Fußzeile. Schließt `</body>` und `</html>` |
 | `passwort-kriterien.php` | Liste der Passwort-Anforderungen unter einem Passwortfeld |
+| `cookie-banner.php` | Einwilligungsleiste für Google Analytics, von `footer.php` eingebunden |
 | `kurskalender.php` | Fenster mit den Kursterminen, auf allen drei Kursseiten |
 
 ## Reihenfolge in einer Seite

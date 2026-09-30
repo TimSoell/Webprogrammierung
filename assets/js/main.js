@@ -16,6 +16,8 @@
 
 import { initNav } from './components/nav.js';
 import { initPreloader } from './components/preloader.js';
+import { initCookieBanner } from './components/cookie-banner.js';
 
 initNav();
 initPreloader();
+initCookieBanner();
