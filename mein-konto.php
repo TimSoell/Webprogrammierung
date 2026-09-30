@@ -39,20 +39,6 @@ require ROOT_PATH . '/partials/header.php';
 
       <div class="auth-cards">
         <div class="auth-card konto-uebersicht">
-          <div class="konto-uebersicht-kopf">
-            <div class="konto-profil">
-              <button class="konto-profil__bild" id="konto-profil-auswaehlen" type="button" aria-label="Profilbild auswählen" title="Profilbild auswählen">
-                <span id="konto-profil-initialen" aria-hidden="true">?</span>
-                <img id="konto-profilbild" alt="" hidden>
-              </button>
-              <div class="konto-profil__angaben">
-                <h2 class="auth-heading konto-profil__name" id="konto-profil-name">…</h2>
-              </div>
-            </div>
-            <button class="button button--ghost konto-abmelden" id="abmelden" type="button">Abmelden</button>
-            <input class="konto-profil__input" id="konto-profil-upload" type="file" accept="image/*" hidden>
-          </div>
-
           <section class="konto-stammdaten" aria-labelledby="konto-stammdaten-titel">
             <h2 class="auth-heading" id="konto-stammdaten-titel">Stammdaten</h2>
 
@@ -72,6 +58,8 @@ require ROOT_PATH . '/partials/header.php';
             </dl>
 
             <p class="auth-message" id="konto-meldung" role="alert"></p>
+
+            <button class="button button--ghost" id="abmelden" type="button">Abmelden</button>
           </section>
 
           <section class="konto-termine" aria-labelledby="konto-termine-titel">

@@ -59,17 +59,6 @@ export async function angemeldetesMitgliedLaden() {
 }
 
 /**
- * Speichert das komprimierte Profilbild des angemeldeten Mitglieds.
- *
- * @param {string} profilbild  JPEG-Bilddaten als base64 ohne Data-URL-Präfix
- * @returns {Promise<{gespeichert: true}>}
- * @throws {ApiError}
- */
-export async function profilbildSpeichern(profilbild) {
-  return sendJson('PUT', 'api/sitzung.php', { profilbild });
-}
-
-/**
  * Fordert einen Link zum Zurücksetzen des Passworts an.
  *
  * Die Antwort ist absichtlich dieselbe, egal ob es die Adresse gibt.
