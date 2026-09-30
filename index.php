@@ -196,13 +196,19 @@ require ROOT_PATH . '/partials/header.php';
 
         <!-- Das Karussell. Die Kacheln trägt assets/js/components/bewertungen.js
              ein; die Liste scrollt quer: drei Kacheln zu sehen, der Rest
-             daneben. Die Pfeile liegen am Rechner über dem Rand der äußeren
-             Kacheln, auf dem Handy stehen sie darüber. Sie erscheinen nur, wenn nicht alle
-             Kacheln auf einmal zu sehen sind - das entscheidet bewertungen.js. -->
+             daneben. Die Pfeile stehen am Rechner links und rechts neben der
+             Liste, auf dem Handy darüber. Sie erscheinen nur, wenn nicht alle
+             Kacheln auf einmal zu sehen sind - das entscheidet bewertungen.js.
+             Das Pfeilsymbol ist ein SVG; Strichstärke und Farbe setzt
+             bewertungen.css. -->
         <div class="bewertungen-karussell">
-          <button class="bewertungen-pfeil bewertungen-pfeil--zurueck" id="bewertungen-zurueck" type="button" aria-label="Vorherige Bewertung" hidden>←</button>
+          <button class="bewertungen-pfeil bewertungen-pfeil--zurueck" id="bewertungen-zurueck" type="button" aria-label="Vorherige Bewertung" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7"/></svg>
+          </button>
           <ul class="bewertungen-kacheln" id="bewertungen-kacheln" aria-label="Bewertungen, zum Blättern quer scrollen"></ul>
-          <button class="bewertungen-pfeil bewertungen-pfeil--weiter" id="bewertungen-weiter" type="button" aria-label="Nächste Bewertung" hidden>→</button>
+          <button class="bewertungen-pfeil bewertungen-pfeil--weiter" id="bewertungen-weiter" type="button" aria-label="Nächste Bewertung" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
         </div>
         <p class="bewertungen-meldung" id="bewertungen-meldung" role="status">Bewertungen werden geladen …</p>
 

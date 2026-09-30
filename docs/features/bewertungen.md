@@ -10,11 +10,12 @@ Auf der Startseite steht vor „Komm rein." der Abschnitt **„Was andere
 sagen."**: ein **Karussell** aus Bildkacheln wie bei „Dein Programm", jede
 mit Bild, Sternen, Text, Name und der Angabe **Mitglied** oder **Kein
 Mitglied**. Drei Kacheln sind zu sehen (auf dem Handy eine). Die Pfeile
-liegen am Rechner als Streifen über dem linken Rand der ersten und dem
-rechten Rand der letzten sichtbaren Kachel, so hoch wie die Kacheln; der
-Text in den Kacheln rückt dafür etwas ein. Auf dem Handy stehen sie klein
-über den Kacheln. Grau hinterlegt mit grauem
-Pfeil, mit dem Mauszeiger darüber gelb mit schwarzem Pfeil. Sie drehen um
+stehen am Rechner links und rechts neben den Kacheln, so hoch wie diese und
+mit demselben Abstand wie die Kacheln untereinander; auf dem Handy stehen
+sie klein über den Kacheln. Sie sind in Glas-Optik fast unsichtbar (leicht
+gerundete Ecken wie die Balken der Auslastung) und werden beim Überfahren
+mit der Maus gelb mit schwarzem Pfeil. Auf Geräten ohne Maus sind sie von
+Anfang an deutlicher zu sehen. Sie drehen um
 eine Kachel weiter, am Ende geht es von vorn los.
 Wischen und Touchpad funktionieren ebenfalls. Ohne Bild
 wird die Kachel zur **Zitat-Kachel**: ein großes Anführungszeichen statt
