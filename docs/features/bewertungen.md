@@ -7,8 +7,11 @@
 ## Was kann man damit
 
 Auf der Startseite steht vor „Komm rein." der Abschnitt **„Was andere
-sagen."**: drei Bildkacheln wie bei „Dein Programm", jede mit Bild, Sternen,
-Text, Name und der Angabe **Mitglied** oder **Kein Mitglied**. Ohne Bild
+sagen."**: ein **Karussell** aus Bildkacheln wie bei „Dein Programm", jede
+mit Bild, Sternen, Text, Name und der Angabe **Mitglied** oder **Kein
+Mitglied**. Drei Kacheln sind zu sehen (auf dem Handy eine), die Pfeile
+oben rechts drehen um eine Kachel weiter; am Ende geht es von vorn los.
+Wischen und Touchpad funktionieren ebenfalls. Ohne Bild
 wird die Kachel zur **Zitat-Kachel**: ein großes Anführungszeichen statt
 des Fotos, keine Initialen. Darunter stehen der Durchschnitt und der Button
 **„Alle Bewertungen"**.
@@ -47,13 +50,18 @@ Bewertung.
 | CSS | `assets/css/components/bewertungen.css` |
 | Bilder | `assets/img/bewertungen/`, siehe die [README dort](../../assets/img/bewertungen/README.md) |
 
-## Welche Bewertungen als Kachel erscheinen
+## Das Karussell
 
-Die drei neuesten **mit Bild**, erst danach die ohne. Bilder haben bisher
-nur die Beispiele aus `seed.sql` — neue Bewertungen erscheinen deshalb im
-Fenster, aber nicht auf der Startseite. Das ändert sich mit den
-Profilbildern. Die Zahl steht als `KACHELN` oben in
-`assets/js/components/bewertungen.js`.
+Im Karussell stehen **alle** Bewertungen: zuerst die mit Bild, danach die
+ohne, jeweils die neueste zuerst. Bilder haben bisher nur die Beispiele aus
+`seed.sql` — neue Bewertungen stehen deshalb hinten im Karussell. Das ändert
+sich mit den Profilbildern.
+
+Technisch ist es eine quer scrollende Liste mit `scroll-snap` in
+`bewertungen.css`; Wischen kommt dadurch vom Browser. Die Pfeile erscheinen
+nur, wenn nicht alle Kacheln auf einmal zu sehen sind. Es dreht sich nicht
+von selbst — nur auf Klick oder Wischen, damit niemandem der Text beim
+Lesen davonläuft.
 
 ## Datenform
 

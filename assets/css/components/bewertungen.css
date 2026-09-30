@@ -1,10 +1,10 @@
 /**
  * @file        assets/css/components/bewertungen.css
  * @layer       Komponente
- * @description Die Bewertungen auf der Startseite: die Bildkacheln im
- *              hellen Abschnitt #bewertungen, darunter Durchschnitt und
- *              Button, und das Fenster "Alle Bewertungen" mit Durchschnitt,
- *              Formular und Karten.
+ * @description Die Bewertungen auf der Startseite: das Karussell aus
+ *              Bildkacheln im hellen Abschnitt #bewertungen samt Pfeilen,
+ *              darunter Durchschnitt und Button, und das Fenster "Alle
+ *              Bewertungen" mit Durchschnitt, Formular und Karten.
  * @see         index.php
  * @see         assets/js/components/bewertungen.js
  * @see         assets/css/components/program-card.css
@@ -46,24 +46,74 @@
   color: var(--ink);
 }
 
-/* --- Kacheln auf der Startseite -------------------------------------------- */
-/* Aufbau wie die Programmkacheln: Bild über die ganze Fläche, der Text
-   unten auf einem dunklen Verlauf. */
+/* --- Karussell auf der Startseite ------------------------------------------ */
+/* Eine quer scrollende Reihe: drei Kacheln passen hinein, der Rest liegt
+   daneben. scroll-snap lässt jede Kachel sauber am linken Rand einrasten -
+   beim Wischen wie beim Blättern mit den Pfeilen (bewertungen.js). */
 .bewertungen-kacheln {
+  --kachel-abstand: 18px;
+
   display: grid;
   margin: 0;
   padding: 0;
-  gap: 18px;
-  grid-template-columns: repeat(3, 1fr);
+  gap: var(--kachel-abstand);
+  grid-auto-columns: calc((100% - 2 * var(--kachel-abstand)) / 3);
+  grid-auto-flow: column;
   list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
 }
 
+/* Keine Scrollleiste: Geblättert wird mit den Pfeilen oder per Wischen. */
+.bewertungen-kacheln::-webkit-scrollbar {
+  display: none;
+}
+
+.bewertungen-pfeile {
+  display: flex;
+  gap: 10px;
+}
+
+/* Das hidden-Attribut verliert sonst gegen display: flex. */
+.bewertungen-pfeile[hidden] {
+  display: none;
+}
+
+.bewertungen-pfeil {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  font: 700 1.3rem var(--body);
+  cursor: pointer;
+  place-items: center;
+  transition: background .2s, color .2s;
+}
+
+.bewertungen-pfeil:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.bewertungen-pfeil:focus-visible {
+  outline: 2px solid var(--lime-dark);
+  outline-offset: 2px;
+}
+
+/* Aufbau wie die Programmkacheln: Bild über die ganze Fläche, der Text
+   unten auf einem dunklen Verlauf. */
 .bewertung-kachel {
   position: relative;
   min-height: 480px;
   background: var(--ink);
   color: var(--paper);
   overflow: hidden;
+  scroll-snap-align: start;
 }
 
 .bewertung-kachel-bild {
@@ -412,8 +462,14 @@
 }
 
 @media (max-width: 800px) {
+  /* Auf dem Handy eine Kachel auf einmal, die nächste per Wischen. */
   .bewertungen-kacheln {
-    grid-template-columns: 1fr;
+    grid-auto-columns: 100%;
+  }
+
+  /* Der Abschnittskopf steht hier untereinander (section-head.css). */
+  .bewertungen-pfeile {
+    margin-top: 22px;
   }
 
   .bewertung-kachel {
@@ -431,5 +487,16 @@
 
   .bewertungen-schnitt-wert {
     font-size: 3.6rem;
+  }
+}
+
+/* "Bewegung reduzieren" im System: Das Karussell springt statt zu gleiten. */
+@media (prefers-reduced-motion: reduce) {
+  .bewertungen-kacheln {
+    scroll-behavior: auto;
+  }
+
+  .bewertungen-pfeil {
+    transition: none;
   }
 }
