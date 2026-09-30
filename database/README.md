@@ -8,36 +8,48 @@
 Getrennt, weil sie unterschiedlich oft laufen: Das Schema einmal, die
 Testdaten beim Entwickeln immer wieder.
 
+Die Datenbank ist **PostgreSQL bei Supabase**, siehe
+[ADR-0017](../docs/decisions/ADR-0017-postgresql-auf-supabase.md).
+
+| Supabase-Projekt | Wofür |
+|---|---|
+| `schwitzkasten-dev` | lokal (`start.bat` / `start.sh`) und Preview-Deployments |
+| Produktion | nur die veröffentlichte Seite auf `main` |
+
 ## Einspielen
 
-1. In XAMPP **MySQL** starten — und **Apache** dazu, denn phpMyAdmin läuft
-   darüber. Für die Projektseite selbst wird Apache nicht gebraucht, die
-   startet `./start.sh` (Windows: `start.bat`).
-2. `http://localhost/phpmyadmin` öffnen.
-3. Reiter **Importieren** → `schema.sql` auswählen → **OK**.
+1. [supabase.com/dashboard](https://supabase.com/dashboard) öffnen, Projekt
+   **`schwitzkasten-dev`** auswählen.
+2. Links **SQL Editor** → **New query**.
+3. Den Inhalt von `schema.sql` einfügen → **Run**.
 4. Dasselbe mit `seed.sql`. Seit es Tarife gibt, ist das kein optionaler
    Schritt mehr.
 
-Auf der Kommandozeile:
+Beide Dateien sind UTF-8, Umlaute kommen so ohne Umweg richtig an.
 
-```bash
-mysql --default-character-set=utf8mb4 -u root < database/schema.sql
-```
+In die Produktionsdatenbank kommt `seed.sql` genau **einmal** beim
+Einrichten – danach nie wieder, siehe unten.
 
-**Der Schalter ist unter Windows Pflicht.** Ohne ihn liest der Client die
-Dateien in der Zeichensatz-Einstellung der Konsole statt als UTF-8, und aus
-`Alle Geräte` wird in der Datenbank `Alle Ger├ñte`. Über phpMyAdmin passiert
-das nicht.
+## Ansehen und von Hand ändern
+
+Im Supabase-Dashboard unter **Table Editor**. Das ersetzt phpMyAdmin.
 
 ## Regeln
 
 - **Jede Tabellenänderung kommt in `schema.sql`** und wird im Team angesagt.
-  Sonst hat jede Person eine andere Datenbank, und der Fehler taucht erst
-  bei der Vorführung auf.
+  `CREATE TABLE IF NOT EXISTS` legt nur neue Tabellen an – eine geänderte
+  Spalte in einer vorhandenen Tabelle braucht zusätzlich ein `ALTER TABLE`.
 - Tabellennamen kleingeschrieben, Mehrzahl, ohne Umlaute: `kurse`, `buchungen`
 - Spaltennamen kleingeschrieben mit Unterstrich: `erstellt_am`, `kurs_id`
 - Jede Tabelle hat `id` als Primärschlüssel und `erstellt_am` als Zeitstempel
-- `ENGINE = InnoDB` und `utf8mb4` — beides steht als Beispiel in `schema.sql`
+- **Jede neue Tabelle bekommt `ENABLE ROW LEVEL SECURITY`** am Ende von
+  `schema.sql`. Sonst ist sie über die öffentliche Schnittstelle von Supabase
+  lesbar.
+- **Fremdschlüssel brauchen einen eigenen Index** – PostgreSQL legt ihn nicht
+  selbst an.
+- Wie MySQL-Typen übersetzt werden, steht in
+  [ADR-0017](../docs/decisions/ADR-0017-postgresql-auf-supabase.md). Das
+  auskommentierte Beispiel oben in `schema.sql` zeigt die Konventionen.
 - In `seed.sql` **nur erfundene Daten**. Keine echten Namen, keine echten
   E-Mail-Adressen, keine Passwörter. Testkonten legt man deshalb über die
   Registrierung auf der Website an.
@@ -55,10 +67,12 @@ das nicht.
 | `kursbuchungen` | Terminkalender | gebuchte Kurstermine, mit konkretem Datum |
 | `verfuegbarkeiten` | Terminkalender | Wochenfenster der Coaches fürs Probetraining, Inhalt aus `seed.sql` |
 | `probetrainings` | Terminkalender | gebuchte Probetrainings |
+| `sitzungen` | Hosting auf Vercel | PHP-Sitzungen, siehe [ADR-0017](../docs/decisions/ADR-0017-postgresql-auf-supabase.md) |
 
 **`seed.sql` neu einspielen löscht alle Buchungen.** Kursbuchungen und
 Probetrainings hängen über Fremdschlüssel an Programmen und Coaches, die
-`seed.sql` neu anlegt. Vor einer Vorführung also nicht neu einspielen.
+`seed.sql` neu anlegt. Die Entwicklungsdatenbank teilt sich das ganze Team –
+vorher Bescheid sagen. Und vor einer Vorführung nicht neu einspielen.
 
 **`seed.sql` ist für die Tarife Pflicht, nicht optional.** Ohne sie ist
 `mitgliedschaft.php` leer — das ist die häufigste Fehlersuche an dieser Stelle.
