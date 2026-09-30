@@ -15,12 +15,14 @@
   box-sizing: border-box;
 }
 
-/* overscroll-behavior: none schaltet das Nachfedern am Seitenrand ab
-   (Trackpad, Touch). Sonst lässt sich die Seite samt Kopfzeile über den
-   Rand hinausziehen, oben, unten und seitlich. */
+/* overscroll-behavior-y: none schaltet das Nachfedern am oberen und unteren
+   Seitenrand ab (Trackpad, Touch). Sonst lässt sich die Seite samt
+   Kopfzeile über den Rand hinausziehen.
+   Nur senkrecht: Waagerecht abgeschaltet sperrt der Browser auch das
+   Zurückwischen mit zwei Fingern zur vorherigen Seite. */
 html {
   scroll-behavior: smooth;
-  overscroll-behavior: none;
+  overscroll-behavior-y: none;
 }
 
 body {
