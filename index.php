@@ -56,7 +56,6 @@ require ROOT_PATH . '/partials/header.php';
         <h1 class="display hero-title">Trainiere<br><em>deine</em><br>Basis.</h1>
         <div class="hero-bottom">
           <p class="hero-copy">Ein neuer Athletic Club für alle, die stärker werden wollen. Ohne Show. Mit System. Jeden Tag.</p>
-          <span class="scroll-note"><i></i> Entdecke deinen Club</span>
         </div>
       </div>
     </section>
