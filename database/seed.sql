@@ -521,7 +521,7 @@ JOIN coaches c ON c.name = t.coach;
 -- und neu angelegt - Bewertungen echter Konten bleiben stehen.
 --
 -- Die Bilder liefert das Team nach, siehe assets/img/bewertungen/README.md.
--- Bis dahin zeigt die Seite die Initialen.
+-- Bis dahin zeigt die Startseite Zitat-Kacheln.
 DELETE FROM bewertungen WHERE mitglied_id IS NULL;
 
 INSERT INTO bewertungen (name, war_mitglied, sterne, text, bild, erstellt_am) VALUES

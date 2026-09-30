@@ -12,8 +12,9 @@
  *              Schließen des Fensters übernimmt modal.js, wie beim
  *              Kurskalender.
  *
- *              Fehlt das Bild einer Person, treten die Initialen an seine
- *              Stelle - wie bei den Coaches in programm-details.js.
+ *              Fehlt das Bild einer Person, wird die Kachel zur
+ *              Zitat-Kachel. Im Fenster stehen im kleinen Kreis die
+ *              Initialen - wie bei den Coaches in programm-details.js.
  *
  *              KEIN innerHTML: Namen und Texte kommen aus einem Formular,
  *              das jeder mit Konto ausfüllen kann.
@@ -86,22 +87,20 @@ function statusBauen(mitglied) {
 }
 
 /**
- * Das Bild der Person, ersatzweise ihre Initialen. Dieselbe Datei erscheint
- * groß auf der Kachel und rund neben der Karte im Fenster - nur die Klasse
- * unterscheidet sich.
+ * Das kleine runde Bild neben der Karte im Fenster, ersatzweise die
+ * Initialen - wie bei den Coaches in programm-details.js.
  *
  * alt bleibt leer: Der Name steht direkt daneben, ein Screenreader würde
  * ihn sonst zweimal vorlesen.
  *
  * @param {import('../services/bewertungen.js').Bewertung} bewertung
- * @param {string} klasse   'bewertung-kachel-bild' oder 'bewertung-bild'
  * @param {string} baseUrl  Präfix aus data-base-url am <html>-Tag
  * @returns {HTMLElement}
  */
-function bildBauen(bewertung, klasse, baseUrl) {
+function bildBauen(bewertung, baseUrl) {
   const ersatz = element(
     'span',
-    `${klasse} ${klasse}--ersatz`,
+    'bewertung-bild bewertung-bild--ersatz',
     bewertung.name.split(' ').map((teil) => teil.charAt(0)).join('').slice(0, 2),
   );
 
@@ -109,7 +108,7 @@ function bildBauen(bewertung, klasse, baseUrl) {
     return ersatz;
   }
 
-  const bild = element('img', klasse);
+  const bild = element('img', 'bewertung-bild');
   bild.src = baseUrl + bewertung.bild;
   bild.alt = '';
   bild.loading = 'lazy';
@@ -121,6 +120,9 @@ function bildBauen(bewertung, klasse, baseUrl) {
 /**
  * Kachel für die Startseite: Bild über die ganze Fläche, darauf Sterne,
  * Text, Name und Status.
+ *
+ * Ohne Bild - oder wenn die Datei fehlt - wird daraus eine Zitat-Kachel:
+ * ein großes Anführungszeichen statt des Fotos, keine Initialen.
  *
  * @param {import('../services/bewertungen.js').Bewertung} bewertung
  * @param {string} baseUrl
@@ -134,7 +136,26 @@ function kachelBauen(bewertung, baseUrl) {
   inhalt.append(sterneBauen(bewertung.sterne), element('p', 'bewertung-kachel-text', bewertung.text), person);
 
   const kachel = element('li', 'bewertung-kachel');
-  kachel.append(bildBauen(bewertung, 'bewertung-kachel-bild', baseUrl), inhalt);
+
+  const zeichen = element('span', 'bewertung-kachel-zeichen', '“');
+  zeichen.setAttribute('aria-hidden', 'true');
+
+  if (bewertung.bild === null) {
+    kachel.classList.add('bewertung-kachel--zitat');
+    kachel.append(zeichen, inhalt);
+    return kachel;
+  }
+
+  const bild = element('img', 'bewertung-kachel-bild');
+  bild.src = baseUrl + bewertung.bild;
+  bild.alt = '';
+  bild.loading = 'lazy';
+  bild.addEventListener('error', () => {
+    kachel.classList.add('bewertung-kachel--zitat');
+    bild.replaceWith(zeichen);
+  });
+
+  kachel.append(bild, inhalt);
 
   return kachel;
 }
@@ -151,7 +172,7 @@ function karteBauen(bewertung, baseUrl) {
   person.append(element('p', 'bewertung-name', bewertung.name), statusBauen(bewertung.mitglied));
 
   const kopf = element('div', 'bewertung-kopf');
-  kopf.append(bildBauen(bewertung, 'bewertung-bild', baseUrl), person);
+  kopf.append(bildBauen(bewertung, baseUrl), person);
 
   const wertung = element('div', 'bewertung-wertung');
   wertung.append(
@@ -223,7 +244,8 @@ export function initBewertungen() {
    * nach dem Abschicken einer neuen.
    *
    * Als Kachel stehen zuerst Bewertungen mit Bild: Die Kacheln leben vom
-   * Foto, und Bilder haben nur die Beispiele aus seed.sql.
+   * Foto. Bilder haben bisher nur die Beispiele aus seed.sql, später
+   * kommen die freigegebenen Profilbilder dazu.
    *
    * @returns {Promise<void>}
    */

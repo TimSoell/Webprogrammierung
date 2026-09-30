@@ -8,8 +8,10 @@
 
 Auf der Startseite steht vor „Komm rein." der Abschnitt **„Was andere
 sagen."**: drei Bildkacheln wie bei „Dein Programm", jede mit Bild, Sternen,
-Text, Name und der Angabe **Mitglied** oder **Kein Mitglied**. Darunter
-stehen der Durchschnitt und der Button **„Alle Bewertungen"**.
+Text, Name und der Angabe **Mitglied** oder **Kein Mitglied**. Ohne Bild
+wird die Kachel zur **Zitat-Kachel**: ein großes Anführungszeichen statt
+des Fotos, keine Initialen. Darunter stehen der Durchschnitt und der Button
+**„Alle Bewertungen"**.
 
 Der Button öffnet ein Fenster über der Startseite (wie der Kurskalender) mit
 dem Durchschnitt und allen Bewertungen. Wer angemeldet ist, vergibt dort über
@@ -47,9 +49,10 @@ Bewertung.
 
 ## Welche Bewertungen als Kachel erscheinen
 
-Die drei neuesten **mit Bild**, erst danach die ohne. Bilder haben nur die
-Beispiele aus `seed.sql` — neue Bewertungen erscheinen deshalb im Fenster,
-aber nicht auf der Startseite. Die Zahl steht als `KACHELN` oben in
+Die drei neuesten **mit Bild**, erst danach die ohne. Bilder haben bisher
+nur die Beispiele aus `seed.sql` — neue Bewertungen erscheinen deshalb im
+Fenster, aber nicht auf der Startseite. Das ändert sich mit den
+Profilbildern. Die Zahl steht als `KACHELN` oben in
 `assets/js/components/bewertungen.js`.
 
 ## Datenform
@@ -69,8 +72,9 @@ aber nicht auf der Startseite. Die Zahl steht als `KACHELN` oben in
 - `name` ist Vorname und erster Buchstabe des Nachnamens — die Seite ist
   öffentlich.
 - `mitglied` kommt aus der Spalte `war_mitglied`.
-- `bild` ist `null` bei Bewertungen echter Konten. Dann stehen die
-  Initialen da, ebenso wenn die Datei fehlt.
+- `bild` ist `null` bei Bewertungen echter Konten, bis es Profilbilder
+  gibt. Dann zeigt die Startseite eine Zitat-Kachel und das Fenster einen
+  kleinen Kreis mit den Initialen — ebenso, wenn die Datei fehlt.
 
 ## Endpunkte
 
@@ -97,7 +101,12 @@ der Produktionsdatenbank. Eingespielt wurde jeweils nur der Abschnitt
 
 ## Was fehlt noch
 
-- Die sechs Bilder in `assets/img/bewertungen/`
+- **Profilbilder** (Feature von Philipp, noch nicht im Repository): Jede
+  Person legt ein Profilbild an und bestimmt selbst, ob es freigegeben
+  ist. Sobald es das gibt, liefert `BewertungRepository::alleFinden()` für
+  Bewertungen mit Konto das freigegebene Profilbild als `bild`. Komponente,
+  Service und Seite bleiben dabei unverändert — sie kennen nur `bild`.
+- Die sechs KI-Bilder für die Beispiele in `assets/img/bewertungen/`
 - Bewertungen erscheinen sofort, ohne Freigabe. Für eine öffentliche
   Domain wäre eine Freigabe durch das Team zu überlegen.
 - Eigene Bewertung ändern oder löschen gibt es nicht

@@ -23,7 +23,8 @@ import { getJson, postJson } from './api.js';
  * @property {string}      text
  * @property {string}      datum     'JJJJ-MM-TT'
  * @property {string|null} bild      Pfad ohne führenden Slash, relativ zur
- *                                   BASE_URL. null = Initialen statt Bild
+ *                                   BASE_URL. null = kein Bild: Zitat-Kachel
+ *                                   und Initialen im Fenster
  */
 
 /**
