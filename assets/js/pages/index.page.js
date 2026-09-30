@@ -2,7 +2,8 @@
  * @file        assets/js/pages/index.page.js
  * @layer       2 – Seitenskript
  * @description Verhalten, das es NUR auf der Startseite gibt: das
- *              scrollgesteuerte Hero-Video und das Auslastungsdiagramm.
+ *              scrollgesteuerte Hero-Video, das Auslastungsdiagramm und
+ *              die Bewertungen.
  *
  *              Eingebunden wird die Datei über die Variable $pageScript
  *              in index.php - nicht über main.js.
@@ -13,9 +14,11 @@
 import { $ } from '../lib/dom.js';
 import { initScrollVideo } from '../components/scroll-video.js';
 import { diagrammZeichnen } from '../components/auslastung-diagramm.js';
+import { initBewertungen } from '../components/bewertungen.js';
 import { auslastungLaden } from '../services/auslastung.js';
 
 initScrollVideo('[data-scroll-video]');
+initBewertungen();
 
 // --- Auslastungsdiagramm -----------------------------------------------------
 
