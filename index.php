@@ -25,6 +25,7 @@ require __DIR__ . '/src/bootstrap.php';
 $pageTitle       = 'SCHWITZKASTEN — Athletic Club';
 $pageDescription = 'SCHWITZKASTEN Athletic Club — Dein neues Fitnessstudio in Köln. Strength, Move und Fight auf 1.200 m².';
 $pageScript      = 'index.page.js';
+$pageHasPreloader = true;
 
 require ROOT_PATH . '/partials/head.php';
 require ROOT_PATH . '/partials/header.php';

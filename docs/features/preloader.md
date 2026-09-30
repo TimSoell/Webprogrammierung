@@ -2,13 +2,19 @@
 
 **Status:** fertig
 **Verantwortlich:** offen
-**Zuletzt geprüft:** 2026-09-21
+**Zuletzt geprüft:** 2026-09-30
 
 ## Was kann man damit
 
-Beim Laden jeder Seite zeigt die Website kurz den animierten SCHWITZKASTEN-
-Preloader. Sobald alle Ressourcen geladen sind, wird der Ladebildschirm weich
-ausgeblendet und aus dem Dokument entfernt.
+Beim ersten Aufruf der Startseite in einer Browser-Sitzung zeigt die Website
+kurz den animierten SCHWITZKASTEN-Preloader. Sobald alle Ressourcen geladen
+sind, wird der Ladebildschirm weich ausgeblendet und aus dem Dokument
+entfernt. Auf allen anderen Seiten und bei jedem weiteren Aufruf der
+Startseite in derselben Sitzung erscheint er nicht.
+
+Steuerung: `index.php` setzt `$pageHasPreloader = true`, erst dann gibt
+`partials/head.php` das Element aus. Ob er schon lief, merkt sich
+`preloader.js` im `sessionStorage`.
 
 ## Beteiligte Dateien
 

@@ -12,6 +12,7 @@
  *                  $pageDescription  Text für Suchmaschinen (optional)
  *                  $pageScript       Dateiname in assets/js/pages/ (optional)
  *                  $pageUsesMap      Leaflet für interaktive Karten (optional)
+ *                  $pageHasPreloader Ladebildschirm ausgeben (optional, nur Startseite)
  *
  *              Beispiel siehe index.php.
  * @see         partials/README.md
@@ -54,6 +55,7 @@ if (!defined('BASE_URL')) {
 <?php endif; ?>
 </head>
 <body>
+<?php if (!empty($pageHasPreloader)): ?>
   <div class="preloader" data-preloader role="status" aria-label="Seite wird geladen">
     <div class="preloader-inner">
       <div class="preloader-mark">
@@ -62,3 +64,4 @@ if (!defined('BASE_URL')) {
       <p class="preloader-label">Athletic Club</p>
     </div>
   </div>
+<?php endif; ?>
