@@ -56,10 +56,13 @@ jobs:
 
       - name: Auf Vercel hochladen
         run: |
+          # Das Ziel steht immer ausdrücklich da. Ohne Angabe macht die
+          # Vercel-CLI den ersten Deploy eines Projekts zur Produktion -
+          # auch wenn er aus einem Pull Request kommt.
           if [ "${{ github.event_name }}" = "push" ]; then
             ZIEL="--prod"
           else
-            ZIEL=""
+            ZIEL="--target=preview"
           fi
 
           URL=$(npx --yes vercel@latest deploy $ZIEL --token "$VERCEL_TOKEN")

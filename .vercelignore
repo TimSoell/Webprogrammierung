@@ -11,6 +11,13 @@
 # sonst mit im Paket.
 /config/config.php
 
+# Die Login-Bibliothek installiert Vercel beim Bauen selbst aus
+# composer.lock. Das eingecheckte vendor/ ist für das Team lokal gedacht
+# (ADR-0005). Lädt man es mit hoch, erzeugt Composer auf Vercel die
+# Autoload-Dateien neu, platform_check.php verschwindet dabei, und der
+# Build bricht mit ENOENT ab.
+/vendor
+
 # Wird auf Vercel nicht gebraucht: Dokumentation, SQL-Dateien, lokale
 # Startskripte und Werkzeuge.
 /docs
