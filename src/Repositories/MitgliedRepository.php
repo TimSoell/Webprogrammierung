@@ -65,31 +65,15 @@ final class MitgliedRepository
      * Sucht die Stammdaten zu einem Konto.
      *
      * @param int $userId  id des Kontos aus der Tabelle users
-    * @return array{vorname: string, nachname: string, profilbild: string|null}|null
-    *         null, wenn es keine Stammdaten gibt
+     * @return array{vorname: string, nachname: string}|null  null, wenn es keine gibt
      */
     public function findenNachUserId(int $userId): ?array
     {
         $stmt = Database::connection()->prepare(
-            "SELECT vorname, nachname, replace(encode(profilbild, 'base64'), E'\\n', '') AS profilbild "
-            . 'FROM mitglieder WHERE user_id = ?'
+            'SELECT vorname, nachname FROM mitglieder WHERE user_id = ?'
         );
         $stmt->execute([$userId]);
 
         return $stmt->fetch() ?: null;
-    }
-
-    /**
-     * Speichert das bereits geprüfte Profilbild eines Kontos.
-     *
-     * @param int    $userId     id des Kontos aus der Tabelle users
-     * @param string $profilbild JPEG-Bilddaten als base64
-     */
-    public function profilbildSpeichern(int $userId, string $profilbild): void
-    {
-        $stmt = Database::connection()->prepare(
-            "UPDATE mitglieder SET profilbild = decode(?, 'base64') WHERE user_id = ?"
-        );
-        $stmt->execute([$profilbild, $userId]);
     }
 }

@@ -4,9 +4,8 @@
  * @layer       4 – API-Endpunkt
  * @description Anmelden, Abmelden und "Wer ist gerade angemeldet?".
  *
- *                GET     -> { vorname, nachname, email, profilbild } oder 401
+ *                GET     -> { vorname, nachname, email } oder 401
  *                POST    { email, passwort } -> anmelden
- *                PUT     { profilbild } -> Profilbild speichern
  *                DELETE  -> abmelden
  *
  *              Kein Tabellenname, weil die Sitzung in der PHP-Session liegt,
@@ -44,31 +43,7 @@ try {
             'vorname'  => $mitglied['vorname'] ?? '',
             'nachname' => $mitglied['nachname'] ?? '',
             'email'    => $auth->getEmail(),
-            'profilbild' => $mitglied['profilbild'] ?? null,
         ]);
-    }
-
-    if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-        if (!$auth->isLoggedIn()) {
-            Api::fehler(401, 'Du bist nicht angemeldet.');
-        }
-
-        $eingabe = Api::eingabe();
-        $profilbild = Api::text($eingabe, 'profilbild');
-        $bilddaten = base64_decode($profilbild, true);
-
-        if ($profilbild === '' || strlen($profilbild) > 1500000 || $bilddaten === false) {
-            Api::fehler(400, 'Das Profilbild ist ungültig oder zu groß.');
-        }
-
-        $bild = getimagesizefromstring($bilddaten);
-        if ($bild === false || $bild['mime'] !== 'image/jpeg'
-            || $bild[0] > 512 || $bild[1] > 512 || strlen($bilddaten) > 1100000) {
-            Api::fehler(400, 'Bitte wähle ein gültiges JPEG-Profilbild aus.');
-        }
-
-        (new MitgliedRepository())->profilbildSpeichern($auth->getUserId(), $profilbild);
-        Api::antworten(['gespeichert' => true]);
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
