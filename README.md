@@ -179,8 +179,7 @@ in der Architektur nennt:
 ## Aktueller Stand
 
 Umgesetzt sind die **Startseite** und die drei **Programmseiten**
-(Strength, Move, Fight), inklusive mobiler Navigation und dem Anmeldefenster
-für Interessenten.
+(Strength, Move, Fight), inklusive mobiler Navigation.
 
 Dazu kommt das erste datenbankgestützte Feature: der **Mitglieder-Login**
 mit Registrierung, Login, Mein Konto und „Passwort vergessen“ — siehe

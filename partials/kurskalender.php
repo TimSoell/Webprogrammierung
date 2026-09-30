@@ -26,10 +26,10 @@ if (!defined('BASE_URL')) {
       <button class="modal-close" id="kurskalender-schliessen" type="button" aria-label="Fenster schließen">×</button>
 
       <h2 id="kurskalender-titel">Termine.</h2>
-      <p>Fahr über einen Tag, um zu sehen, was ansteht. Klick ihn an und wähl einen Termin zum Buchen.</p>
+      <p>Fahr über einen Tag, um zu sehen, was ansteht. Klick ihn an und wähl einen Termin zum Buchen. Mit den Pfeilen oder per Wischen geht es in die nächsten Monate.</p>
 
       <!-- Kein aria-live hier: Angesagt wird nur die Tagesansicht darin,
-           nicht bei jedem Neuzeichnen alle vierzehn Kreise. -->
+           nicht bei jedem Neuzeichnen alle Kreise des Monats. -->
       <div class="kalender" id="kurskalender-liste"></div>
     </div>
   </div>

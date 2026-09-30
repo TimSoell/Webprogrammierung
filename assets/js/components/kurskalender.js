@@ -4,13 +4,27 @@
  * @description Der Terminkalender im Fenster auf den drei Kursseiten.
  *              Öffnet sich über den Button "Termin buchen".
  *
- *              EIN KREIS PRO TAG
- *              Oben die nächsten zwei Wochen als Kreise mit der Tageszahl,
- *              darunter die Termine EINES Tages. Überfahren eines Kreises
- *              zeigt dessen Tag, ein Klick wählt ihn fest. So kann man mit
- *              der Maus zu den Terminen fahren, ohne dass unterwegs ein
- *              anderer Kreis den Tag austauscht: Sobald die Maus die Kreise
+ *              EIN MONAT, EIN KREIS PRO TAG
+ *              Oben ein ganzer Monat als Kreise mit der Tageszahl, darunter
+ *              die Termine EINES Tages. Überfahren eines Kreises zeigt
+ *              dessen Tag, ein Klick wählt ihn fest. So kann man mit der
+ *              Maus zu den Terminen fahren, ohne dass unterwegs ein anderer
+ *              Kreis den Tag austauscht: Sobald die Maus die Kreise
  *              verlässt, steht wieder der gewählte Tag da.
+ *
+ *              BLÄTTERN
+ *              Pfeile neben dem Monatsnamen, Wischen über den Kalender (Finger
+ *              oder Maus) oder waagerechtes Wischen auf dem Touchpad. Wie weit
+ *              es geht, sagt der Server (ersterMonat, letzterMonat). Jeder
+ *              Monat wird einzeln geladen und bis zum Schließen gemerkt.
+ *
+ *              TARIF
+ *              Ist man angemeldet, aber im gezeigten Monat sind keine Kurse
+ *              im Tarif, steht über den Kreisen ein Hinweis mit Link zur
+ *              Mitgliedschaft - und an den Terminen statt "Buchen" derselbe
+ *              Hinweis in kurz. Geprüft wird pro Monat, weil ein Wechsel
+ *              immer erst zum Monatsersten gilt. Die eigentliche Prüfung
+ *              macht der Server beim Buchen; das hier ist nur die Anzeige.
  *
  *              ZWEI STUFEN PRO TERMIN
  *              Überfahren mit der Maus (oder Fokus per Tastatur) klappt die
@@ -31,13 +45,18 @@
  */
 
 import { $ } from '../lib/dom.js';
-import { kalenderWochen, kurzesDatum, nachTagen, tagUeberschrift } from '../lib/datum.js';
+import {
+  kalenderWochen, kurzesDatum, monatUeberschrift, monatVerschieben, nachTagen, tagUeberschrift,
+} from '../lib/datum.js';
 import { initModal } from './modal.js';
 import { stufenAuswahlBauen } from './stufen.js';
 import { buchen, termineLaden } from '../services/kurstermine.js';
 
 /** Was bei einem vollen Termin erscheint. Der Server schickt denselben Satz. */
 const AUSGEBUCHT = 'Leider ist hier schon alles vollgeschwitzt.';
+
+/** So weit (in Pixeln) muss man waagerecht wischen, damit der Monat wechselt. */
+const WISCHWEG = 50;
 
 /**
  * Hilfsfunktion: Element mit Klasse und Text.
@@ -96,6 +115,7 @@ export function kurskalenderAufbauen(slug) {
   });
 
   const baseUrl = document.documentElement.dataset.baseUrl ?? '/';
+  const mitgliedschaftUrl = `${baseUrl}mitgliedschaft.php`;
 
   /**
    * Welcher Termin nach dem Neuladen wieder offen sein soll ("terminId|datum").
@@ -106,14 +126,38 @@ export function kurskalenderAufbauen(slug) {
   /** Rückmeldung, die nach dem Neuzeichnen am offenen Termin erscheinen soll. */
   let hinweis = null;
 
+  /** Antwort des Servers für den gezeigten Monat, zum Neuzeichnen ohne neue Anfrage. */
+  let daten = null;
+
+  /**
+   * Schon geladene Monate, bis das Fenster geschlossen und neu geöffnet wird.
+   * So kostet Hin- und Herblättern keine neuen Anfragen.
+   *
+   * @type {Map<string, import('../services/kurstermine.js').Kursmonat>}
+   */
+  let geladen = new Map();
+
+  /**
+   * Zählt die Anfragen mit. Blättert jemand schnell weiter, kann eine ältere
+   * Antwort nach einer neueren ankommen - sie wird dann verworfen.
+   */
+  let anfrage = 0;
+
+  /**
+   * Kurse in diesem Monat buchbar? Ohne Anmeldung "ja" - dann erscheint
+   * stattdessen der Hinweis zum Anmelden.
+   *
+   * @returns {boolean}
+   */
+  const kurseImTarif = () => !daten.angemeldet || daten.tarif?.kurse === true;
+
   /**
    * Baut die rechte Hälfte eines geöffneten Termins.
    *
    * @param {import('../services/kurstermine.js').Kurstermin} termin
-   * @param {boolean} angemeldet
    * @returns {HTMLElement}
    */
-  const aktionBauen = (termin, angemeldet) => {
+  const aktionBauen = (termin) => {
     const aktion = element('div', 'termin-aktion');
 
     if (termin.gebucht) {
@@ -128,9 +172,16 @@ export function kurskalenderAufbauen(slug) {
       return aktion;
     }
 
-    if (!angemeldet) {
+    if (!daten.angemeldet) {
       const satz = element('p', 'kalender-meldung', '');
       satz.append(link(`${baseUrl}anmelden.php`, 'Melde dich an'), ', um diesen Termin zu buchen.');
+      aktion.append(satz);
+      return aktion;
+    }
+
+    if (!kurseImTarif()) {
+      const satz = element('p', 'kalender-meldung kalender-meldung--voll', 'Kurse sind in deinem Tarif nicht enthalten. ');
+      satz.append(link(mitgliedschaftUrl, 'Tarif anpassen'));
       aktion.append(satz);
       return aktion;
     }
@@ -161,7 +212,9 @@ export function kurskalenderAufbauen(slug) {
         hinweis = fehler.message === AUSGEBUCHT ? null : fehler.message;
       }
 
-      await laden();
+      // Die Belegung dieses Monats hat sich geändert - nicht aus dem Speicher nehmen.
+      geladen.delete(daten.monat);
+      await laden(daten.monat);
     });
 
     aktion.append(element('p', 'termin-label', 'Deine Stufe'), stufe.element, knopf, meldung);
@@ -173,10 +226,9 @@ export function kurskalenderAufbauen(slug) {
    * Baut einen Termin: Kopfzeile, Infos, Aktion.
    *
    * @param {import('../services/kurstermine.js').Kurstermin} termin
-   * @param {boolean} angemeldet
    * @returns {HTMLElement}
    */
-  const terminBauen = (termin, angemeldet) => {
+  const terminBauen = (termin) => {
     const schluessel = `${termin.terminId}|${termin.datum}`;
     const voll = termin.belegt >= termin.max;
     const detailsId = `termin-${termin.terminId}-${termin.datum}`;
@@ -216,7 +268,7 @@ export function kurskalenderAufbauen(slug) {
       element('p', 'termin-beschreibung', termin.formatBeschreibung),
     );
 
-    const aktion = aktionBauen(termin, angemeldet);
+    const aktion = aktionBauen(termin);
 
     if (offen === schluessel && hinweis) {
       // hinweis ist entweder "Gebucht!" oder ein Fehlertext vom Server.
@@ -255,9 +307,6 @@ export function kurskalenderAufbauen(slug) {
 
   // --- Monatsansicht: ein Kreis pro Tag --------------------------------------
 
-  /** Antwort des Servers, zum Neuzeichnen ohne neue Anfrage. */
-  let daten = null;
-
   /**
    * Der angeklickte Tag. Überfahren zeigt einen anderen Tag nur vorübergehend;
    * verlässt die Maus die Kreise, erscheint wieder dieser.
@@ -289,10 +338,11 @@ export function kurskalenderAufbauen(slug) {
     const inhalt = [element('h3', 'kalender-datum', tagUeberschrift(datum))];
 
     if (termine.length === 0) {
-      inhalt.push(element('p', 'kalender-leer', 'An diesem Tag gibt es keine Kurse.'));
+      const text = datum < daten.heute ? 'Dieser Tag ist schon vorbei.' : 'An diesem Tag gibt es keine Kurse.';
+      inhalt.push(element('p', 'kalender-leer', text));
     } else {
       const termineListe = element('ul', 'termine');
-      termineListe.append(...termine.map((termin) => terminBauen(termin, daten.angemeldet)));
+      termineListe.append(...termine.map(terminBauen));
       inhalt.push(termineListe);
     }
 
@@ -300,19 +350,25 @@ export function kurskalenderAufbauen(slug) {
   };
 
   /**
-   * Baut den Kreis eines Tages.
+   * Baut den Kreis eines Tages. Vergangene Tage sind nur Zahl, kein Knopf.
    *
    * @param {string} datum
-   * @returns {HTMLButtonElement}
+   * @returns {HTMLElement}
    */
   const kreisBauen = (datum) => {
+    const tageszahl = String(Number(datum.slice(8)));
+
+    if (datum < daten.heute) {
+      return element('span', 'kalender-kreis kalender-kreis--vergangen', tageszahl);
+    }
+
     const termine = proTag.get(datum) ?? [];
     const voll = termine.length > 0 && termine.every((t) => t.belegt >= t.max);
     const gebucht = termine.some((t) => t.gebucht);
 
     // Nur die Zahl steht im Kreis. Was ein Screenreader vorliest, steht im
     // aria-label - dort gehört der ganze Tag samt Anzahl hin.
-    const kreis = element('button', 'kalender-kreis', String(Number(datum.slice(8))));
+    const kreis = element('button', 'kalender-kreis', tageszahl);
     kreis.type = 'button';
     kreis.dataset.datum = datum;
     kreis.classList.toggle('kalender-kreis--termine', termine.length > 0);
@@ -345,16 +401,82 @@ export function kurskalenderAufbauen(slug) {
   };
 
   /**
-   * Zeichnet Kreise und Tagesansicht aus den geladenen Daten.
+   * Die Zeile mit Monatsname und den beiden Pfeilen.
    *
+   * @returns {HTMLElement}
+   */
+  const monatskopfBauen = () => {
+    const pfeil = (zeichen, beschriftung, schritt, gesperrt) => {
+      const knopf = element('button', 'kalender-blaettern', zeichen);
+      knopf.type = 'button';
+      knopf.disabled = gesperrt;
+      knopf.setAttribute('aria-label', beschriftung);
+      knopf.addEventListener('click', () => blaettern(schritt));
+      return knopf;
+    };
+
+    const kopf = element('div', 'kalender-monatskopf');
+    kopf.append(
+      pfeil('‹', 'Vorheriger Monat', -1, daten.monat <= daten.ersterMonat),
+      element('h3', 'kalender-monat', monatUeberschrift(daten.monat)),
+      pfeil('›', 'Nächster Monat', 1, daten.monat >= daten.letzterMonat),
+    );
+
+    return kopf;
+  };
+
+  /**
+   * Der Hinweis über den Kreisen, wenn im Tarif dieses Monats keine Kurse
+   * enthalten sind. null, wenn alles passt oder niemand angemeldet ist.
+   *
+   * @returns {HTMLElement|null}
+   */
+  const tarifHinweisBauen = () => {
+    if (kurseImTarif()) {
+      return null;
+    }
+
+    // Ohne Vertrag gilt die erste Wahl sofort, ein Wechsel erst zum
+    // nächsten Monatsersten (ADR-0010). Liegt der gezeigte Monat schon
+    // dahinter, würde ein Wechsel für ihn rechtzeitig gelten.
+    let titel;
+    let text;
+
+    if (daten.tarif === null) {
+      titel = 'Du hast noch keinen Tarif.';
+      text = 'Wähle einen Tarif mit Kursen – dann kannst du sofort buchen.';
+    } else {
+      titel = `Kurse sind in deinem Tarif „${daten.tarif.name}“ nicht enthalten.`;
+      text = daten.von >= daten.wechselAb
+        ? `Wechsle jetzt auf einen Tarif mit Kursen – dann kannst du ab dem ${kurzesDatum(daten.von)} buchen.`
+        : `Ein Tarifwechsel gilt ab dem ${kurzesDatum(daten.wechselAb)}. Blättere weiter, um die Kurse ab dann zu sehen.`;
+    }
+
+    const kasten = element('div', 'kalender-hinweis');
+    const zeilen = element('div', 'kalender-hinweis-text');
+    zeilen.append(element('p', 'kalender-hinweis-titel', titel), element('p', 'kalender-hinweis-zusatz', text));
+
+    const knopf = element('a', 'button kalender-hinweis-link', daten.tarif === null ? 'Tarif wählen' : 'Tarif anpassen');
+    knopf.href = mitgliedschaftUrl;
+
+    kasten.append(zeilen, knopf);
+
+    return kasten;
+  };
+
+  /**
+   * Zeichnet Monat und Tagesansicht aus den geladenen Daten.
+   *
+   * @param {number} [richtung]  1 = kam von rechts (weiter), -1 = von links, 0 = ohne Bewegung
    * @returns {void}
    */
-  const zeichnen = () => {
+  const zeichnen = (richtung = 0) => {
     proTag = new Map(nachTagen(daten.termine).map(({ datum, eintraege }) => [datum, eintraege]));
 
-    // Beim ersten Öffnen der erste Tag mit Kursen, danach bleibt die Wahl.
+    // Neuer Monat: der erste Tag mit Kursen, sonst heute, sonst der Erste.
+    // Beim Neuzeichnen nach dem Buchen bleibt die Wahl.
     if (gewaehlt === null || gewaehlt < daten.von || gewaehlt > daten.bis) {
-      gewaehlt = daten.termine[0]?.datum ?? daten.von;
+      gewaehlt = daten.termine[0]?.datum ?? (daten.heute > daten.von ? daten.heute : daten.von);
     }
 
     const kopf = element('div', 'kalender-woche kalender-wochentage');
@@ -363,14 +485,18 @@ export function kurskalenderAufbauen(slug) {
 
     const raster = element('div', 'kalender-raster');
     raster.setAttribute('role', 'group');
-    raster.setAttribute('aria-label', 'Tag wählen');
+    raster.setAttribute('aria-label', `Tag wählen, ${monatUeberschrift(daten.monat)}`);
     raster.append(kopf, ...kalenderWochen(daten.von, daten.bis).map((woche) => {
       const zeile = element('div', 'kalender-woche');
-      // Tage außerhalb des Zeitraums bleiben als leerer Platz stehen, damit
+      // Tage aus dem Nachbarmonat bleiben als leerer Platz stehen, damit
       // jeder Kreis unter seinem Wochentag sitzt.
       zeile.append(...woche.map((datum) => (datum ? kreisBauen(datum) : element('span', 'kalender-kreis kalender-kreis--leer'))));
       return zeile;
     }));
+
+    if (richtung !== 0) {
+      raster.classList.add(richtung > 0 ? 'kalender-raster--von-rechts' : 'kalender-raster--von-links');
+    }
 
     // Maus verlässt die Kreise: zurück zum gewählten Tag.
     raster.addEventListener('mouseleave', () => tagZeigen(gewaehlt));
@@ -388,38 +514,148 @@ export function kurskalenderAufbauen(slug) {
       element('span', 'kalender-legende-eintrag kalender-legende-eintrag--gebucht', 'von dir gebucht'),
     );
 
+    // Hier drin wird gewischt - nicht in der Tagesansicht, dort markiert
+    // man eher Text oder scrollt.
+    const monatsansicht = element('div', 'kalender-monatsansicht');
+    monatsansicht.append(monatskopfBauen(), raster, legende);
+
     tagesansicht = element('div', 'kalender-tagesansicht');
     tagesansicht.setAttribute('aria-live', 'polite');
     angezeigt = null;
 
-    liste.replaceChildren(
-      element('p', 'kalender-zeitraum', `${kurzesDatum(daten.von)} – ${kurzesDatum(daten.bis)}`),
-      raster,
-      legende,
-      tagesansicht,
-    );
+    const tarifHinweis = tarifHinweisBauen();
+
+    liste.classList.remove('kalender--laedt');
+    liste.replaceChildren(...[tarifHinweis, monatsansicht, tagesansicht].filter(Boolean));
 
     tagZeigen(gewaehlt);
   };
 
   /**
-   * Lädt die Termine und zeichnet den Kalender neu.
+   * Lädt einen Monat - aus dem Speicher oder vom Server - und zeichnet ihn.
    *
+   * @param {string} [monat]     'JJJJ-MM'; ohne Angabe der laufende Monat
+   * @param {number} [richtung]  für die Bewegung beim Blättern, siehe zeichnen()
    * @returns {Promise<void>}
    */
-  async function laden() {
+  async function laden(monat, richtung = 0) {
+    const nummer = ++anfrage;
+
     try {
-      daten = await termineLaden(slug);
-      zeichnen();
+      const antwort = geladen.get(monat) ?? await termineLaden(slug, monat);
+
+      if (nummer !== anfrage) {
+        return;
+      }
+
+      geladen.set(antwort.monat, antwort);
+      daten = antwort;
+      zeichnen(richtung);
     } catch (fehler) {
-      liste.replaceChildren(element('p', 'kalender-meldung kalender-meldung--voll', fehler.message));
+      if (nummer === anfrage) {
+        liste.classList.remove('kalender--laedt');
+        liste.replaceChildren(element('p', 'kalender-meldung kalender-meldung--voll', fehler.message));
+      }
     }
   }
+
+  /**
+   * Einen Monat vor oder zurück, solange der Server ihn zeigt.
+   *
+   * @param {number} schritt  -1 oder 1
+   * @returns {void}
+   */
+  function blaettern(schritt) {
+    if (!daten) {
+      return;
+    }
+
+    const ziel = monatVerschieben(daten.monat, schritt);
+
+    if (ziel < daten.ersterMonat || ziel > daten.letzterMonat) {
+      return;
+    }
+
+    offen = null;
+    hinweis = null;
+    // Der alte Monat bleibt stehen, bis der neue da ist - nur blasser.
+    liste.classList.add('kalender--laedt');
+    laden(ziel, schritt);
+  }
+
+  // --- Wischen ------------------------------------------------------------------
+  // Einmal am festen Container, nicht an jedem neu gezeichneten Monat.
+
+  /** Wo der Finger oder die Maus aufgesetzt hat. */
+  let start = null;
+
+  /** Nach einem Wischen mit der Maus darf der folgende Klick keinen Tag wählen. */
+  let gewischt = false;
+
+  liste.addEventListener('pointerdown', (ereignis) => {
+    start = ereignis.target.closest('.kalender-monatsansicht') && ereignis.isPrimary
+      ? { x: ereignis.clientX, y: ereignis.clientY }
+      : null;
+  });
+
+  liste.addEventListener('pointerup', (ereignis) => {
+    if (!start) {
+      return;
+    }
+
+    const dx = ereignis.clientX - start.x;
+    const dy = ereignis.clientY - start.y;
+    start = null;
+
+    // Deutlich mehr waagerecht als senkrecht - sonst war es Scrollen.
+    if (Math.abs(dx) >= WISCHWEG && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      gewischt = true;
+      setTimeout(() => { gewischt = false; }, 0);
+      blaettern(dx < 0 ? 1 : -1);
+    }
+  });
+
+  liste.addEventListener('pointercancel', () => { start = null; });
+
+  liste.addEventListener('click', (ereignis) => {
+    if (gewischt) {
+      ereignis.stopPropagation();
+      ereignis.preventDefault();
+    }
+  }, true);
+
+  // Touchpad: zwei Finger waagerecht. Ein Wisch löst viele wheel-Ereignisse
+  // aus; nach einem Wechsel ist deshalb kurz Pause.
+  let wischSumme = 0;
+  let wischPause = false;
+
+  liste.addEventListener('wheel', (ereignis) => {
+    if (!ereignis.target.closest('.kalender-monatsansicht') || Math.abs(ereignis.deltaX) <= Math.abs(ereignis.deltaY)) {
+      return;
+    }
+
+    ereignis.preventDefault();
+
+    if (wischPause) {
+      return;
+    }
+
+    wischSumme += ereignis.deltaX;
+
+    if (Math.abs(wischSumme) >= WISCHWEG * 2) {
+      blaettern(wischSumme > 0 ? 1 : -1);
+      wischSumme = 0;
+      wischPause = true;
+      setTimeout(() => { wischPause = false; }, 600);
+    }
+  }, { passive: false });
 
   oeffnen.addEventListener('click', () => {
     offen = null;
     hinweis = null;
     gewaehlt = null;
+    geladen = new Map();
+    liste.classList.remove('kalender--laedt');
     liste.replaceChildren(element('p', 'kalender-leer', 'Termine werden geladen …'));
     laden();
   });

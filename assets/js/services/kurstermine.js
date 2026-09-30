@@ -43,18 +43,31 @@ import { getJson, postJson, sendJson } from './api.js';
  */
 
 /**
- * Lädt die Termine eines Programms für die nächsten zwei Wochen.
+ * @typedef  {object} Kursmonat
+ * @property {boolean} angemeldet
+ * @property {string}  monat         der gezeigte Monat, 'JJJJ-MM'
+ * @property {string}  ersterMonat   so weit zurück kann man blättern
+ * @property {string}  letzterMonat  so weit vor
+ * @property {string}  heute         'JJJJ-MM-TT', Tage davor sind vergangen
+ * @property {string}  von           erster Tag des Monats
+ * @property {string}  bis           letzter Tag des Monats
+ * @property {{name: string, kurse: boolean}|null} tarif
+ *           Der Tarif in diesem Monat. null = nicht angemeldet oder kein Vertrag
+ * @property {string|null} wechselAb Ab diesem Tag gilt ein heute vorgemerkter Wechsel
+ * @property {Kurstermin[]} termine  nur die, die noch nicht begonnen haben
+ */
+
+/**
+ * Lädt die Termine eines Programms für einen Monat.
  * Geht auch ohne Anmeldung.
  *
- * von und bis sind erster und letzter Tag des Kalenders ('JJJJ-MM-TT'),
- * auch wenn an ihnen kein Termin liegt.
- *
- * @param {string} slug  'strength', 'move' oder 'fight'
- * @returns {Promise<{angemeldet: boolean, von: string, bis: string, termine: Kurstermin[]}>}
- * @throws {ApiError}  404, wenn es das Programm nicht gibt
+ * @param {string} slug     'strength', 'move' oder 'fight'
+ * @param {string} [monat]  'JJJJ-MM'; ohne Angabe der laufende Monat
+ * @returns {Promise<Kursmonat>}
+ * @throws {ApiError}  404, wenn es das Programm nicht gibt · 400 Monat außerhalb des Kalenders
  */
-export async function termineLaden(slug) {
-  return getJson('api/kurstermine.php', { slug });
+export async function termineLaden(slug, monat) {
+  return getJson('api/kurstermine.php', monat ? { slug, monat } : { slug });
 }
 
 /**
@@ -64,7 +77,7 @@ export async function termineLaden(slug) {
  * @param {string} datum  'JJJJ-MM-TT'
  * @param {string} stufe  'einsteiger', 'fortgeschritten' oder 'erfahren'
  * @returns {Promise<{gebucht: true}>}
- * @throws {ApiError}  401 nicht angemeldet · 409 ausgebucht oder schon gebucht · 400 ungültig
+ * @throws {ApiError}  401 nicht angemeldet · 403 Kurse nicht im Tarif · 409 ausgebucht oder schon gebucht · 400 ungültig
  */
 export async function buchen(terminId, datum, stufe) {
   return postJson('api/kursbuchungen.php', { terminId, datum, stufe });

@@ -181,7 +181,7 @@ require ROOT_PATH . '/partials/header.php';
         </div>
         <div class="join-info">
           <p>Die ersten 100 Mitglieder trainieren im ersten Monat zum Eröffnungspreis.</p>
-          <button class="button button--dark" id="open-modal" type="button">Jetzt Platz sichern</button>
+          <a class="button button--dark" href="<?= e(BASE_URL) ?>mitgliedschaft.php">Jetzt Platz sichern</a>
         </div>
       </div>
     </section>
@@ -189,5 +189,4 @@ require ROOT_PATH . '/partials/header.php';
   </main>
 
 <?php
-require ROOT_PATH . '/partials/modal-anmeldung.php';
 require ROOT_PATH . '/partials/footer.php';

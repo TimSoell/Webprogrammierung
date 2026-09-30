@@ -6,6 +6,7 @@
  *
  *                GET                                  -> kommende eigene Buchungen
  *                POST    { terminId, datum, stufe }   -> 201 gebucht
+ *                                                     -> 403 Kurse nicht im Tarif
  *                                                     -> 409 ausgebucht oder schon gebucht
  *                DELETE  { id }                       -> storniert, bis zum Terminbeginn
  *
@@ -13,8 +14,10 @@
  *
  *              Ob der Termin an dem Tag überhaupt stattfindet, prüft
  *              Terminplan::kursterminBuchbar() - dieselbe Rechnung, die dem
- *              Kalender die Termine liefert. Ob noch Platz ist, prüft
- *              KursbuchungRepository::buchen() unter Sperre.
+ *              Kalender die Termine liefert. Ob der Tarif an dem Tag Kurse
+ *              enthält, prüft MitgliedschaftRepository::amTagFinden(). Ob
+ *              noch Platz ist, prüft KursbuchungRepository::buchen() unter
+ *              Sperre.
  * @see         assets/js/services/kurstermine.js
  * @see         src/Repositories/KursbuchungRepository.php
  * @see         docs/features/terminkalender.md
@@ -27,6 +30,7 @@ require __DIR__ . '/../src/bootstrap.php';
 use Repositories\KursbuchungRepository;
 use Repositories\KursterminRepository;
 use Repositories\MitgliedRepository;
+use Repositories\MitgliedschaftRepository;
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -90,6 +94,18 @@ try {
 
         if ($termin === null || !Terminplan::kursterminBuchbar($termin, $datum, $jetzt)) {
             Api::fehler(400, 'Diesen Termin gibt es nicht oder er hat schon begonnen.');
+        }
+
+        // Der Tarif, der AM TAG DES KURSES gilt - nicht der heutige. Wer zum
+        // nächsten Monat auf einen Tarif mit Kursen wechselt, kann die Kurse
+        // dieses Monats schon jetzt buchen.
+        $vertrag = (new MitgliedschaftRepository())->amTagFinden($mitgliedId, $datum);
+
+        if ($vertrag === null) {
+            Api::fehler(403, 'Für diesen Tag hast du noch keinen Tarif. Wähle einen unter Mitgliedschaft.');
+        }
+        if (!(bool) $vertrag['zugang_kurse']) {
+            Api::fehler(403, 'Kurse sind in deinem Tarif „' . $vertrag['name'] . '“ nicht enthalten. Wechsle unter Mitgliedschaft auf einen Tarif mit Kursen.');
         }
 
         $ergebnis = $buchungen->buchen($mitgliedId, $terminId, $datum, $stufe);

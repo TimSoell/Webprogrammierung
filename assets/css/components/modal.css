@@ -1,14 +1,16 @@
 /**
  * @file        assets/css/components/modal.css
  * @layer       Komponente
- * @description Das Overlay-Fenster für die Interessenten-Anmeldung.
+ * @description Die Overlay-Fenster: Kurskalender und Rückfrage beim
+ *              Tarifwechsel.
  *
  *              Sichtbarkeit wird ausschließlich über die Klasse .open
  *              gesteuert, gesetzt von assets/js/components/modal.js.
  *              Kein style.display im JavaScript - so bleibt die gesamte
  *              Darstellung im CSS und ist an einer Stelle nachvollziehbar.
  * @see         assets/js/components/modal.js
- * @see         partials/modal-anmeldung.php
+ * @see         partials/kurskalender.php
+ * @see         mitgliedschaft.php
  */
 
 .modal {
@@ -88,50 +90,3 @@
   cursor: pointer;
 }
 
-.signup-form {
-  display: grid;
-  gap: 11px;
-}
-
-/* Wird gebraucht, weil eine Klasse mit display:grid das hidden-Attribut
-   des Browsers überstimmt. Ohne diese Regel bliebe das Formular nach dem
-   Absenden sichtbar - siehe assets/js/pages/index.page.js. */
-.signup-form[hidden] {
-  display: none;
-}
-
-.signup-form label {
-  font-size: .72rem;
-  font-weight: 700;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-
-.signup-form input {
-  width: 100%;
-  padding: 13px;
-  border: 1px solid #d3d4cc;
-  background: #fff;
-  font: .9rem var(--body);
-}
-
-.signup-form input:focus-visible {
-  outline: 2px solid var(--lime-dark);
-  outline-offset: 1px;
-}
-
-.signup-form .button {
-  margin-top: 7px;
-}
-
-/* Erfolgsmeldung nach dem Absenden. Wird per .show eingeblendet. */
-.form-success {
-  display: none;
-  padding: 15px;
-  background: var(--lime);
-  font-weight: 700;
-}
-
-.form-success.show {
-  display: block;
-}

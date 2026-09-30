@@ -13,9 +13,12 @@
  *              Stelle umstellen kann.
  *
  *              KREISE
- *              Der Kurskalender zeigt die Tage als Kreise mit der Tageszahl.
- *              Ring in Limette = Kurse, rot = alles ausgebucht, gefüllt =
- *              gewählter Tag, Punkt = selbst gebucht.
+ *              Der Kurskalender zeigt einen Monat, die Tage als Kreise mit
+ *              der Tageszahl. Ring in Limette = Kurse, rot = alles
+ *              ausgebucht, gefüllt = gewählter Tag, Punkt = selbst gebucht,
+ *              blass ohne Ring = schon vorbei. Darüber Monatsname mit
+ *              Pfeilen zum Blättern und, falls Kurse nicht im Tarif sind,
+ *              der Hinweis .kalender-hinweis.
  *
  *              AUFKLAPPEN
  *              .termin-details erscheint beim Überfahren (:hover), bei Fokus
@@ -53,19 +56,125 @@
   font-size: .88rem;
 }
 
-/* --- Kurskalender: ein Kreis pro Tag --------------------------------------- */
-.kalender-zeitraum {
+/* --- Kurskalender: Hinweis zum Tarif ---------------------------------------- */
+/* Wie .auth-message: roter Strich links. Daneben der Weg zur Mitgliedschaft. */
+.kalender-hinweis {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-left: 3px solid var(--k-warnung);
+  background: var(--k-flaeche);
+  gap: 14px 22px;
+}
+
+.kalender-hinweis-text p {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.kalender-hinweis-titel {
+  font-weight: 700;
+}
+
+.kalender-hinweis .kalender-hinweis-zusatz {
+  margin-top: 4px;
+  color: var(--k-leise);
+  font-size: .84rem;
+}
+
+.kalender-hinweis-link {
+  flex-shrink: 0;
+  min-height: 42px;
+}
+
+/* --- Kurskalender: ein Monat, ein Kreis pro Tag ----------------------------- */
+.kalender-monatsansicht {
+  display: grid;
+  gap: 22px;
+  /* Senkrecht scrollt der Browser, waagerecht wischt das Skript den Monat
+     weiter. user-select: Beim Wischen mit der Maus sonst blaue Markierung. */
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.kalender-monatskopf {
+  display: grid;
+  align-items: center;
+  gap: 12px;
+  grid-template-columns: auto 1fr auto;
+}
+
+.kalender-monat {
   margin: 0;
   color: var(--k-akzent);
-  font-size: .72rem;
-  font-weight: 700;
-  letter-spacing: .1em;
+  font: 700 1.5rem/1 var(--display);
+  letter-spacing: .04em;
+  text-align: center;
   text-transform: uppercase;
+}
+
+.kalender-blaettern {
+  display: grid;
+  width: 40px;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 1px solid var(--k-linie);
+  background: none;
+  color: var(--paper);
+  cursor: pointer;
+  font: 400 1.6rem/1 var(--body);
+  place-items: center;
+  transition: border-color .15s, color .15s;
+}
+
+.kalender-blaettern:hover:not([disabled]),
+.kalender-blaettern:focus-visible {
+  border-color: var(--k-akzent);
+  color: var(--k-akzent);
+}
+
+/* Am Anfang und Ende des Kalenders: sichtbar, aber erkennbar ohne Wirkung. */
+.kalender-blaettern[disabled] {
+  cursor: default;
+  opacity: .3;
+}
+
+/* Beim Blättern bleibt der alte Monat stehen, bis der neue geladen ist. */
+.kalender--laedt .kalender-monatsansicht,
+.kalender--laedt .kalender-tagesansicht {
+  opacity: .45;
+  pointer-events: none;
+  transition: opacity .15s;
 }
 
 .kalender-raster {
   display: grid;
   gap: 10px;
+}
+
+/* Der neue Monat gleitet aus der Richtung herein, in die gewischt wurde. */
+.kalender-raster--von-rechts {
+  animation: kalender-von-rechts .25s ease-out;
+}
+
+.kalender-raster--von-links {
+  animation: kalender-von-links .25s ease-out;
+}
+
+@keyframes kalender-von-rechts {
+  from { opacity: 0; transform: translateX(32px); }
+}
+
+@keyframes kalender-von-links {
+  from { opacity: 0; transform: translateX(-32px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kalender-raster--von-rechts,
+  .kalender-raster--von-links {
+    animation: none;
+  }
 }
 
 .kalender-woche {
@@ -140,9 +249,21 @@
   background: var(--ink);
 }
 
-/* Platzhalter für Tage außerhalb der zwei Wochen - hält die Spalten. */
+/* Platzhalter für Tage aus dem Nachbarmonat - hält die Spalten. */
 .kalender-kreis--leer {
   visibility: hidden;
+}
+
+/* Schon vorbei: nur noch die Zahl, ohne Ring und ohne Klick. */
+.kalender-kreis--vergangen {
+  border-color: transparent;
+  cursor: default;
+  opacity: .35;
+}
+
+.kalender-kreis--vergangen:hover {
+  background: none;
+  outline: 0;
 }
 
 .kalender-legende {
@@ -505,6 +626,12 @@
 
   .kalender-kreis--gebucht::after {
     bottom: 4px;
+  }
+
+  /* Hinweis und Button untereinander statt nebeneinander. */
+  .kalender-hinweis {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   /* Uhrzeit, ein langer Formatname und "18/20" passen auf 375 px nicht in
