@@ -16,6 +16,18 @@ cd "$(dirname "$0")" || exit 1
 PHP="/Applications/XAMPP/xamppfiles/bin/php"
 [ -x "$PHP" ] || PHP="php"
 
+if ! command -v "$PHP" >/dev/null 2>&1; then
+    echo "Kein PHP gefunden. Entweder XAMPP installieren oder PHP ueber"
+    echo "Homebrew (brew install php). Siehe README.md."
+    exit 1
+fi
+
+if [ ! -f config/config.php ]; then
+    echo "Konfiguration fehlt. Einmalig ausfuehren:"
+    echo "    cp config/config.example.php config/config.php"
+    exit 1
+fi
+
 # Die Datenbank ist PostgreSQL bei Supabase. Ist der Treiber pdo_pgsql nicht
 # eingeschaltet, wird er beim Start dazugeladen. Fehlt er ganz (manche
 # XAMPP-Fassungen fuer macOS), meldet PHP das beim Start - siehe README.md.
