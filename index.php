@@ -192,7 +192,6 @@ require ROOT_PATH . '/partials/header.php';
             <p class="eyebrow">Stimmen aus dem Club</p>
             <h2 class="display section-title" id="bewertungen-heading">Was andere<br>sagen.</h2>
           </div>
-          <p class="section-lead">Mitglieder und Gäste über ihr Training bei uns. Ungeschönt, auch wenn mal etwas nicht passt.</p>
         </div>
 
         <!-- Die Kacheln trägt assets/js/components/bewertungen.js ein. -->
