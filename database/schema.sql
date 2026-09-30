@@ -27,6 +27,7 @@
 --              verfuegbarkeiten und probetrainings.
 --              Hosting auf Vercel: sitzungen (PHP-Sitzungen in der Datenbank).
 --              Feature Bewertungen: bewertungen.
+--              Feature Profilbilder: profilbilder.
 --              Die auskommentierte Tabelle in der Mitte zeigt die Konventionen.
 --
 --              Die Datei darf mehrfach eingespielt werden: CREATE ... IF NOT
@@ -837,8 +838,8 @@ CREATE TABLE IF NOT EXISTS bewertungen (
 
     -- Pfad relativ zur BASE_URL, z. B. 'assets/img/bewertungen/lea-m.jpg'.
     -- Nur die Beispielbewertungen haben hier ein Bild. Bewertungen mit
-    -- Konto bekommen später das freigegebene Profilbild; ohne Bild zeigt
-    -- die Startseite eine Zitat-Kachel.
+    -- Konto zeigen das freigegebene Profilbild aus der Tabelle profilbilder
+    -- (BewertungRepository); ohne Bild zeigt die Startseite eine Zitat-Kachel.
     bild         varchar(255)  NULL,
 
     erstellt_am  timestamp(0)  NOT NULL DEFAULT LOCALTIMESTAMP(0),
@@ -850,6 +851,44 @@ CREATE TABLE IF NOT EXISTS bewertungen (
 
     -- Wird ein Konto gelöscht, verschwindet seine Bewertung mit.
     CONSTRAINT fk_bewertungen_mitglieder
+        FOREIGN KEY (mitglied_id) REFERENCES mitglieder (id)
+        ON DELETE CASCADE
+);
+
+
+-- -----------------------------------------------------------------------------
+-- FEATURE PROFILBILDER
+-- -----------------------------------------------------------------------------
+-- Ein Bild pro Mitglied, als JPEG direkt in der Datenbank. Auf Vercel gibt es
+-- keinen dauerhaften Speicher für hochgeladene Dateien - siehe
+-- docs/decisions/ADR-0019-profilbilder-in-der-datenbank.md
+--
+-- Eigene Tabelle statt einer Spalte in mitglieder: So lädt nicht jede Abfrage
+-- der Stammdaten das Bild mit, und die Datei legt die Tabelle auch in einer
+-- bestehenden Datenbank an (eine neue Spalte käme per CREATE ... IF NOT
+-- EXISTS nicht an).
+--
+-- Siehe docs/features/profilbilder.md
+-- -----------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS profilbilder (
+    -- Zugleich Primärschlüssel: genau ein Bild pro Mitglied.
+    mitglied_id  integer      PRIMARY KEY,
+
+    -- Im Browser quadratisch zugeschnitten und verkleinert, höchstens
+    -- 300 KB - das prüft api/profilbilder.php vor dem Speichern.
+    bild         bytea        NOT NULL,
+
+    -- 1 = wird bei den eigenen Bewertungen gezeigt. Anfangs an, abschalten
+    -- geht in "Mein Konto" (Entscheidung im Team, 2026-09-30).
+    oeffentlich  smallint     NOT NULL DEFAULT 1 CHECK (oeffentlich IN (0, 1)),
+
+    -- Steckt in der Bildadresse (?v=...). Ein neues Bild bekommt so eine
+    -- neue Adresse, und der Browser darf das alte lange zwischenspeichern.
+    geaendert_am timestamp(0) NOT NULL DEFAULT LOCALTIMESTAMP(0),
+
+    -- Wird ein Konto gelöscht, verschwindet sein Bild mit.
+    CONSTRAINT fk_profilbilder_mitglieder
         FOREIGN KEY (mitglied_id) REFERENCES mitglieder (id)
         ON DELETE CASCADE
 );
@@ -895,3 +934,4 @@ ALTER TABLE verfuegbarkeiten     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE probetrainings       ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sitzungen            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bewertungen          ENABLE ROW LEVEL SECURITY;
+ALTER TABLE profilbilder         ENABLE ROW LEVEL SECURITY;

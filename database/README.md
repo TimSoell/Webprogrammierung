@@ -69,6 +69,7 @@ Im Supabase-Dashboard unter **Table Editor**. Das ersetzt phpMyAdmin.
 | `probetrainings` | Terminkalender | gebuchte Probetrainings |
 | `sitzungen` | Hosting auf Vercel | PHP-Sitzungen, siehe [ADR-0017](../docs/decisions/ADR-0017-postgresql-auf-supabase.md) |
 | `bewertungen` | Bewertungen | Bewertungen der Konten, dazu Beispiele ohne Konto aus `seed.sql` |
+| `profilbilder` | Profilbilder | ein JPEG pro Mitglied samt Freigabe, siehe [ADR-0019](../docs/decisions/ADR-0019-profilbilder-in-der-datenbank.md) |
 
 **`seed.sql` neu einspielen löscht alle Buchungen.** Kursbuchungen und
 Probetrainings hängen über Fremdschlüssel an Programmen und Coaches, die

@@ -5,6 +5,11 @@ zurück, nie HTML.
 
 Angesprochen werden sie ausschließlich aus `assets/js/services/`.
 
+**Ausnahme: `profilbilder.php` liefert bei GET das Bild selbst**
+(`image/jpeg`), damit die Adresse direkt in `<img src>` stehen kann. Speichern,
+Freigeben und Entfernen laufen normal über den Service. Siehe
+[ADR-0019](../docs/decisions/ADR-0019-profilbilder-in-der-datenbank.md).
+
 **Ausnahme: `index.php` ist kein Endpunkt.** Sie ist der einzige Einstieg
 auf Vercel und bindet von dort aus Seiten und Endpunkte ein. Vercel führt PHP
 nur in diesem Ordner aus, deshalb liegt sie hier. Nicht anfassen, keinen

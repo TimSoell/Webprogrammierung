@@ -300,8 +300,8 @@ export function initBewertungen() {
    * nach dem Abschicken einer neuen.
    *
    * Ins Karussell kommen alle Bewertungen, die mit Bild zuerst: Die Kacheln
-   * leben vom Foto. Bilder haben bisher nur die Beispiele aus seed.sql,
-   * später kommen die freigegebenen Profilbilder dazu.
+   * leben vom Foto. Ein Bild haben die Beispiele aus seed.sql und alle
+   * Bewertungen, deren Verfasser ein freigegebenes Profilbild haben.
    *
    * @returns {Promise<void>}
    */

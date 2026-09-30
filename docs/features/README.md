@@ -28,6 +28,7 @@ kommt: „Wo muss ich anfassen, wenn ich am Kursplan etwas ändern will?"
 | [Nachweise](nachweise.md) | in Arbeit | Felix |
 | [Terminkalender](terminkalender.md) | fertig | Jonny |
 | [Bewertungen](bewertungen.md) | in Arbeit | Felix |
+| [Profilbilder](profilbilder.md) | fertig | Felix |
 | [Cookie-Banner](cookie-banner.md) | in Arbeit | Giani |
 
 Der Aufbau eines Features ist am Beispiel-Feature beschrieben — siehe
