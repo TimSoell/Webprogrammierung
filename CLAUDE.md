@@ -16,9 +16,9 @@ Studienarbeit im Fach Webprogrammierung (DHBW, 3. Semester), 5 Personen.
 | | |
 |---|---|
 | Frontend | HTML, CSS, JavaScript als ES-Module. **Kein Framework** |
-| Backend | PHP 8, MySQL über PDO |
+| Backend | PHP 8, PostgreSQL bei Supabase über PDO — siehe [`ADR-0017`](docs/decisions/ADR-0017-postgresql-auf-supabase.md) |
 | Login | [delight-im/auth](https://github.com/delight-im/PHP-Auth) über Composer, `vendor/` eingecheckt — siehe [`ADR-0005`](docs/decisions/ADR-0005-login-bibliothek.md) |
-| Umgebung | XAMPP — PHP-Server zum Entwickeln, Apache zur Abgabe, MySQL |
+| Umgebung | Lokal PHP-Server aus XAMPP, veröffentlicht auf Vercel — siehe [`ADR-0016`](docs/decisions/ADR-0016-hosting-auf-vercel.md) |
 | Aufbau | Sechs Schichten, siehe [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) |
 
 **Kein React, kein Vue, kein Bootstrap, kein Tailwind, kein npm, kein
@@ -30,7 +30,7 @@ werden nicht ohne Absprache eingeführt.
 ## 2. Starten
 
 ```bash
-cp config/config.example.php config/config.php   # einmalig nach dem Klonen
+cp config/config.example.php config/config.php   # einmalig, dann DB-Passwort eintragen
 ./start.sh                                       # Windows: start.bat
 ```
 
@@ -38,14 +38,16 @@ Dann `http://localhost:8000/` aufrufen. Das Skript startet den in PHP
 eingebauten Entwicklungsserver direkt aus dem Projektordner — **das Projekt
 muss nicht in `xampp/htdocs/` liegen.** Beenden mit `Ctrl+C`.
 
-MySQL wird erst ab dem ersten Datenbank-Feature gebraucht und kommt weiter aus
-XAMPP; für phpMyAdmin zusätzlich Apache starten.
+Die Datenbank ist **`schwitzkasten-dev` bei Supabase** — lokal läuft keine
+Datenbank mehr, aber ohne Internet läuft auch keine Seite. Nie lokal gegen
+die Produktionsdatenbank arbeiten.
 
-Für **Abgabe und Vorführung** gilt der klassische Weg: Ordner nach
-`xampp/htdocs/`, Apache starten, `http://localhost/<projektordner>/`. Am
-Quelltext ändert das nichts, `BASE_URL` passt in beiden Fällen — aber einmal
-vorher prüfen. Begründung und verworfene Alternativen:
-[`ADR-0004`](docs/decisions/ADR-0004-php-entwicklungsserver.md).
+**Veröffentlicht** wird automatisch: Pull Request → Preview auf Vercel,
+Merge nach `main` → Produktion (`.github/workflows/vercel.yml`). Auf Vercel
+ist `api/index.php` der einzige Einstieg und bindet Seiten und Endpunkte ein,
+siehe [`ADR-0016`](docs/decisions/ADR-0016-hosting-auf-vercel.md). Neue Seiten
+brauchen dafür nichts Zusätzliches, solange sie in der obersten Ebene, in
+`programme/` oder in `api/` liegen.
 
 ---
 
@@ -81,8 +83,11 @@ Architektur aus.
 Weitere feste Punkte:
 
 - `declare(strict_types=1);` in jeder PHP-Datei.
-- **Zugangsdaten gehören nie ins Repository.** `config/config.php` steht in
-  `.gitignore` und bleibt dort.
+- **Zugangsdaten gehören nie ins Repository** — es ist öffentlich.
+  `config/config.php` steht in `.gitignore` und bleibt dort; auf Vercel
+  stehen die Werte in den Umgebungsvariablen des Projekts.
+- **Neue Tabelle = `ENABLE ROW LEVEL SECURITY`** am Ende von `schema.sql`,
+  sonst ist sie über die öffentliche Schnittstelle von Supabase lesbar.
 - `require` bekommt `ROOT_PATH`, `href` und `src` bekommen `BASE_URL`.
   Diese beiden zu verwechseln ist der häufigste Fehler im Projekt.
 - **`vendor/` wird nie von Hand geändert.** Die Login-Bibliothek wird nur
@@ -188,7 +193,7 @@ Spaltennamen — in Texten und Inhalten selbstverständlich schon.
 
 Am Beispiel „Kursplan". Von unten nach oben:
 
-1. Tabelle in `database/schema.sql`, einspielen, **im Team ansagen**
+1. Tabelle in `database/schema.sql`, in `schwitzkasten-dev` einspielen, **im Team ansagen**
 2. `src/Repositories/KursRepository.php` — das SQL
 3. `api/kurse.php` — Eingaben prüfen, JSON zurückgeben
 4. `assets/js/services/kurse.js` — `alleLaden()` und Co.

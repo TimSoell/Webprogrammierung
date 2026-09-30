@@ -3,16 +3,22 @@
 Website eines Fitnessstudios. Studienarbeit im Fach **Webprogrammierung**,
 DHBW, 3. Semester.
 
-Umgesetzt mit HTML, CSS und JavaScript. PHP und MySQL bilden den serverseitigen
-Teil. Es kommt **kein Framework und kein Build-Werkzeug** zum Einsatz — der
-Quelltext im Repository ist genau der Quelltext, der im Browser ankommt.
+Umgesetzt mit HTML, CSS und JavaScript. PHP und PostgreSQL bilden den
+serverseitigen Teil. Es kommt **kein Framework und kein Build-Werkzeug** zum
+Einsatz — der Quelltext im Repository ist genau der Quelltext, der im Browser
+ankommt.
+
+Die veröffentlichte Fassung läuft auf **Vercel**, die Daten liegen bei
+**Supabase**. Siehe [ADR-0016](docs/decisions/ADR-0016-hosting-auf-vercel.md)
+und [ADR-0017](docs/decisions/ADR-0017-postgresql-auf-supabase.md).
 
 ---
 
 ## Starten
 
-Voraussetzung: **XAMPP** ist installiert. Gebraucht wird davon zunächst nur
-das mitgelieferte PHP. MySQL kommt dazu, sobald ein Feature Daten speichert.
+Voraussetzung: **XAMPP** ist installiert. Gebraucht wird davon nur das
+mitgelieferte PHP — MySQL, Apache und phpMyAdmin nicht mehr. Und eine
+Internetverbindung, denn die Datenbank liegt bei Supabase.
 
 Der Projektordner darf liegen, wo du willst — er muss **nicht** in
 `xampp/htdocs/`.
@@ -24,8 +30,9 @@ Der Projektordner darf liegen, wo du willst — er muss **nicht** in
    cp config/config.example.php config/config.php
    ```
 
-   Unter Windows genügt Kopieren und Umbenennen im Explorer. Die
-   Standardwerte passen zu einer frischen XAMPP-Installation.
+   Unter Windows genügt Kopieren und Umbenennen im Explorer. Danach in
+   `config/config.php` bei `'password'` das Passwort der
+   Entwicklungsdatenbank eintragen. Das gibt es im Team per Passwortmanager.
 
 3. Startskript ausführen:
 
@@ -42,77 +49,33 @@ sofort, ein Neustart ist nicht nötig.
 Fehlt Schritt 2, erscheint statt der Seite ein deutlicher Hinweis darauf.
 
 Die Skripte starten den in PHP eingebauten Entwicklungsserver direkt aus dem
-Projektordner. Warum das so gelöst ist und warum ein Symlink nach `htdocs`
-**nicht** funktioniert, steht in
-[`ADR-0004`](docs/decisions/ADR-0004-php-entwicklungsserver.md).
-Dabei läuft `router.php` mit, damit der Server Videos stückweise ausliefern
-kann; ohne das steht das Scroll-Video still. Siehe
+Projektordner, siehe
+[`ADR-0004`](docs/decisions/ADR-0004-php-entwicklungsserver.md). Dabei läuft
+`router.php` mit, damit der Server Videos stückweise ausliefern kann; ohne
+das steht das Scroll-Video still. Siehe
 [`ADR-0006`](docs/decisions/ADR-0006-router-fuer-entwicklungsserver.md).
 
-### Alternative: über Apache aus `htdocs`
-
-Der klassische XAMPP-Weg gilt weiterhin — und er ist der Weg für die
-**Abgabe und die Vorführung**:
-
-1. Projektordner nach `xampp/htdocs/` legen.
-2. In XAMPP **Apache** starten.
-3. Im Browser `http://localhost/<projektordner>/` aufrufen.
-
-Am Quelltext ändert das nichts: `BASE_URL` wird berechnet und stimmt in beiden
-Fällen. Weil aber entwickelt und vorgeführt auf unterschiedlichen Servern
-wird, gilt: **vor der Abgabe einmal über Apache prüfen.**
+Den Datenbank-Treiber `pdo_pgsql` laden die Skripte selbst dazu – an der
+`php.ini` muss niemand etwas ändern. **macOS:** Ob XAMPP für macOS den Treiber
+überhaupt mitbringt, zeigt `php -m | grep pdo_pgsql`. Fehlt er, PHP über
+Homebrew installieren (`brew install php`).
 
 ### Datenbank
 
-Nur die Startseite läuft ohne Datenbank. Login, Mitgliedsbereich und der
-untere Teil der Programmseiten (Merkmale, Coaches) brauchen sie:
+Lokal und in Preview-Deployments wird die gemeinsame Entwicklungsdatenbank
+`schwitzkasten-dev` bei Supabase benutzt, nie die Produktionsdatenbank.
+Tabellen ansehen und ändern: Supabase-Dashboard → **Table Editor**. Schema und
+Testdaten einspielen: siehe [`database/README.md`](database/README.md).
 
-In XAMPP **MySQL** starten. Für phpMyAdmin zusätzlich **Apache** — das
-Startskript ersetzt Apache nur für die Projektseite, nicht für phpMyAdmin.
-Dann `http://localhost/phpmyadmin` öffnen und unter *Importieren* nacheinander
-einspielen:
+**Supabase pausiert kostenlose Projekte nach sieben Tagen ohne Zugriff.** Dann
+zeigt jede Seite einen Datenbankfehler. Im Dashboard das Projekt öffnen und
+**Restore** klicken – vor jeder Vorführung einmal prüfen.
 
-1. `database/schema.sql` — legt die Datenbank `schwitzkasten` samt Tabellen an
-   und darf beliebig oft eingespielt werden.
-2. `database/seed.sql` — füllt die Programmseiten und die Tarife. Löscht dabei
-   die gemerkten Auswahlen aller Mitglieder, also nicht kurz vor einer
-   Vorführung.
+### Veröffentlichen
 
-**Umzug von `baseline`.** Bis September 2026 hieß die Datenbank `baseline`.
-Wer lokal noch damit arbeitet und seine Testkonten behalten will, kopiert sie
-einmal hinüber, statt nur neu einzuspielen. Wem die Testkonten egal sind,
-reichen die zwei Dateien oben.
-
-`mysql` liegt bei XAMPP nicht im PATH, deshalb stehen die Befehle mit vollem
-Pfad da. Ausführen im Projektordner; die Reihenfolge ist wichtig — die Kopie
-hat die neueren Tabellen noch nicht, die legt erst `schema.sql` an.
-
-Windows (XAMPP unter `C:\xampp`, in PowerShell oder `cmd`):
-
-```bat
-C:\xampp\mysql\bin\mysql.exe -u root -e "CREATE DATABASE schwitzkasten CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
-cmd /c "C:\xampp\mysql\bin\mysqldump.exe -u root baseline | C:\xampp\mysql\bin\mysql.exe -u root schwitzkasten"
-cmd /c "C:\xampp\mysql\bin\mysql.exe --default-character-set=utf8mb4 -u root < database\schema.sql"
-cmd /c "C:\xampp\mysql\bin\mysql.exe --default-character-set=utf8mb4 -u root < database\seed.sql"
-```
-
-`cmd /c` ist unter PowerShell nötig: PowerShell kennt `<` nicht und würde die
-Pipe mit `|` neu kodieren, wodurch Umlaute kaputtgehen. Aus demselben Grund
-braucht `mysql.exe` beim Einspielen den Zeichensatz-Schalter, siehe
-[`database/README.md`](database/README.md).
-
-macOS (XAMPP unter `/Applications/XAMPP`):
-
-```bash
-/Applications/XAMPP/xamppfiles/bin/mysql -u root -e "CREATE DATABASE schwitzkasten CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
-/Applications/XAMPP/xamppfiles/bin/mysqldump -u root baseline | /Applications/XAMPP/xamppfiles/bin/mysql -u root schwitzkasten
-/Applications/XAMPP/xamppfiles/bin/mysql -u root < database/schema.sql
-/Applications/XAMPP/xamppfiles/bin/mysql -u root < database/seed.sql
-```
-
-Danach in `config/config.php` bei `'name'` `schwitzkasten` eintragen — die
-Datei ist nicht in Git, die Änderung kommt also nicht mit dem Pull.
-`baseline` kann anschließend gelöscht werden.
+Nichts von Hand. Jeder Pull Request auf `main` bekommt eine Preview auf
+Vercel, jeder Merge nach `main` geht in Produktion. Das erledigt
+`.github/workflows/vercel.yml`.
 
 ---
 
