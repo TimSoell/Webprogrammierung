@@ -215,7 +215,8 @@ export function initBewertungen() {
   // bewertungen.css). Wischen und Touchpad funktionieren dadurch von selbst,
   // die Pfeile blättern um eine Kachel. Weich scrollt das CSS, nicht dieses
   // Skript - so gilt dort auch "Bewegung reduzieren" des Systems.
-  const pfeile = $('#bewertungen-pfeile');
+  const zurueck = $('#bewertungen-zurueck');
+  const weiter = $('#bewertungen-weiter');
 
   /**
    * Blättert um eine Kachel. Am Ende geht es wieder von vorn los, am Anfang
@@ -254,11 +255,14 @@ export function initBewertungen() {
    * @returns {void}
    */
   const pfeileAnpassen = () => {
-    pfeile.hidden = kacheln.scrollWidth <= kacheln.clientWidth + 2;
+    const allesZuSehen = kacheln.scrollWidth <= kacheln.clientWidth + 2;
+
+    zurueck.hidden = allesZuSehen;
+    weiter.hidden = allesZuSehen;
   };
 
-  $('#bewertungen-zurueck').addEventListener('click', () => blaettern(-1));
-  $('#bewertungen-weiter').addEventListener('click', () => blaettern(1));
+  zurueck.addEventListener('click', () => blaettern(-1));
+  weiter.addEventListener('click', () => blaettern(1));
 
   // Beim Drehen des Handys oder Ändern der Fensterbreite passen mal drei,
   // mal nur eine Kachel hinein.

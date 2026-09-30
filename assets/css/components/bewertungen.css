@@ -47,6 +47,37 @@
 }
 
 /* --- Karussell auf der Startseite ------------------------------------------ */
+/* Am Rechner liegen die Pfeile als Streifen über dem linken Rand der ersten
+   und dem rechten Rand der letzten sichtbaren Kachel, so hoch wie die
+   Kacheln. Die Kacheln behalten dadurch ihre volle Breite. */
+.bewertungen-karussell {
+  --pfeil-breite: 52px;
+
+  position: relative;
+}
+
+.bewertungen-pfeil--zurueck {
+  left: 0;
+  grid-area: zurueck;
+}
+
+.bewertungen-pfeil--weiter {
+  right: 0;
+  grid-area: weiter;
+}
+
+/* Welche Kachel gerade außen steht, ändert sich beim Blättern. Damit die
+   Pfeile nie Text verdecken, rückt der Inhalt jeder Kachel um die
+   Pfeilbreite ein - aber nur, solange Pfeile zu sehen sind. */
+.bewertungen-karussell:has(.bewertungen-pfeil:not([hidden])) .bewertung-kachel-inhalt {
+  right: calc(var(--pfeil-breite) + 20px);
+  left: calc(var(--pfeil-breite) + 20px);
+}
+
+.bewertungen-karussell:has(.bewertungen-pfeil:not([hidden])) .bewertung-kachel-zeichen {
+  left: calc(var(--pfeil-breite) + 17px);
+}
+
 /* Eine quer scrollende Reihe: drei Kacheln passen hinein, der Rest liegt
    daneben. scroll-snap lässt jede Kachel sauber am linken Rand einrasten -
    beim Wischen wie beim Blättern mit den Pfeilen (bewertungen.js). */
@@ -54,9 +85,11 @@
   --kachel-abstand: 18px;
 
   display: grid;
+  min-width: 0;
   margin: 0;
   padding: 0;
   gap: var(--kachel-abstand);
+  grid-area: liste;
   grid-auto-columns: calc((100% - 2 * var(--kachel-abstand)) / 3);
   grid-auto-flow: column;
   list-style: none;
@@ -72,32 +105,34 @@
   display: none;
 }
 
-.bewertungen-pfeile {
-  display: flex;
-  gap: 10px;
-}
-
-/* Das hidden-Attribut verliert sonst gegen display: flex. */
-.bewertungen-pfeile[hidden] {
-  display: none;
-}
-
+/* Grau hinterlegt mit grauem Pfeil. Das Grau des Pfeils ist dunkel genug
+   für ein Kontrastverhältnis über 3:1 zum Hintergrund - so bleibt er auch
+   für schlechter Sehende erkennbar. Mit dem Mauszeiger darüber: gelb
+   (Markenfarbe) mit schwarzem Pfeil. */
 .bewertungen-pfeil {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  bottom: 0;
   display: grid;
-  width: 52px;
-  height: 52px;
-  border: 1px solid var(--ink);
-  background: transparent;
-  color: var(--ink);
+  width: var(--pfeil-breite);
+  border: 0;
+  background: color-mix(in srgb, var(--ink) 14%, var(--paper));
+  color: color-mix(in srgb, var(--ink) 60%, var(--paper));
   font: 700 1.3rem var(--body);
   cursor: pointer;
   place-items: center;
   transition: background .2s, color .2s;
 }
 
+/* Das hidden-Attribut verliert sonst gegen display: grid. */
+.bewertungen-pfeil[hidden] {
+  display: none;
+}
+
 .bewertungen-pfeil:hover {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--lime);
+  color: var(--ink);
 }
 
 .bewertungen-pfeil:focus-visible {
@@ -467,9 +502,36 @@
     grid-auto-columns: 100%;
   }
 
-  /* Der Abschnittskopf steht hier untereinander (section-head.css). */
-  .bewertungen-pfeile {
-    margin-top: 22px;
+  /* Auf dem Handy stehen beide Pfeile klein nebeneinander über den
+     Kacheln - nicht darüber gelegt, dafür ist eine Kachel zu schmal. */
+  .bewertungen-karussell {
+    display: grid;
+    grid-template-areas:
+      "zurueck weiter ."
+      "liste   liste  liste";
+    grid-template-columns: auto auto minmax(0, 1fr);
+  }
+
+  .bewertungen-pfeil {
+    position: static;
+    height: 52px;
+  }
+
+  .bewertungen-karussell:has(.bewertungen-pfeil:not([hidden])) .bewertung-kachel-inhalt {
+    right: 25px;
+    left: 25px;
+  }
+
+  .bewertungen-karussell:has(.bewertungen-pfeil:not([hidden])) .bewertung-kachel-zeichen {
+    left: 22px;
+  }
+
+  .bewertungen-pfeil--zurueck {
+    margin: 0 10px 22px 0;
+  }
+
+  .bewertungen-pfeil--weiter {
+    margin: 0 0 22px;
   }
 
   .bewertung-kachel {
