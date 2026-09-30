@@ -44,6 +44,9 @@ if (!defined('BASE_URL')) {
   <title><?= e($pageTitle ?? 'SCHWITZKASTEN — Athletic Club') ?></title>
   <meta name="description" content="<?= e($pageDescription ?? 'SCHWITZKASTEN Athletic Club — Dein neues Fitnessstudio in Köln.') ?>">
 
+  <link rel="icon" type="image/png" href="<?= e(BASE_URL) ?>assets/img/favicon.png">
+  <link rel="apple-touch-icon" href="<?= e(BASE_URL) ?>assets/img/apple-touch-icon.png">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;700&display=swap">
