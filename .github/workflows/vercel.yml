@@ -1,0 +1,67 @@
+# =============================================================================
+# @file        .github/workflows/vercel.yml
+# @layer       Infrastruktur
+# @description Bringt den Code auf Vercel.
+#                Push auf main          -> Produktion
+#                Pull Request auf main  -> Preview, Adresse steht in der
+#                                          Zusammenfassung des Laufs
+#
+#              Warum GitHub Actions statt der eingebauten Git-Anbindung von
+#              Vercel: Das Repository gehört Tim, das Vercel-Konto Jonathan.
+#              Vercel lässt im Hobby-Plan nur den Eigentümer des Repositories
+#              verbinden. Der Workflow deployt stattdessen mit Jonathans Token.
+#
+#              Node.js läuft nur hier, auf den Servern von GitHub - das
+#              Projekt selbst bleibt ohne npm und ohne Build-Schritt.
+#
+#              Braucht drei Secrets im Repository (Settings -> Secrets and
+#              variables -> Actions): VERCEL_TOKEN, VERCEL_ORG_ID,
+#              VERCEL_PROJECT_ID.
+# @see         docs/decisions/ADR-0016-hosting-auf-vercel.md
+# @see         vercel.json
+# =============================================================================
+
+name: Vercel
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Kommt ein neuer Push, während der alte noch deployt, wird der alte
+# abgebrochen - es zählt ohnehin nur der neueste Stand.
+concurrency:
+  group: vercel-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    # Pull Requests aus Forks bekommen von GitHub keine Secrets - dort
+    # würde der Lauf nur scheitern.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Auf Vercel hochladen
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            ZIEL="--prod"
+          else
+            ZIEL=""
+          fi
+
+          URL=$(npx --yes vercel@latest deploy $ZIEL --token "$VERCEL_TOKEN")
+
+          echo "Vercel: $URL" >> "$GITHUB_STEP_SUMMARY"
