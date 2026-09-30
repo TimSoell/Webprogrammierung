@@ -47,6 +47,9 @@ Beenden mit `Ctrl+C`, unter Windows `Strg+C`. Änderungen am Quelltext wirken
 sofort, ein Neustart ist nicht nötig.
 
 Fehlt Schritt 2, erscheint statt der Seite ein deutlicher Hinweis darauf.
+Dasselbe gilt, wenn `config/config.php` veraltet ist, weil in der Vorlage
+inzwischen ein Wert dazugekommen ist: Dann Schritt 2 wiederholen und das
+Passwort erneut eintragen.
 
 Die Skripte starten den in PHP eingebauten Entwicklungsserver direkt aus dem
 Projektordner, siehe
