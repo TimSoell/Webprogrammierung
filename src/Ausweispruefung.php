@@ -270,9 +270,6 @@ final class Ausweispruefung
      */
     private static function einstellung(string $name): string
     {
-        /** @var array $config */
-        $config = require ROOT_PATH . '/config/config.php';
-
-        return trim((string) ($config['ki'][$name] ?? ''));
+        return trim((string) (CONFIG['ki'][$name] ?? ''));
     }
 }

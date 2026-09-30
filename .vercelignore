@@ -1,0 +1,23 @@
+# =============================================================================
+# @file        .vercelignore
+# @layer       Infrastruktur
+# @description Was beim Deployment NICHT zu Vercel hochgeladen wird.
+#              Wie .gitignore, aber für Vercel. Siehe
+#              docs/decisions/ADR-0016-hosting-auf-vercel.md
+# =============================================================================
+
+# Die lokale Konfiguration mit dem Datenbank-Passwort. Liegt zwar ohnehin
+# nicht in Git - wer aber einmal vom eigenen Rechner aus deployt, hätte sie
+# sonst mit im Paket.
+/config/config.php
+
+# Wird auf Vercel nicht gebraucht: Dokumentation, SQL-Dateien, lokale
+# Startskripte und Werkzeuge.
+/docs
+/database
+/.claude
+/.github
+/start.bat
+/start.sh
+/schluessel-setzen.bat
+/config/schluessel-setzen.php

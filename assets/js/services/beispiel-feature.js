@@ -11,7 +11,7 @@
  *              Solange die Funktionen hier gleich heißen und gleich
  *              aussehende Daten zurückgeben, ist es der Seite völlig egal,
  *              WOHER die Daten kommen. Genau deshalb könnt ihr heute mit
- *              erfundenen Daten arbeiten und später auf MySQL umstellen,
+ *              erfundenen Daten arbeiten und später auf die Datenbank umstellen,
  *              ohne eine einzige Seite anzufassen.
  *
  * ============================================================================

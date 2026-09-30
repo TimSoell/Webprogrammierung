@@ -38,7 +38,7 @@ Aufgabe und spricht **nur mit der Schicht direkt darunter**.
    └──────────────────────────┬──────────────────────────────────-┘
                               │ PDO
    ┌─ 6 ──────────────────────▼──────────────────────────────────┐
-   │  Datenbank        database/schema.sql · MySQL                │
+   │  Datenbank        database/schema.sql · PostgreSQL (Supabase)│
    └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -64,7 +64,7 @@ export async function alleLaden() {
 }
 ```
 
-**Später**, mit MySQL:
+**Später**, mit der Datenbank:
 
 ```js
 import { getJson } from './api.js';
@@ -92,10 +92,12 @@ Unterschied. Genau dafür gibt es diese Schicht.
 | `assets/js/services/` | Datenbeschaffung | 3 |
 | `assets/js/lib/` | Allgemeine Helfer ohne Feature-Bezug | – |
 | `api/` | Endpunkte, geben JSON zurück | 4 |
-| `src/` | PHP-Klassen, nicht direkt aufrufbar (`Database`, `Auth`, `Api`) | 4–5 |
+| `api/index.php` | Einziger Einstieg auf Vercel, bindet Seiten und Endpunkte ein. Kein Endpunkt | – |
+| `src/` | PHP-Klassen, nicht direkt aufrufbar (`Database`, `Auth`, `Api`, `SitzungsSpeicher`) | 4–5 |
 | `src/Repositories/` | Datenzugriff, der einzige Ort mit SQL | 5 |
 | `database/` | Bauplan und Testdaten | 6 |
-| `config/` | Zugangsdaten (nicht im Repository) | – |
+| `config/` | Zugangsdaten (nicht im Repository), auf Vercel aus Umgebungsvariablen | – |
+| `vercel.json`, `.github/` | Veröffentlichung auf Vercel, siehe [ADR-0016](decisions/ADR-0016-hosting-auf-vercel.md) | – |
 | `vendor/` | Fremde Bibliotheken, aktuell nur der Login. Nie von Hand ändern | – |
 | `docs/` | Diese Dokumentation | – |
 
@@ -123,6 +125,12 @@ egal wo der Ordner liegt, und in beiden Startvarianten:
 |---|---|---|
 | `./start.sh` (PHP-Server) | der Projektordner selbst | `/` |
 | Apache aus `htdocs` | `…/xampp/htdocs` | `/<projektordner>/` |
+| Vercel | wird nicht gerechnet | immer `/` |
+
+Außerdem lädt `bootstrap.php` die Konfiguration (lokal `config/config.php`,
+auf Vercel aus Umgebungsvariablen), stellt die Zeitzone auf Berlin und legt
+die Sitzung in der Datenbank ab statt als Datei, siehe
+[ADR-0017](decisions/ADR-0017-postgresql-auf-supabase.md).
 
 Genau daran scheitert übrigens ein **Symlink** aus `htdocs` in den
 Projektordner: PHP löst Symlinks in `__DIR__` auf, `ROOT_PATH` und

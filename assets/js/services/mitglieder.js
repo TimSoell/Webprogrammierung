@@ -62,8 +62,9 @@ export async function angemeldetesMitgliedLaden() {
  * Fordert einen Link zum Zurücksetzen des Passworts an.
  *
  * Die Antwort ist absichtlich dieselbe, egal ob es die Adresse gibt.
- * Nur im Demo-Modus (config 'debug' => true) und nur für bestehende Konten
- * enthält sie zusätzlich den Link, weil XAMPP keine E-Mails verschickt.
+ * Nur mit 'demo_reset_link' => true in der Konfiguration und nur für
+ * bestehende Konten enthält sie zusätzlich den Link, weil das Projekt keine
+ * E-Mails verschickt.
  *
  * @param {string} email
  * @returns {Promise<{nachricht: string, demoLink?: string}>}

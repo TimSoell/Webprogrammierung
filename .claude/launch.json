@@ -10,7 +10,7 @@
     {
       "name": "schwitzkasten-windows",
       "runtimeExecutable": "C:/xampp/php/php.exe",
-      "runtimeArgs": ["-S", "localhost:8001", "-t", ".", "router.php"],
+      "runtimeArgs": ["-d", "extension=pdo_pgsql", "-S", "localhost:8001", "-t", ".", "router.php"],
       "port": 8001
     }
   ]

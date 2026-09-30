@@ -29,7 +29,7 @@ try {
         // als CSRF-Schutz, und den braucht nur, wer etwas ändert.
         $tarife = (new TarifRepository())->alleAngebotenenFinden();
 
-        // MySQL liefert DECIMAL als Text und TINYINT als '0'/'1'. Ohne die
+        // PDO liefert numeric als Text und die Zugangsspalten als 0/1. Ohne die
         // Umwandlung stünde im JSON "29.90" statt 29.90 und 1 statt true -
         // und JavaScript müsste beides wieder geradebiegen.
         $antwort = array_map(static fn (array $zeile): array => [

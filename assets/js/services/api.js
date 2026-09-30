@@ -94,7 +94,7 @@ export async function getJson(path, params = {}) {
   try {
     response = await fetch(url, { headers: { Accept: 'application/json' } });
   } catch {
-    throw new ApiError('Server nicht erreichbar. Läuft Apache in XAMPP?', 0);
+    throw new ApiError('Server nicht erreichbar. Bitte versuche es gleich noch einmal.', 0);
   }
 
   return parse(response);
@@ -141,7 +141,7 @@ export async function sendJson(method, path, body = {}) {
       body: JSON.stringify(body),
     });
   } catch {
-    throw new ApiError('Server nicht erreichbar. Läuft Apache in XAMPP?', 0);
+    throw new ApiError('Server nicht erreichbar. Bitte versuche es gleich noch einmal.', 0);
   }
 
   return parse(response);

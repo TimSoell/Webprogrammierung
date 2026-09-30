@@ -80,9 +80,9 @@ final class KursbuchungRepository
         } catch (PDOException $fehler) {
             $pdo->rollBack();
 
-            // 23000 = Verletzung eines UNIQUE-Schlüssels. Hier heißt das:
+            // 23505 = Verletzung eines UNIQUE-Schlüssels. Hier heißt das:
             // uniq_termin_datum_mitglied - das Mitglied hat den Termin schon.
-            if ($fehler->getCode() === '23000') {
+            if ($fehler->getCode() === '23505') {
                 return self::DOPPELT;
             }
 

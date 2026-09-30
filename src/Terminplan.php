@@ -44,7 +44,7 @@ final class Terminplan
     public const PROBETRAINING_MINUTEN = 60;
 
     /**
-     * Die drei Stufen, die man bei jeder Buchung angibt. Muss zum ENUM in
+     * Die drei Stufen, die man bei jeder Buchung angibt. Muss zur CHECK-Liste in
      * kursbuchungen.stufe und probetrainings.stufe passen.
      */
     public const STUFEN = ['einsteiger', 'fortgeschritten', 'erfahren'];

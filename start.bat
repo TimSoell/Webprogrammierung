@@ -4,8 +4,8 @@ REM @file        start.bat
 REM @layer       Infrastruktur
 REM @description Windows-Gegenstueck zu start.sh. Startet das Projekt mit dem
 REM              eingebauten PHP-Webserver direkt aus diesem Ordner - also
-REM              ohne Kopie in xampp\htdocs. Nur fuer die Entwicklung; fuer
-REM              die Abgabe laeuft das Projekt unveraendert unter Apache.
+REM              ohne Kopie in xampp\htdocs. Nur fuer die Entwicklung; die
+REM              veroeffentlichte Fassung laeuft auf Vercel.
 REM @see         start.sh
 REM @see         README.md
 REM ===========================================================================
@@ -34,7 +34,14 @@ if not exist "config\config.php" (
     exit /b 1
 )
 
+REM Die Datenbank ist PostgreSQL bei Supabase. XAMPP bringt den Treiber
+REM pdo_pgsql mit, schaltet ihn aber nicht ein. Statt dass jede Person ihre
+REM php.ini aendert, laedt das Skript ihn beim Start dazu - nur falls noetig,
+REM sonst meldet PHP "already loaded".
+set "PGSQL="
+"%PHP%" -m | findstr /i /x "pdo_pgsql" >nul || set "PGSQL=-d extension=pdo_pgsql"
+
 echo SCHWITZKASTEN laeuft auf http://localhost:8000/   (Beenden mit Strg+C)
 REM router.php beantwortet Range-Anfragen, ohne die kein Video springen kann.
-"%PHP%" -S localhost:8000 -t . router.php
+"%PHP%" %PGSQL% -S localhost:8000 -t . router.php
 pause

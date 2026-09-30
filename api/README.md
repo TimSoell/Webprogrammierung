@@ -5,6 +5,12 @@ zurück, nie HTML.
 
 Angesprochen werden sie ausschließlich aus `assets/js/services/`.
 
+**Ausnahme: `index.php` ist kein Endpunkt.** Sie ist der einzige Einstieg
+auf Vercel und bindet von dort aus Seiten und Endpunkte ein. Vercel führt PHP
+nur in diesem Ordner aus, deshalb liegt sie hier. Nicht anfassen, keinen
+Endpunkt so nennen. Siehe
+[ADR-0016](../docs/decisions/ADR-0016-hosting-auf-vercel.md).
+
 ## Aufbau eines Endpunkts
 
 1. `bootstrap.php` einbinden
@@ -50,8 +56,8 @@ Im Fehlerfall ist die Antwort immer `{"error": "Text für Menschen"}`.
 - **Kein `echo` zum Debuggen.** Jede zusätzliche Ausgabe zerstört das JSON;
   im Browser erscheint dann nur „Antwort war kein gültiges JSON".
   Zum Debuggen `error_log()` benutzen. Beim Start über `./start.sh` erscheint
-  die Ausgabe direkt im Terminal; läuft das Projekt über Apache, landet sie in
-  `xampp/apache/logs/error.log`.
+  die Ausgabe direkt im Terminal; auf Vercel im Dashboard unter *Logs* – dort
+  aber nur eine Stunde lang.
 - **Eingaben immer prüfen**, auch wenn das Formular im Browser schon prüft.
   Ein Endpunkt lässt sich auch ohne Browser aufrufen.
 - **Fehlermeldungen der Datenbank nie durchreichen.** Sie verraten

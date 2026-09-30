@@ -18,9 +18,8 @@
  *              wäre falsch, seit es vorgemerkte Wechsel gibt.
  *
  *              "Höchstens ein laufender Vertrag pro Mitglied" kann die
- *              Datenbank nicht erzwingen: Einen Unique-Index, der nur für
- *              endet_am IS NULL gilt, gibt es in MySQL nicht. Wer an dieser
- *              Klasse vorbei einfügt, umgeht die Regel.
+ *              Datenbank nicht erzwingen, weil "laufend" vom heutigen Datum
+ *              abhängt. Wer an dieser Klasse vorbei einfügt, umgeht die Regel.
  * @see         database/schema.sql
  * @see         api/mitgliedschaften.php
  * @see         docs/features/mitgliedschaften.md
@@ -45,6 +44,15 @@ final class MitgliedschaftRepository
                     m.preisgruppe, m.preis_monatlich, m.beginnt_am, m.endet_am';
 
     /**
+     * Letzter Tag des laufenden Monats, als SQL-Ausdruck. PostgreSQL kennt
+     * kein LAST_DAY() wie MySQL: Monatsanfang plus ein Monat minus ein Tag.
+     */
+    private const MONATSLETZTER = "(date_trunc('month', CURRENT_DATE) + interval '1 month - 1 day')::date";
+
+    /** Erster Tag des nächsten Monats, als SQL-Ausdruck. */
+    private const NAECHSTER_MONATSERSTER = "(date_trunc('month', CURRENT_DATE) + interval '1 month')::date";
+
+    /**
      * Sucht den heute laufenden Vertrag eines Mitglieds samt Tarifdaten.
      *
      * @param int $mitgliedId  mitglieder.id, NICHT users.id
@@ -57,8 +65,8 @@ final class MitgliedschaftRepository
                FROM mitgliedschaften m
                JOIN tarife t ON t.id = m.tarif_id
               WHERE m.mitglied_id = ?
-                AND m.beginnt_am <= CURDATE()
-                AND (m.endet_am IS NULL OR m.endet_am >= CURDATE())
+                AND m.beginnt_am <= CURRENT_DATE
+                AND (m.endet_am IS NULL OR m.endet_am >= CURRENT_DATE)
               ORDER BY m.beginnt_am DESC, m.id DESC
               LIMIT 1'
         );
@@ -110,7 +118,7 @@ final class MitgliedschaftRepository
                FROM mitgliedschaften m
                JOIN tarife t ON t.id = m.tarif_id
               WHERE m.mitglied_id = ?
-                AND m.beginnt_am > CURDATE()
+                AND m.beginnt_am > CURRENT_DATE
               ORDER BY m.beginnt_am, m.id
               LIMIT 1'
         );
@@ -124,16 +132,16 @@ final class MitgliedschaftRepository
      * Tag des nächsten Monats.
      *
      * Kommt aus der Datenbank und nicht aus PHP, damit die Seite genau das
-     * Datum anzeigt, das beim Speichern auch eingetragen wird. PHP und MySQL
-     * können unterschiedliche Zeitzonen haben, und am Monatsletzten wäre das
-     * ein Tag Unterschied.
+     * Datum anzeigt, das beim Speichern auch eingetragen wird. PHP und die
+     * Datenbank können unterschiedliche Zeitzonen haben, und am Monatsletzten
+     * wäre das ein Tag Unterschied.
      *
      * @return string  Datum als 'JJJJ-MM-TT'
      */
     public function naechsterWechseltermin(): string
     {
         $stmt = Database::connection()->query(
-            'SELECT LAST_DAY(CURDATE()) + INTERVAL 1 DAY AS termin'
+            'SELECT ' . self::NAECHSTER_MONATSERSTER . ' AS termin'
         );
 
         return (string) $stmt->fetch()['termin'];
@@ -161,7 +169,7 @@ final class MitgliedschaftRepository
         $stmt = Database::connection()->prepare(
             'INSERT INTO mitgliedschaften
                  (mitglied_id, tarif_id, preisgruppe, preis_monatlich, beginnt_am)
-             VALUES (?, ?, ?, ?, CURDATE())'
+             VALUES (?, ?, ?, ?, CURRENT_DATE)'
         );
         $stmt->execute([$mitgliedId, $tarifId, $preisgruppe, $preisMonatlich]);
 
@@ -198,23 +206,23 @@ final class MitgliedschaftRepository
         try {
             $alteVormerkung = $pdo->prepare(
                 'DELETE FROM mitgliedschaften
-                  WHERE mitglied_id = ? AND beginnt_am > CURDATE()'
+                  WHERE mitglied_id = ? AND beginnt_am > CURRENT_DATE'
             );
             $alteVormerkung->execute([$mitgliedId]);
 
             $befristen = $pdo->prepare(
                 'UPDATE mitgliedschaften
-                    SET endet_am = LAST_DAY(CURDATE())
+                    SET endet_am = ' . self::MONATSLETZTER . '
                   WHERE mitglied_id = ?
-                    AND beginnt_am <= CURDATE()
-                    AND (endet_am IS NULL OR endet_am >= CURDATE())'
+                    AND beginnt_am <= CURRENT_DATE
+                    AND (endet_am IS NULL OR endet_am >= CURRENT_DATE)'
             );
             $befristen->execute([$mitgliedId]);
 
             $anlegen = $pdo->prepare(
                 'INSERT INTO mitgliedschaften
                      (mitglied_id, tarif_id, preisgruppe, preis_monatlich, beginnt_am)
-                 VALUES (?, ?, ?, ?, LAST_DAY(CURDATE()) + INTERVAL 1 DAY)'
+                 VALUES (?, ?, ?, ?, ' . self::NAECHSTER_MONATSERSTER . ')'
             );
             $anlegen->execute([$mitgliedId, $tarifId, $preisgruppe, $preisMonatlich]);
 
@@ -234,7 +242,7 @@ final class MitgliedschaftRepository
      * Nimmt einen vorgemerkten Wechsel zurück: Die Vormerkung verschwindet,
      * und der laufende Vertrag läuft wieder unbefristet weiter.
      *
-     * Die Bedingung auf endet_am = LAST_DAY(CURDATE()) ist wichtig. Ohne sie
+     * Die Bedingung auf endet_am = Monatsletzter ist wichtig. Ohne sie
      * würde die Methode auch eine Befristung aufheben, die aus einem anderen
      * Grund gesetzt wurde.
      *
@@ -249,7 +257,7 @@ final class MitgliedschaftRepository
         try {
             $loeschen = $pdo->prepare(
                 'DELETE FROM mitgliedschaften
-                  WHERE mitglied_id = ? AND beginnt_am > CURDATE()'
+                  WHERE mitglied_id = ? AND beginnt_am > CURRENT_DATE'
             );
             $loeschen->execute([$mitgliedId]);
 
@@ -257,8 +265,8 @@ final class MitgliedschaftRepository
                 'UPDATE mitgliedschaften
                     SET endet_am = NULL
                   WHERE mitglied_id = ?
-                    AND beginnt_am <= CURDATE()
-                    AND endet_am = LAST_DAY(CURDATE())'
+                    AND beginnt_am <= CURRENT_DATE
+                    AND endet_am = ' . self::MONATSLETZTER
             );
             $entfristen->execute([$mitgliedId]);
 

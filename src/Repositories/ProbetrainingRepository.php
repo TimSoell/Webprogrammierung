@@ -92,10 +92,10 @@ final class ProbetrainingRepository
      */
     public function belegtFinden(int $coachId, string $von, string $bis): array
     {
-        // DATE(beginnt_am) BETWEEN: Der letzte Tag soll ganz dazugehören,
+        // beginnt_am::date BETWEEN: Der letzte Tag soll ganz dazugehören,
         // nicht nur bis 00:00 Uhr.
         $stmt = Database::connection()->prepare(
-            'SELECT beginnt_am FROM probetrainings WHERE coach_id = ? AND DATE(beginnt_am) BETWEEN ? AND ?'
+            'SELECT beginnt_am FROM probetrainings WHERE coach_id = ? AND beginnt_am::date BETWEEN ? AND ?'
         );
         $stmt->execute([$coachId, $von, $bis]);
 
@@ -125,7 +125,8 @@ final class ProbetrainingRepository
 
             return true;
         } catch (PDOException $fehler) {
-            if ($fehler->getCode() === '23000') {
+            // 23505 = Verletzung eines UNIQUE-Schlüssels, hier uniq_coach_beginn.
+            if ($fehler->getCode() === '23505') {
                 return false;
             }
 
@@ -147,7 +148,7 @@ final class ProbetrainingRepository
                FROM probetrainings t
                JOIN coaches   c ON c.id = t.coach_id
                JOIN programme p ON p.id = c.programm_id
-              WHERE t.mitglied_id = ? AND DATE(t.beginnt_am) >= ?
+              WHERE t.mitglied_id = ? AND t.beginnt_am::date >= ?
               ORDER BY t.beginnt_am'
         );
         $stmt->execute([$mitgliedId, $abDatum]);

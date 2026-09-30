@@ -169,7 +169,7 @@ Fehlerfälle des POST, alle mit deutscher Meldung für das Formular:
 
 | Code | Wann |
 |---|---|
-| 400 | kein Bild, falsches Format, größer als 4 MB |
+| 400 | kein Bild, falsches Format, größer als 3 MB |
 | 422 | Dokument passt nicht zur gewählten Art · kein Datum lesbar · Ausweis abgelaufen · noch keine 65 |
 | 502 | Prüfdienst nicht erreichbar |
 

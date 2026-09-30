@@ -48,9 +48,12 @@ const SENIORENALTER = 65;
 
 /**
  * Größte erlaubte Bildgröße in Byte, vor der base64-Kodierung.
- * 4 MB passen mit Reserve unter das übliche post_max_size von 8 MB.
+ * Vercel nimmt höchstens 4,5 MB je Anfrage an. Base64 macht aus 3 MB rund
+ * 4 MB, dazu kommt der Rest des JSON - 3 MB passen also mit Reserve.
+ * In der Praxis verkleinert assets/js/lib/bild.js das Foto vorher ohnehin
+ * auf deutlich weniger.
  */
-const MAX_BILD_BYTE = 4 * 1024 * 1024;
+const MAX_BILD_BYTE = 3 * 1024 * 1024;
 
 try {
     $auth = Auth::instanz();
@@ -120,7 +123,7 @@ try {
                 Api::fehler(400, 'Das Bild konnte nicht gelesen werden. Bitte versuche es erneut.');
             }
             if (strlen($bild) > MAX_BILD_BYTE) {
-                Api::fehler(400, 'Das Bild ist zu groß. Bitte lade es mit höchstens 4 MB hoch.');
+                Api::fehler(400, 'Das Bild ist zu groß. Bitte lade es mit höchstens 3 MB hoch.');
             }
 
             try {

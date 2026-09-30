@@ -28,7 +28,7 @@ Kein ADR für: Farbwerte, Textänderungen, das Anlegen einer einzelnen Datei.
 | [0001](ADR-0001-php-includes.md) | PHP-Includes statt vier eigenständiger HTML-Dateien | angenommen |
 | [0002](ADR-0002-schichtenarchitektur.md) | Sechs Schichten mit einem Service als Naht zur Datenbank | angenommen |
 | [0003](ADR-0003-css-aufteilung.md) | CSS in Tokens, Basis, Layout und Komponenten | angenommen |
-| [0004](ADR-0004-php-entwicklungsserver.md) | PHP-Entwicklungsserver als Standard-Startweg | angenommen |
+| [0004](ADR-0004-php-entwicklungsserver.md) | PHP-Entwicklungsserver als Standard-Startweg | angenommen, Abgabe/MySQL ersetzt durch 0016/0017 |
 | [0005](ADR-0005-login-bibliothek.md) | Mitglieder-Login mit delight-im/auth über Composer | angenommen |
 | [0006](ADR-0006-router-fuer-entwicklungsserver.md) | Router-Skript für den PHP-Entwicklungsserver | angenommen |
 | [0007](ADR-0007-programm-details-aus-der-datenbank.md) | Programm-Details kommen aus der Datenbank | angenommen |
@@ -40,3 +40,5 @@ Kein ADR für: Farbwerte, Textänderungen, das Anlegen einer einzelnen Datei.
 | [0013](ADR-0013-auslastung-und-besuche.md) | Auslastung als Summe aus fester Kurve und gezählten Besuchen | angenommen |
 | [0014](ADR-0014-terminkalender-wochenplan.md) | Termine als Wochenplan, Buchungen mit Datum | angenommen |
 | [0015](ADR-0015-kurskalender-monate-und-tarif.md) | Kurskalender monatsweise, Kurse nur mit passendem Tarif | angenommen |
+| [0016](ADR-0016-hosting-auf-vercel.md) | Hosting auf Vercel mit der Laufzeit vercel-php | angenommen |
+| [0017](ADR-0017-postgresql-auf-supabase.md) | PostgreSQL bei Supabase, Sitzungen in der Datenbank | angenommen |
