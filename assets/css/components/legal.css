@@ -1,0 +1,58 @@
+/**
+ * @file        assets/css/components/legal.css
+ * @layer       Komponente
+ * @description Layout und Typografie für rechtliche Informationsseiten.
+ * @see         agb.php
+ * @see         impressum.php
+ * @see         datenschutz.php
+ */
+
+.legal-page {
+  padding: 140px 0 110px;
+}
+
+.legal-title {
+  margin-bottom: 42px;
+  font-size: clamp(4rem, 9vw, 8rem);
+  line-height: 1.02;
+}
+
+.legal-intro {
+  margin: 0 0 56px;
+  color: var(--paper);
+  font-size: 1.15rem;
+  line-height: 1.65;
+}
+
+.legal-section {
+  padding: 28px 0;
+  border-top: 1px solid var(--line);
+}
+
+.legal-section h2 {
+  margin: 0 0 12px;
+  color: var(--paper);
+  font: 700 1.35rem var(--display);
+  letter-spacing: .01em;
+  text-transform: uppercase;
+}
+
+.legal-section p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.legal-note {
+  margin: 32px 0 0;
+  color: var(--muted);
+  font-size: .8rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 800px) {
+  .legal-page {
+    padding: 100px 0 72px;
+  }
+
+}
