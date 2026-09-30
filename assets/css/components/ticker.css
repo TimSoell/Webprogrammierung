@@ -3,10 +3,24 @@
  * @layer       Komponente
  * @description Das durchlaufende Band mit den Studio-Schlagworten.
  *
- *              Die Endlosschleife funktioniert, weil die Wörter im Markup
- *              doppelt stehen und die Animation genau um 50 % verschiebt.
- *              Wenn ihr Wörter ergänzt, müsst ihr sie in BEIDEN Hälften
- *              ergänzen, sonst ruckelt der Übergang.
+ *              SO FUNKTIONIERT DIE ENDLOSSCHLEIFE
+ *              Die Spur enthält zwei GLEICHE Gruppen und verschiebt sich
+ *              genau um die Breite einer Gruppe (-50 %). In dem Moment steht
+ *              die zweite Gruppe exakt dort, wo die erste angefangen hat -
+ *              der Neustart der Animation ist deshalb unsichtbar.
+ *
+ *              Damit der Streifen dabei nie leer läuft, ist jede Gruppe
+ *              MINDESTENS so breit wie der Bildschirm (min-width: 100vw).
+ *              Wenn links ein Wort verschwindet, ist rechts immer schon das
+ *              nächste da. Vorher war eine Gruppe nur gut 550 px breit - auf
+ *              großen Bildschirmen lief das Band rechts leer und sprang zurück.
+ *
+ *              Innerhalb einer Gruppe verteilt space-around die Wörter
+ *              gleichmäßig über die ganze Breite. Der Innenabstand der Wörter
+ *              ist nur das MINIMUM für schmale Bildschirme.
+ *
+ *              Wörter ergänzen: in BEIDEN Gruppen in index.php, sonst sind
+ *              die Gruppen unterschiedlich breit und der Übergang springt.
  * @see         index.php
  */
 
@@ -25,11 +39,21 @@
   font: 700 1.02rem var(--display);
   letter-spacing: .09em;
   text-transform: uppercase;
-  animation: ticker-marquee 22s linear infinite;
+  /* Dauer so gewählt, dass das Band auf einem 1920er-Bildschirm etwa so
+     schnell läuft wie vorher (rund 25 px pro Sekunde). Eine Gruppe ist dort
+     knapp 1920 px breit. */
+  animation: ticker-marquee 75s linear infinite;
 }
 
-.ticker-track span {
-  padding: 0 28px;
+.ticker-group {
+  display: flex;
+  min-width: 100vw;
+  flex-shrink: 0;
+  justify-content: space-around;
+}
+
+.ticker-group span {
+  padding: 0 40px;
 }
 
 @keyframes ticker-marquee {

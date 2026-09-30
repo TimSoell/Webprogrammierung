@@ -61,12 +61,19 @@ require ROOT_PATH . '/partials/header.php';
       </div>
     </section>
 
-    <!-- Die Wörter stehen doppelt, damit die Schleife nahtlos läuft.
+    <!-- Zwei GLEICHE Gruppen, damit die Schleife nahtlos läuft. Die zweite
+         ist nur für die Optik da und für Screenreader ausgeblendet.
          Erklärung in assets/css/components/ticker.css -->
     <div class="ticker" aria-label="Studio-Highlights">
       <div class="ticker-track">
-        <span>Strength</span><span>Conditioning</span><span>Community</span><span>Recovery</span>
-        <span>Strength</span><span>Conditioning</span><span>Community</span><span>Recovery</span>
+        <div class="ticker-group">
+          <span>Strength</span><span>Conditioning</span><span>Community</span><span>Recovery</span>
+          <span>Strength</span><span>Conditioning</span><span>Community</span><span>Recovery</span>
+        </div>
+        <div class="ticker-group" aria-hidden="true">
+          <span>Strength</span><span>Conditioning</span><span>Community</span><span>Recovery</span>
+          <span>Strength</span><span>Conditioning</span><span>Community</span><span>Recovery</span>
+        </div>
       </div>
     </div>
 
