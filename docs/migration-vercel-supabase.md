@@ -8,13 +8,13 @@ Stand 30.09.2026 · erstellt mit Claude Code für Jonathan · Status: **in Umset
 |---|---|
 | Entscheidungen | E1 Dozent: ja · E2: GitHub Actions, Repo ist öffentlich · E3–E7 wie empfohlen |
 | Vercel | Connector verbunden, Projekt `schwitzkasten` (Node 22.x, fra1), nicht-geheime Variablen gesetzt, Secrets im Repo (Tim) |
-| Supabase | `schwitzkasten-dev` (eu-central-1) mit Schema, Seed, RLS, Zeitzone; Zeilenzahlen = MySQL |
+| Supabase | `schwitzkasten-dev` und `schwitzkasten` (Produktion), beide eu-central-1, mit Schema, Seed, RLS, Zeitzone; Zeilenzahlen = MySQL |
 | Code | Branch `feature/vercel-supabase`: Schema/Seed PostgreSQL, 6 Repositories, Sitzungen in der DB, Konfiguration aus Umgebungsvariablen, `api/index.php`, `vercel.json`, Workflow, ADR-0016/0017, Doku |
-| **Offen** | Produktionsdatenbank (Supabase-Limit, siehe unten) · DB-Passwort setzen (M4/M6/M9) · lokaler Test · PR + Preview · Produktion |
+| Lokaler Test | bestanden: Login, Sitzungen, Auswahl, Tarifwechsel, Kurse, Probetraining, Auslastung, Nachweis, Passwort-Reset |
+| **Offen** | Preview prüfen · Produktions-Passwort in Vercel (M9) · Merge → Produktion · Team-Umstieg |
 
-**Blocker Produktionsdatenbank:** Supabase lehnt ein zweites kostenloses
-Projekt ab, weil Tim als Admin der Organisation sein Limit von zwei aktiven
-Free-Projekten (über alle seine Organisationen) erreicht hat.
+Tim ist in der Supabase-Organisation nur noch Developer. Das Limit von zwei
+aktiven Free-Projekten zählt nur für Owner und Admins.
 
 Ziel: Die Website läuft nicht mehr lokal über XAMPP, sondern öffentlich
 erreichbar auf **Vercel** (PHP-Seiten und Endpunkte) mit den Daten in
