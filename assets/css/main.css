@@ -46,8 +46,5 @@
 @import "components/probetraining.css";
 @import "components/ausweis-scan.css";
 @import "components/legal.css";
-<<<<<<< HEAD
-@import "components/cookie-banner.css";
-=======
 @import "components/bewertungen.css";
->>>>>>> cef59d8f393ceb8974a0af165cd9d60cc08fe938
+@import "components/cookie-banner.css";
