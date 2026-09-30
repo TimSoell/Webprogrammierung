@@ -30,15 +30,6 @@ if (!defined('BASE_URL')) {
 <!doctype html>
 <html lang="de" data-base-url="<?= e(BASE_URL) ?>">
 <head>
-  <!-- Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-723B66WSY1"></script>
-  <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
- 
-  gtag('config', 'G-723B66WSY1');
-  </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= e($pageTitle ?? 'SCHWITZKASTEN — Athletic Club') ?></title>

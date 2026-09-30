@@ -1,0 +1,99 @@
+/**
+ * @file        assets/css/components/cookie-banner.css
+ * @layer       Komponente
+ * @description Die Einwilligungsleiste für Google Analytics: auf breiten
+ *              Bildschirmen eine schmale Leiste am unteren Rand, auf schmalen
+ *              ein Block mit untereinander stehenden Buttons.
+ *              Dazu der Link „Cookie-Einstellungen“ im Footer, der als
+ *              <button> umgesetzt ist und wie die anderen Footer-Links aussieht.
+ * @see         partials/cookie-banner.php
+ * @see         assets/js/components/cookie-banner.js
+ */
+
+.cookie-banner {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 900; /* über allem außer dem Preloader (1000) */
+  padding: 18px 0;
+  border-top: 1px solid var(--lime);
+  background: var(--ink-soft);
+  color: var(--paper);
+  box-shadow: 0 -12px 32px rgba(0, 0, 0, .35);
+}
+
+.cookie-banner[hidden] {
+  display: none;
+}
+
+.cookie-banner-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+}
+
+.cookie-banner-title {
+  margin: 0 0 4px;
+  font-family: var(--display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.cookie-banner-text {
+  max-width: 760px;
+  margin: 0;
+  color: var(--muted);
+  font-size: .85rem;
+  line-height: 1.5;
+}
+
+.cookie-banner-text a {
+  color: var(--paper);
+  text-decoration: underline;
+}
+
+.cookie-banner-text a:hover {
+  color: var(--lime);
+}
+
+.cookie-banner-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 12px;
+}
+
+.cookie-banner-actions .button {
+  cursor: pointer;
+  font-family: var(--body);
+}
+
+/* Der Link im Footer ist ein <button>, damit er per Tastatur bedienbar ist. */
+.footer-cookie-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  transition: color .2s ease;
+}
+
+.footer-cookie-link:hover {
+  color: var(--paper);
+}
+
+@media (max-width: 760px) {
+  .cookie-banner-inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .cookie-banner-actions {
+    flex-direction: column-reverse;
+  }
+}
