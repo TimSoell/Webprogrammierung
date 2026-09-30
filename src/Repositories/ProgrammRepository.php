@@ -6,7 +6,7 @@
  *              Merkmale (Fokus, Level, Format) und die Coaches.
  *
  *              Nur Lesen. Gepflegt werden die Daten über database/seed.sql
- *              oder phpMyAdmin - ein Pflegebereich im Browser ist nicht Teil
+ *              oder den Table Editor von Supabase - ein Pflegebereich im Browser ist nicht Teil
  *              dieses Features.
  * @see         database/schema.sql
  * @see         api/programme.php
@@ -24,9 +24,9 @@ final class ProgrammRepository
     /**
      * Die erlaubten Werte der Spalte merkmale.art, in Anzeigereihenfolge.
      *
-     * Muss zum ENUM in database/schema.sql passen. Die Liste steht hier
+     * Muss zur CHECK-Liste in database/schema.sql passen. Die Liste steht hier
      * zusätzlich, weil sie auch die Reihenfolge auf der Seite bestimmt -
-     * das kann das ENUM allein nicht ausdrücken.
+     * das kann die CHECK-Liste allein nicht ausdrücken.
      */
     public const ARTEN = ['fokus', 'level', 'format'];
 
@@ -80,7 +80,7 @@ final class ProgrammRepository
 
         foreach ($stmt->fetchAll() as $zeile) {
             // Unbekannte Art überspringen: Käme durch eine Schema-Änderung
-            // ein vierter ENUM-Wert dazu, ohne dass ARTEN nachgezogen wurde,
+            // ein vierter erlaubter Wert dazu, ohne dass ARTEN nachgezogen wurde,
             // fällt die Seite sonst über einen fehlenden Schlüssel.
             if (!isset($nachArt[$zeile['art']])) {
                 continue;

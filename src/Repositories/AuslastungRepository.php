@@ -226,7 +226,7 @@ final class AuslastungRepository
             'SELECT id, beginn, ende, art
                FROM besuche
               WHERE mitglied_id = ?
-                AND ende > NOW()
+                AND ende > LOCALTIMESTAMP
               ORDER BY beginn'
         );
         $stmt->execute([$mitgliedId]);

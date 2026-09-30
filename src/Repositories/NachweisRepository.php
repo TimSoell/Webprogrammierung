@@ -27,7 +27,7 @@ final class NachweisRepository
      * Welche Nachweisarten zu welcher Preisgruppe berechtigen.
      *
      * 'standard' fehlt absichtlich: Der volle Preis braucht keinen Nachweis.
-     * Wer hier eine Art ergänzt, muss auch das ENUM in database/schema.sql
+     * Wer hier eine Art ergänzt, muss auch die CHECK-Liste in database/schema.sql
      * erweitern.
      */
     public const PREISGRUPPE_ARTEN = [
@@ -61,7 +61,7 @@ final class NachweisRepository
                FROM nachweise
               WHERE mitglied_id = ?
                 AND art IN (' . $platzhalter . ')
-                AND (gueltig_bis IS NULL OR gueltig_bis >= CURDATE())
+                AND (gueltig_bis IS NULL OR gueltig_bis >= CURRENT_DATE)
               ORDER BY gueltig_bis IS NULL DESC, gueltig_bis DESC
               LIMIT 1'
         );
@@ -92,7 +92,7 @@ final class NachweisRepository
                FROM nachweise
               WHERE mitglied_id = ?
                 AND art = ?
-                AND (gueltig_bis IS NULL OR gueltig_bis >= CURDATE())
+                AND (gueltig_bis IS NULL OR gueltig_bis >= CURRENT_DATE)
               ORDER BY gueltig_bis IS NULL DESC, gueltig_bis DESC
               LIMIT 1'
         );

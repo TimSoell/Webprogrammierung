@@ -52,7 +52,7 @@ use Repositories\TarifRepository;
 
 header('Content-Type: application/json; charset=utf-8');
 
-/** Die drei Preisgruppen. Muss zum ENUM in database/schema.sql passen. */
+/** Die drei Preisgruppen. Muss zur CHECK-Liste in database/schema.sql passen. */
 const PREISGRUPPEN = ['standard', 'ermaessigt', 'senior'];
 
 try {
@@ -136,9 +136,9 @@ try {
 
     $ermaessigungPruefen();
 
-    // Formt eine Datenbankzeile in die Antwort. MySQL liefert DECIMAL als
-    // Text und TINYINT als '0'/'1' - im JSON sollen Zahl und Wahrheitswert
-    // stehen.
+    // Formt eine Datenbankzeile in die Antwort. PDO liefert numeric als
+    // Text und die Zugangsspalten als 0/1 - im JSON sollen Zahl und
+    // Wahrheitswert stehen.
     $alsAntwort = static fn (?array $zeile): ?array => $zeile === null ? null : [
         'tarif'          => $zeile['kennung'],
         'name'           => $zeile['name'],

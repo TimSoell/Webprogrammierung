@@ -25,9 +25,12 @@ final class MitgliedAuswahlRepository
     /**
      * Legt die gemerkte Auswahl an oder überschreibt die vorhandene.
      *
-     * INSERT ... ON DUPLICATE KEY UPDATE statt "erst SELECT, dann INSERT
-     * oder UPDATE": eine Anweisung, kein Zeitfenster dazwischen, und der
-     * UNIQUE-Schlüssel uniq_mitglied_programm erledigt die Unterscheidung.
+     * INSERT ... ON CONFLICT statt "erst SELECT, dann INSERT oder UPDATE":
+     * eine Anweisung, kein Zeitfenster dazwischen, und der UNIQUE-Schlüssel
+     * uniq_mitglied_programm erledigt die Unterscheidung.
+     *
+     * geaendert_am wird hier gesetzt, weil PostgreSQL kein "ON UPDATE
+     * CURRENT_TIMESTAMP" an der Spalte kennt.
      *
      * @param int      $mitgliedId  id aus mitglieder
      * @param int      $programmId  id aus programme
@@ -40,8 +43,10 @@ final class MitgliedAuswahlRepository
         $stmt = Database::connection()->prepare(
             'INSERT INTO mitglied_auswahl (mitglied_id, programm_id, level_id, format_id)
                   VALUES (?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE level_id = VALUES(level_id),
-                                     format_id = VALUES(format_id)'
+             ON CONFLICT (mitglied_id, programm_id)
+             DO UPDATE SET level_id     = EXCLUDED.level_id,
+                           format_id    = EXCLUDED.format_id,
+                           geaendert_am = LOCALTIMESTAMP(0)'
         );
         $stmt->execute([$mitgliedId, $programmId, $levelId, $formatId]);
     }

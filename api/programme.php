@@ -9,8 +9,9 @@
  *                     -> 404 wenn es das Programm nicht gibt
  *
  *              Nur GET. Die Inhalte pflegt das Team über database/seed.sql
- *              oder phpMyAdmin, nicht über diesen Endpunkt - deshalb gibt es
- *              hier kein POST und keine CSRF-Prüfung über Api::eingabe().
+ *              oder den Table Editor von Supabase, nicht über diesen
+ *              Endpunkt - deshalb gibt es hier kein POST und keine
+ *              CSRF-Prüfung über Api::eingabe().
  * @see         assets/js/services/programme.js
  * @see         src/Repositories/ProgrammRepository.php
  * @see         docs/features/programm-details.md

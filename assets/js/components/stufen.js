@@ -7,7 +7,7 @@
  *              als drei Schaltflächen.
  *
  *              Die Kennungen müssen zu Terminplan::STUFEN im PHP und zum
- *              ENUM in der Datenbank passen.
+ *              CHECK-Liste in der Datenbank passen.
  * @see         src/Terminplan.php
  * @see         assets/css/components/kalender.css
  */
