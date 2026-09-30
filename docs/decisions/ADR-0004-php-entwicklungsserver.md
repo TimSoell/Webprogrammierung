@@ -1,6 +1,8 @@
 # ADR-0004 — PHP-Entwicklungsserver als Standard-Startweg
 
-**Status:** angenommen
+**Status:** angenommen – die Regeln zu Abgabe über Apache sowie MySQL und
+phpMyAdmin aus XAMPP sind ersetzt durch [ADR-0016](ADR-0016-hosting-auf-vercel.md)
+und [ADR-0017](ADR-0017-postgresql-auf-supabase.md)
 **Datum:** 2026-09-10
 
 ## Kontext
