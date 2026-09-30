@@ -192,18 +192,18 @@ require ROOT_PATH . '/partials/header.php';
             <p class="eyebrow">Stimmen aus dem Club</p>
             <h2 class="display section-title" id="bewertungen-heading">Was andere<br>sagen.</h2>
           </div>
-
-          <!-- Blättern im Karussell. Erscheint nur, wenn nicht alle Kacheln
-               auf einmal zu sehen sind - das entscheidet bewertungen.js. -->
-          <div class="bewertungen-pfeile" id="bewertungen-pfeile" hidden>
-            <button class="bewertungen-pfeil" id="bewertungen-zurueck" type="button" aria-label="Vorherige Bewertung">←</button>
-            <button class="bewertungen-pfeil" id="bewertungen-weiter" type="button" aria-label="Nächste Bewertung">→</button>
-          </div>
         </div>
 
-        <!-- Die Kacheln trägt assets/js/components/bewertungen.js ein. Die
-             Liste scrollt quer: drei Kacheln zu sehen, der Rest daneben. -->
-        <ul class="bewertungen-kacheln" id="bewertungen-kacheln" aria-label="Bewertungen, zum Blättern quer scrollen"></ul>
+        <!-- Das Karussell. Die Kacheln trägt assets/js/components/bewertungen.js
+             ein; die Liste scrollt quer: drei Kacheln zu sehen, der Rest
+             daneben. Die Pfeile liegen am Rechner über dem Rand der äußeren
+             Kacheln, auf dem Handy stehen sie darüber. Sie erscheinen nur, wenn nicht alle
+             Kacheln auf einmal zu sehen sind - das entscheidet bewertungen.js. -->
+        <div class="bewertungen-karussell">
+          <button class="bewertungen-pfeil bewertungen-pfeil--zurueck" id="bewertungen-zurueck" type="button" aria-label="Vorherige Bewertung" hidden>←</button>
+          <ul class="bewertungen-kacheln" id="bewertungen-kacheln" aria-label="Bewertungen, zum Blättern quer scrollen"></ul>
+          <button class="bewertungen-pfeil bewertungen-pfeil--weiter" id="bewertungen-weiter" type="button" aria-label="Nächste Bewertung" hidden>→</button>
+        </div>
         <p class="bewertungen-meldung" id="bewertungen-meldung" role="status">Bewertungen werden geladen …</p>
 
         <div class="bewertungen-fuss" id="bewertungen-fuss" hidden>
