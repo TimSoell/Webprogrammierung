@@ -1,6 +1,6 @@
 # ADR-0011 — Ausweise werden per KI geprüft, das Bild wird nie gespeichert
 
-**Status:** angenommen
+**Status:** angenommen, der vom Modell geschriebene Hinweissatz ersetzt durch [ADR-0020](ADR-0020-nachweise-absichern.md)
 **Datum:** 2026-09-21
 
 ## Kontext

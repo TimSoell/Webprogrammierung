@@ -174,8 +174,9 @@ require ROOT_PATH . '/partials/header.php';
           <h2 class="auth-heading">Nachweise</h2>
           <p class="auth-hint">
             Schüler-, Studierenden- und Seniorenpreise gelten nur mit Nachweis.
-            Fotografiere deinen Ausweis — wir lesen das Datum aus und löschen
-            das Bild sofort danach.
+            Fotografiere deinen Ausweis — wir lesen Name und Datum aus und
+            löschen das Bild sofort danach. Der Name muss zu deinem Konto
+            passen, und es gilt immer nur ein Nachweis.
           </p>
 
           <ul class="nachweis-liste" id="nachweis-liste"></ul>
@@ -192,8 +193,8 @@ require ROOT_PATH . '/partials/header.php';
               <option value="senior">Senior (ab 65, Lichtbildausweis)</option>
             </select>
 
-            <!-- Steht hier, wenn für die gewählte Art schon ein gültiger
-                 Nachweis vorliegt. Text und Sichtbarkeit setzt das
+            <!-- Steht hier, wenn schon ein gültiger Nachweis vorliegt, den
+                 ein Upload ersetzen würde. Text und Sichtbarkeit setzt das
                  Seitenskript; der Endpunkt lehnt Doppelte ohnehin ab. -->
             <p class="auth-hint nachweis-vorhanden" id="nachweis-vorhanden" hidden></p>
 

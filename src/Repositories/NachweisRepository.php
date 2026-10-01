@@ -20,6 +20,7 @@ namespace Repositories;
 
 use Database;
 use InvalidArgumentException;
+use Throwable;
 
 final class NachweisRepository
 {
@@ -74,29 +75,26 @@ final class NachweisRepository
     }
 
     /**
-     * Sucht den besten noch gültigen Nachweis EINER bestimmten Art.
+     * Sucht den gültigen Nachweis eines Mitglieds, egal welcher Art.
      *
-     * Der Unterschied zu gueltigenFinden(): Dort geht es um eine Preisgruppe
-     * ('ermaessigt' umfasst Schüler und Studierende), hier um genau eine Art.
-     * Gebraucht wird das beim Hochladen - ein zweiter Nachweis derselben Art
-     * lohnt nur, wenn er länger gilt als der vorhandene.
+     * Ein Mitglied hat höchstens einen gültigen Nachweis - dafür sorgt
+     * anlegen(). Gebraucht wird das beim Hochladen: Ein weiterer Nachweis
+     * derselben Art lohnt nur, wenn er länger gilt als der vorhandene.
      *
-     * @param int    $mitgliedId  mitglieder.id, NICHT users.id
-     * @param string $art         'schueler', 'student' oder 'senior'
+     * @param int $mitgliedId  mitglieder.id, NICHT users.id
      * @return array<string, mixed>|null  null, wenn es keinen gültigen gibt
      */
-    public function gueltigenFindenNachArt(int $mitgliedId, string $art): ?array
+    public function aktuellenFinden(int $mitgliedId): ?array
     {
         $stmt = Database::connection()->prepare(
             'SELECT art, gueltig_bis, quelle, hinweis, geprueft_am
                FROM nachweise
               WHERE mitglied_id = ?
-                AND art = ?
                 AND (gueltig_bis IS NULL OR gueltig_bis >= CURRENT_DATE)
               ORDER BY gueltig_bis IS NULL DESC, gueltig_bis DESC
               LIMIT 1'
         );
-        $stmt->execute([$mitgliedId, $art]);
+        $stmt->execute([$mitgliedId]);
 
         // Gleiche Sortierung wie oben: unbefristet schlägt befristet, sonst
         // gewinnt der, der am längsten gilt.
@@ -115,7 +113,7 @@ final class NachweisRepository
     public function alleFinden(int $mitgliedId): array
     {
         $stmt = Database::connection()->prepare(
-            'SELECT art, gueltig_bis, quelle, ki_modell, hinweis, geprueft_am
+            'SELECT id, art, gueltig_bis, quelle, ki_modell, hinweis, geprueft_am
                FROM nachweise
               WHERE mitglied_id = ?
               ORDER BY geprueft_am DESC, id DESC'
@@ -126,14 +124,20 @@ final class NachweisRepository
     }
 
     /**
-     * Speichert das Ergebnis einer Prüfung.
+     * Speichert das Ergebnis einer Prüfung und ersetzt dabei den bisher
+     * gültigen Nachweis.
+     *
+     * Ein Mitglied hat immer höchstens EINEN gültigen Nachweis. Beides in
+     * einer Transaktion, damit kein Zustand entsteht, in dem der alte schon
+     * weg und der neue noch nicht da ist. Abgelaufene Nachweise bleiben
+     * stehen - sie sind die Historie im Konto.
      *
      * @param int         $mitgliedId   mitglieder.id
      * @param string      $art          'schueler', 'student' oder 'senior'
      * @param string|null $gueltigBis   'JJJJ-MM-TT', null = unbefristet (Senior)
      * @param string      $quelle       'ki' oder 'demo'
      * @param string|null $kiModell     Name des Modells, null im Demo-Modus
-     * @param string      $hinweis      was beim Prüfen gelesen wurde
+     * @param string      $hinweis      was geprüft wurde, ohne persönliche Angaben
      * @return int                      id des neuen Nachweises
      */
     public function anlegen(
@@ -144,13 +148,51 @@ final class NachweisRepository
         ?string $kiModell,
         string $hinweis
     ): int {
-        $stmt = Database::connection()->prepare(
-            'INSERT INTO nachweise
-                 (mitglied_id, art, gueltig_bis, quelle, ki_modell, hinweis)
-             VALUES (?, ?, ?, ?, ?, ?)'
-        );
-        $stmt->execute([$mitgliedId, $art, $gueltigBis, $quelle, $kiModell, $hinweis]);
+        $pdo = Database::connection();
+        $pdo->beginTransaction();
 
-        return (int) Database::connection()->lastInsertId();
+        try {
+            $bisherige = $pdo->prepare(
+                'DELETE FROM nachweise
+                  WHERE mitglied_id = ?
+                    AND (gueltig_bis IS NULL OR gueltig_bis >= CURRENT_DATE)'
+            );
+            $bisherige->execute([$mitgliedId]);
+
+            $anlegen = $pdo->prepare(
+                'INSERT INTO nachweise
+                     (mitglied_id, art, gueltig_bis, quelle, ki_modell, hinweis)
+                 VALUES (?, ?, ?, ?, ?, ?)'
+            );
+            $anlegen->execute([$mitgliedId, $art, $gueltigBis, $quelle, $kiModell, $hinweis]);
+
+            $id = (int) $pdo->lastInsertId();
+
+            $pdo->commit();
+
+            return $id;
+        } catch (Throwable $fehler) {
+            $pdo->rollBack();
+
+            throw $fehler;
+        }
+    }
+
+    /**
+     * Entfernt einen Nachweis des Mitglieds.
+     *
+     * Die Bedingung auf mitglied_id ist der Schutz: Ohne sie könnte jemand
+     * mit einer geratenen id den Nachweis eines anderen Mitglieds löschen.
+     *
+     * @param int $mitgliedId  mitglieder.id
+     * @param int $id          nachweise.id
+     * @return void
+     */
+    public function entfernen(int $mitgliedId, int $id): void
+    {
+        $stmt = Database::connection()->prepare(
+            'DELETE FROM nachweise WHERE id = ? AND mitglied_id = ?'
+        );
+        $stmt->execute([$id, $mitgliedId]);
     }
 }
