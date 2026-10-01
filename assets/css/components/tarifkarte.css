@@ -443,9 +443,10 @@
    Überlegung wie beim Haken in der Leistungsliste weiter oben - die
    Information darf nie allein an der Farbe hängen.
 
-   Den Grund nennt ein Fenster, das beim Anklicken aufgeht, und danach die
-   Aktionsleiste im Klartext ("Für den ermäßigten Preis fehlt dein
-   Nachweis"). Die eigentliche Sperre sitzt im Endpunkt, nicht hier. */
+   Den Grund nennt die Aktionsleiste im Klartext ("Für den ermäßigten Preis
+   fehlt dein Nachweis") und ein Fenster, das aufgeht, sobald man dann
+   einen Tarif anklickt. Die eigentliche Sperre sitzt im Endpunkt, nicht
+   hier. */
 .preisgruppe-option[data-gesperrt="ja"] span {
   border-style: dashed;
   border-color: rgba(240, 239, 233, .2);
@@ -497,10 +498,13 @@
   color: var(--muted);
 }
 
-/* :disabled:hover steht dabei, weil die Regeln weiter oben den gesperrten
-   Button beim Überfahren sonst wieder lime färben würden. */
-.tarife-page--gesperrt .tarifkarte-button:disabled,
-.tarife-page--gesperrt .tarifkarte-button:disabled:hover,
+/* Die Buttons auf den Karten sind hier NICHT disabled: Ein Klick öffnet das
+   Fenster "Nachweis fehlt". Aussehen sollen sie trotzdem wie gesperrt.
+
+   :hover steht dabei, weil die Regeln weiter oben den Button beim
+   Überfahren sonst wieder lime färben und anheben würden. */
+.tarife-page--gesperrt .tarifkarte-button,
+.tarife-page--gesperrt .tarifkarte-button:hover,
 .tarife-page--gesperrt .tarife-aktion .button:disabled,
 .tarife-page--gesperrt .tarife-aktion .button:disabled:hover {
   border-style: dashed;
@@ -509,4 +513,5 @@
   color: var(--muted);
   opacity: 1;
   cursor: not-allowed;
+  transform: none;
 }

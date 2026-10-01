@@ -244,21 +244,33 @@ if (seite) {
     element.classList.toggle('tarifkarte--gewaehlt', istGewaehlt);
 
     // Ohne Nachweis sind die Karten nur zum Ansehen da: Der Button sagt,
-    // was fehlt, und lässt sich nicht drücken. Das Ausgrauen macht das CSS.
+    // was fehlt, und wählt nichts aus. Das Ausgrauen macht das CSS.
     const gesperrt = angemeldet && !preisgruppeErlaubt();
 
     const button = $('.tarifkarte-button', karte);
     button.textContent = istGewaehlt ? 'Ausgewählt' : 'Auswählen';
-    button.disabled = preis === null || gesperrt;
+    button.disabled = preis === null;
 
+    // aria-disabled statt disabled: Ein gesperrter Button würde den Klick
+    // verschlucken - er soll aber das Fenster "Nachweis fehlt" öffnen.
     if (gesperrt) {
       button.textContent = 'Nachweis fehlt';
+      button.setAttribute('aria-disabled', 'true');
     }
 
     // aria-pressed statt disabled: Der Button bleibt für die Tastatur
     // erreichbar, und Screenreader sagen "gedrückt" statt gar nichts.
     button.setAttribute('aria-pressed', String(istGewaehlt));
     button.addEventListener('click', () => {
+      if (gesperrt) {
+        $('#nachweis-preis').textContent = auswahl.preisgruppe === 'senior'
+          ? 'Seniorenpreis'
+          : 'ermäßigten Preis';
+        nachweisFenster.open();
+
+        return;
+      }
+
       auswahl = { ...auswahl, tarif: tarif.kennung };
       zeichnen();
     });
@@ -470,7 +482,9 @@ if (seite) {
   bestaetigen.addEventListener('click', uebernehmen);
 
   // Der Hinweis auf den fehlenden Nachweis hat keinen eigenen Button: Er
-  // geht auf, sobald jemand eine gesperrte Preisgruppe anklickt.
+  // geht auf, wenn jemand bei gesperrter Preisgruppe einen Tarif anklickt -
+  // siehe karteBauen(). Das Umschalten der Preisgruppe allein öffnet nichts,
+  // damit man die Preise in Ruhe vergleichen kann.
   const nachweisFenster = initModal({
     modalId: 'nachweis-modal',
     openId: '',
@@ -483,13 +497,6 @@ if (seite) {
   $('#preisgruppe').addEventListener('change', (ereignis) => {
     auswahl = { ...auswahl, preisgruppe: ereignis.target.value };
     zeichnen();
-
-    if (angemeldet && !preisgruppeErlaubt()) {
-      $('#nachweis-preis').textContent = auswahl.preisgruppe === 'senior'
-        ? 'Seniorenpreis'
-        : 'ermäßigten Preis';
-      nachweisFenster.open();
-    }
   });
 
   // Die letzte Bremse: Wer die Seite mit einer offenen Auswahl verlässt,
