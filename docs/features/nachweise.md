@@ -14,11 +14,13 @@ wird ausgelesen, das Ergebnis gespeichert und **das Bild sofort verworfen**.
 Danach steht die passende Preisgruppe auf der Tarifseite zur Verfügung.
 Ohne Nachweis ist die Preisgruppe abgedunkelt und gestrichelt umrandet: Man
 sieht, was der Preis wäre, und darf die Gruppe auch anklicken — buchen lässt
-sie sich aber nicht. Beim Anklicken geht das Fenster „Nachweis fehlt" auf,
-mit einem Knopf, der direkt zu „Mein Konto" führt. Solange die gesperrte
-Gruppe gewählt ist, sind alle vier Tarifkarten und der Button unten grau
-und gestrichelt statt limefarben, und auf den Karten steht „Nachweis fehlt"
-statt „Auswählen". Die Aktionsleiste nennt den Grund weiterhin im Klartext.
+sie sich aber nicht. Solange die gesperrte Gruppe gewählt ist, sind alle
+vier Tarifkarten und der Button unten grau und gestrichelt statt
+limefarben, und auf den Karten steht „Nachweis fehlt" statt „Auswählen".
+Zwischen den Preisgruppen lässt sich frei hin- und herschalten. Erst wer
+dann einen Tarif anklickt, bekommt das Fenster „Nachweis fehlt" mit einem
+Knopf, der direkt zu „Mein Konto" führt. Die Aktionsleiste nennt den Grund
+weiterhin im Klartext.
 
 Damit lässt sich die Mitgliedschaft vollständig online abschließen — bei
 anderen Studios muss man mit dem Ausweis an den Tresen. Das ist der Punkt

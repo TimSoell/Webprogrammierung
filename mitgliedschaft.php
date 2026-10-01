@@ -170,9 +170,9 @@ require ROOT_PATH . '/partials/header.php';
       </div>
     </div>
 
-    <!-- Geht auf, wenn ein Mitglied eine Preisgruppe anklickt, für die sein
-         Nachweis fehlt. Um welchen Preis es geht, trägt das Seitenskript in
-         #nachweis-preis ein. -->
+    <!-- Geht auf, wenn ein Mitglied einen Tarif anklickt, während eine
+         Preisgruppe gewählt ist, für die sein Nachweis fehlt. Um welchen
+         Preis es geht, trägt das Seitenskript in #nachweis-preis ein. -->
     <div class="modal" id="nachweis-modal" role="dialog" aria-modal="true" aria-labelledby="nachweis-titel">
       <div class="modal-card">
         <button class="modal-close" id="nachweis-schliessen" type="button" aria-label="Fenster schließen">×</button>
