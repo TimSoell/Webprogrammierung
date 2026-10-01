@@ -179,9 +179,12 @@ entscheidet der Server**, nicht der Browser:
 
 ## Woher kommen die Daten aktuell
 
-Aus MySQL. Die vier Tarife und ihre zwölf Preise stehen in
-`database/seed.sql` und müssen einmal eingespielt werden — ohne das ist die
-Seite leer.
+Aus PostgreSQL bei Supabase, siehe
+[ADR-0017](../decisions/ADR-0017-postgresql-auf-supabase.md). Die vier
+Tarife und ihre zwölf Preise stehen in `database/seed.sql` und müssen einmal
+eingespielt sein — ohne das ist die Seite leer. Eingespielt wird über den
+SQL Editor im Supabase-Dashboard, nach `schema.sql`. Die Datei darf mehrfach
+laufen: Die Tarife werden dabei aktualisiert, Verträge bleiben unangetastet.
 
 ## Was fehlt noch
 
