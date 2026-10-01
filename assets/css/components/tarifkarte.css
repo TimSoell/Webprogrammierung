@@ -488,7 +488,8 @@
 /* Ist eine gesperrte Preisgruppe angeklickt, setzt das Seitenskript
    .tarife-page--gesperrt an <main>. Dann verlieren die Karten und der Button
    unten alles Limefarbene: Lime heißt auf dieser Seite "das kannst du
-   wählen", und genau das stimmt ohne Nachweis nicht.
+   wählen", und genau das stimmt ohne Nachweis nicht. Einzige Ausnahme ist
+   der Hinweissatz in der Leiste unten, siehe am Ende dieses Abschnitts.
 
    Die Preise bleiben lesbar - man soll sehen, was es kosten würde.
 
@@ -526,4 +527,12 @@
   opacity: 1;
   cursor: not-allowed;
   transform: none;
+}
+
+/* Der Satz in der Leiste unten ("Für den ermäßigten Preis fehlt dein
+   Nachweis ...") ist dann das Einzige in Lime. Zwischen lauter Grau fällt
+   er so auf - er erklärt, warum sich nichts wählen lässt. In diesem Zustand
+   steht dort immer genau dieser Hinweis, siehe zeichnen() im Seitenskript. */
+.tarife-page--gesperrt .tarife-aktion-text {
+  color: var(--lime);
 }

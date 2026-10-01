@@ -20,7 +20,8 @@ limefarben, und auf den Karten steht „Nachweis fehlt" statt „Auswählen".
 Zwischen den Preisgruppen lässt sich frei hin- und herschalten. Erst wer
 dann einen Tarif anklickt, bekommt das Fenster „Nachweis fehlt" mit einem
 Knopf, der direkt zu „Mein Konto" führt. Die Aktionsleiste nennt den Grund
-weiterhin im Klartext.
+weiterhin im Klartext — limefarben, damit der Satz zwischen den grauen
+Karten auffällt.
 
 Damit lässt sich die Mitgliedschaft vollständig online abschließen — bei
 anderen Studios muss man mit dem Ausweis an den Tresen. Das ist der Punkt
