@@ -2,7 +2,7 @@
 
 **Status:** in Arbeit
 **Verantwortlich:** Felix
-**Zuletzt geprüft:** 2026-09-21
+**Zuletzt geprüft:** 2026-10-01
 
 ## Was kann man damit
 
@@ -14,7 +14,11 @@ wird ausgelesen, das Ergebnis gespeichert und **das Bild sofort verworfen**.
 Danach steht die passende Preisgruppe auf der Tarifseite zur Verfügung.
 Ohne Nachweis ist die Preisgruppe abgedunkelt und gestrichelt umrandet: Man
 sieht, was der Preis wäre, und darf die Gruppe auch anklicken — buchen lässt
-sie sich aber nicht. Den Grund nennt die Aktionsleiste im Klartext.
+sie sich aber nicht. Beim Anklicken geht das Fenster „Nachweis fehlt" auf,
+mit einem Knopf, der direkt zu „Mein Konto" führt. Solange die gesperrte
+Gruppe gewählt ist, sind alle vier Tarifkarten und der Button unten grau
+und gestrichelt statt limefarben, und auf den Karten steht „Nachweis fehlt"
+statt „Auswählen". Die Aktionsleiste nennt den Grund weiterhin im Klartext.
 
 Damit lässt sich die Mitgliedschaft vollständig online abschließen — bei
 anderen Studios muss man mit dem Ausweis an den Tresen. Das ist der Punkt
@@ -130,7 +134,7 @@ dieselbe Anzeige ohne wanderndes Licht und ohne Konfetti.
 |---|---|
 | 1 Seite | `mein-konto.php`, `mitgliedschaft.php` |
 | 2 Seitenskript | `assets/js/pages/mein-konto.page.js`, `assets/js/pages/mitgliedschaft.page.js` |
-| 2 Komponente | `assets/js/components/ausweis-scan.js` (Animation während der Prüfung) |
+| 2 Komponente | `assets/js/components/ausweis-scan.js` (Animation während der Prüfung), `assets/js/components/modal.js` (Fenster „Nachweis fehlt") |
 | Hilfsmittel | `assets/js/lib/bild.js` (verkleinert das Foto vor dem Upload) |
 | 3 Service | `assets/js/services/nachweise.js` |
 | 4 Endpunkt | `api/nachweise.php` |

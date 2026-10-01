@@ -10,7 +10,8 @@
  *              Die Komponente kennt den INHALT des Fensters nicht. Was darin
  *              passiert, steht im jeweiligen Seitenskript. Dadurch lässt
  *              sich dieses Modal für jedes Fenster wiederverwenden - aktuell
- *              Kurskalender und Tarifwechsel.
+ *              Kurskalender, Bewertungen, Tarifwechsel und der Hinweis auf
+ *              den fehlenden Nachweis.
  * @see         assets/css/components/modal.css
  * @see         partials/kurskalender.php
  */
@@ -22,13 +23,16 @@ import { $ } from '../lib/dom.js';
  *
  * @param {object}  [options]
  * @param {string}  [options.modalId]    id des Fensters
- * @param {string}  [options.openId]     id des Buttons, der es öffnet
+ * @param {string}  [options.openId]     id des Buttons, der es öffnet. Ein leerer
+ *                                       Text heißt: Es gibt keinen Button, das
+ *                                       Fenster wird nur über die Rückgabe geöffnet
  * @param {string}  [options.closeId]    id des Buttons, der es schließt
  * @param {string}  [options.focusId]    id des Feldes, das beim Öffnen den Fokus bekommt
  * @returns {{open: () => void, close: () => void}|undefined}
  *          Beide Wege bleiben nutzbar: der Button oben und diese Rückgabe.
  *          Gebraucht wird sie, wenn sich das Fenster nach einer geglückten
- *          Aktion selbst schließen soll - siehe mitgliedschaft.page.js.
+ *          Aktion selbst schließen soll oder ohne Button aufgeht - siehe
+ *          mitgliedschaft.page.js.
  *          undefined, wenn es das Fenster oder den Button nicht gibt.
  */
 export function initModal({
@@ -38,15 +42,20 @@ export function initModal({
   focusId = '',
 } = {}) {
   const modal = $(`#${modalId}`);
-  const openButton = $(`#${openId}`);
+  const openButton = openId ? $(`#${openId}`) : null;
 
-  if (!modal || !openButton) {
+  if (!modal || (openId && !openButton)) {
     return;
   }
 
   const closeButton = $(`#${closeId}`);
 
+  // Ohne Button merkt sich das Fenster, wo der Fokus vor dem Öffnen war,
+  // und gibt ihn beim Schließen dorthin zurück.
+  let fokusZuvor = null;
+
   const open = () => {
+    fokusZuvor = document.activeElement;
     modal.classList.add('open');
 
     // Fokus ins erste Feld, damit man sofort tippen kann - und damit
@@ -59,10 +68,10 @@ export function initModal({
 
   const close = () => {
     modal.classList.remove('open');
-    openButton.focus();
+    (openButton ?? fokusZuvor)?.focus();
   };
 
-  openButton.addEventListener('click', open);
+  openButton?.addEventListener('click', open);
   closeButton?.addEventListener('click', close);
 
   // Klick auf den abgedunkelten Hintergrund schließt das Fenster.

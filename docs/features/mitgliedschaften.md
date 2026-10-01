@@ -36,7 +36,8 @@ laufenden Tarif klickt und bestätigt, nimmt die Vormerkung zurück.
 
 Die Preisgruppe zu wechseln zählt als Wechsel: Sie steht im Vertrag und
 bestimmt den Beitrag. Für die beiden ermäßigten Preisgruppen braucht es
-zusätzlich einen gültigen Nachweis — siehe [Nachweise](nachweise.md). Läuft
+zusätzlich einen gültigen Nachweis — siehe [Nachweise](nachweise.md). Fehlt
+er, sind die Karten grau und ein Fenster erklärt, was zu tun ist. Läuft
 der ab, stellt das System den Vertrag zum nächsten Monatsersten auf den
 Standardpreis um.
 
@@ -46,7 +47,7 @@ Standardpreis um.
 |---|---|
 | 1 Seite | `mitgliedschaft.php`, `mein-konto.php` |
 | 2 Seitenskript | `assets/js/pages/mitgliedschaft.page.js`, `assets/js/pages/mein-konto.page.js` |
-| 2 Komponente | `assets/js/components/modal.js` (für die Rückfrage mitbenutzt) |
+| 2 Komponente | `assets/js/components/modal.js` (für die Rückfrage und das Fenster „Nachweis fehlt" mitbenutzt) |
 | 3 Service | `assets/js/services/tarife.js`, `assets/js/services/mitgliedschaften.js` |
 | 4 Endpunkt | `api/tarife.php`, `api/mitgliedschaften.php` |
 | 5 Repository | `src/Repositories/TarifRepository.php`, `src/Repositories/MitgliedschaftRepository.php` |
