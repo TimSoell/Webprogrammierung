@@ -550,8 +550,9 @@ CREATE TABLE IF NOT EXISTS nachweise (
     -- Welches Modell geprüft hat, für die Nachvollziehbarkeit. NULL im Demo-Modus.
     ki_modell   varchar(60)  NULL,
 
-    -- Was beim Prüfen gelesen wurde, ein Satz. Ersetzt das gelöschte Bild als
-    -- Beleg, wenn jemand die Prüfung anzweifelt.
+    -- Was geprüft wurde, ein Satz. Ersetzt das gelöschte Bild als Beleg, wenn
+    -- jemand die Prüfung anzweifelt. Den Satz baut api/nachweise.php selbst,
+    -- damit weder ein Name noch ein Geburtsdatum darin stehen kann.
     hinweis     varchar(255) NOT NULL,
 
     geprueft_am timestamp(0) NOT NULL DEFAULT LOCALTIMESTAMP(0),

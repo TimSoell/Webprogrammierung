@@ -372,10 +372,41 @@
 }
 
 .nachweis-eintrag {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   padding: 14px 18px;
   background: var(--ink);
   font-size: .88rem;
   line-height: 1.5;
+}
+
+.nachweis-entfernen {
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: .76rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.nachweis-entfernen:hover {
+  color: var(--danger);
+}
+
+.nachweis-entfernen:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 3px;
+}
+
+.nachweis-entfernen[disabled] {
+  cursor: default;
+  opacity: .5;
 }
 
 /* Abgelaufen heißt: zählt nicht mehr. Das muss man sehen können, ohne das
