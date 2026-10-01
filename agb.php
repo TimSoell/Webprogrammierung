@@ -20,7 +20,7 @@ require ROOT_PATH . '/partials/header.php';
   <main class="legal-page">
     <div class="wrap legal-content">
       <p class="eyebrow">Rechtliches</p>
-      <h1 class="display legal-title">Allgemeine<br><span>Geschäftsbedingungen</span></h1>
+      <h1 class="display legal-title legal-title--lang">Allgemeine<br><span>Geschäftsbedingungen</span></h1>
 
       <p class="legal-intro">Diese allgemeine Fassung informiert über die grundlegenden Regeln für die Nutzung des SCHWITZKASTEN Athletic Club.</p>
 
