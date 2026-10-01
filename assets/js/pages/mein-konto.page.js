@@ -363,6 +363,16 @@ if (seite) {
 
       nachweiseZeigen(stand);
       formular.reset();
+
+      if (stand.herabstufungZurueckgenommen) {
+        // Oben auf der Seite steht noch der vorgemerkte Wechsel auf den
+        // Standardpreis. Den gibt es nicht mehr, also neu laden.
+        mitgliedschaftZeigen(await standLaden());
+        meldungZeigen(nachweisMeldung, 'Nachweis gespeichert. Der vorgemerkte Wechsel auf den Standardpreis entfällt, dein Preis bleibt wie bisher.', true);
+
+        return;
+      }
+
       meldungZeigen(nachweisMeldung, 'Nachweis gespeichert. Der Preis steht dir ab sofort offen.', true);
     });
 

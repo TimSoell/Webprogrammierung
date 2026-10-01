@@ -32,6 +32,10 @@ import { verkleinern } from '../lib/bild.js';
  *                                        abgelaufenen, neueste zuerst
  * @property {boolean} kiVerfuegbar       false = Demo-Modus, es wird ein
  *                                        Datum statt eines Bildes erwartet
+ * @property {boolean} herabstufungZurueckgenommen
+ *                                        true nur nach einem Upload, der den
+ *                                        vorgemerkten Wechsel auf den
+ *                                        Standardpreis verworfen hat
  */
 
 /**
@@ -49,7 +53,8 @@ export async function alleLaden() {
  *
  * Das Bild wird vorher im Browser verkleinert. Der Server speichert es nicht,
  * sondern liest nur Name und Datum heraus. Ein gespeicherter Nachweis
- * ersetzt den bisherigen - es gilt immer nur einer.
+ * ersetzt den bisherigen - es gilt immer nur einer. War wegen des fehlenden
+ * Nachweises schon der Standardpreis vorgemerkt, nimmt der Server das zurück.
  *
  * @param {'schueler'|'student'|'senior'} art  was nachgewiesen werden soll
  * @param {File} datei                         das Foto des Ausweises

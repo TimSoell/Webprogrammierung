@@ -4,7 +4,8 @@
  * @layer       4 – API-Endpunkt
  * @description Nachweise für ermäßigte Preise hochladen, ansehen und entfernen.
  *
- *                GET     -> { nachweise: [...], kiVerfuegbar: bool }
+ *                GET     -> { nachweise: [...], kiVerfuegbar: bool,
+ *                             herabstufungZurueckgenommen: bool }
  *                POST    { art, bild, mimeTyp }            -> 201, mit KI
  *                POST    { art, datum }                    -> 201, im Demo-Modus
  *                DELETE  { id }                            -> 200, eigenen entfernen
@@ -29,9 +30,16 @@
  *
  *              EIN MITGLIED, EIN NACHWEIS. Ein neuer Nachweis ersetzt den
  *              bisherigen, siehe NachweisRepository::anlegen().
+ *
+ *              EIN NEUER NACHWEIS NIMMT DIE HERABSTUFUNG ZURUECK. Fehlte der
+ *              Nachweis, hat api/mitgliedschaften.php den Vertrag zum
+ *              Monatsersten auf den Standardpreis vorgemerkt. Passt der neue
+ *              Nachweis zum laufenden Vertrag, verwirft der POST diese
+ *              Vormerkung und meldet das in herabstufungZurueckgenommen.
  * @see         assets/js/services/nachweise.js
  * @see         src/Ausweispruefung.php
  * @see         src/Repositories/NachweisRepository.php
+ * @see         src/Repositories/MitgliedschaftRepository.php
  * @see         docs/decisions/ADR-0011-ausweispruefung-mit-ki.md
  * @see         docs/decisions/ADR-0020-nachweise-absichern.md
  */
@@ -42,6 +50,7 @@ require __DIR__ . '/../src/bootstrap.php';
 
 use Delight\Auth\TooManyRequestsException;
 use Repositories\MitgliedRepository;
+use Repositories\MitgliedschaftRepository;
 use Repositories\NachweisRepository;
 
 header('Content-Type: application/json; charset=utf-8');
@@ -117,7 +126,7 @@ try {
     $nachweise = new NachweisRepository();
 
     /** Der Nachweisstand, wie ihn die Seite nach jeder Anfrage braucht. */
-    $standAntworten = static function (int $status) use ($nachweise, $mitgliedId): void {
+    $standAntworten = static function (int $status, bool $herabstufungZurueckgenommen = false) use ($nachweise, $mitgliedId): void {
         Api::antworten([
             'nachweise' => array_map(static fn (array $zeile): array => [
                 'id'         => (int) $zeile['id'],
@@ -131,6 +140,10 @@ try {
             // Die Seite muss wissen, ob sie ein Bildfeld oder ein Datumsfeld
             // anzeigt. Ohne Schlüssel gibt es nichts auszulesen.
             'kiVerfuegbar' => Ausweispruefung::verfuegbar(),
+
+            // Nur nach einem POST true: Der Upload hat den vorgemerkten
+            // Wechsel auf den Standardpreis verworfen.
+            'herabstufungZurueckgenommen' => $herabstufungZurueckgenommen,
         ], $status);
     };
 
@@ -344,7 +357,34 @@ try {
 
         $nachweise->anlegen($mitgliedId, $art, $gueltigBis, $quelle, $modell, $hinweis);
 
-        $standAntworten(201);
+        // Fehlte der Nachweis, hat api/mitgliedschaften.php den Vertrag zum
+        // Monatsersten auf den Standardpreis vorgemerkt. Mit dem neuen
+        // Nachweis ist das hinfällig.
+        //
+        // Die Tabelle merkt sich nicht, wer eine Vormerkung angelegt hat. Zu
+        // erkennen ist die Herabstufung nur an ihrer Form: derselbe Tarif zum
+        // Standardpreis. Deshalb wird sie hier beim Hochladen verworfen und
+        // nicht bei jedem Aufruf - wer bewusst auf den Standardpreis
+        // wechselt, soll das trotz gültigem Nachweis können.
+        $mitgliedschaften = new MitgliedschaftRepository();
+        $laufend          = $mitgliedschaften->aktiveFinden($mitgliedId);
+        $geplant          = $mitgliedschaften->geplanteFinden($mitgliedId);
+
+        // Der neue Nachweis muss zur Preisgruppe des laufenden Vertrags
+        // passen: Ein Seniorennachweis rettet keinen Schülerpreis.
+        $herabstufungHinfaellig = $laufend !== null
+            && $geplant !== null
+            && $geplant['kennung'] === $laufend['kennung']
+            && $geplant['preisgruppe'] === 'standard'
+            && in_array($art, NachweisRepository::PREISGRUPPE_ARTEN[$laufend['preisgruppe']] ?? [], true);
+
+        if ($herabstufungHinfaellig) {
+            // Der Tarif bleibt derselbe - an den gebuchten Kursen ändert sich
+            // also nichts, anders als bei einer Rücknahme auf der Tarifseite.
+            $mitgliedschaften->vormerkungZuruecknehmen($mitgliedId);
+        }
+
+        $standAntworten(201, $herabstufungHinfaellig);
     }
 
     Api::fehler(405, 'Methode nicht erlaubt.');
