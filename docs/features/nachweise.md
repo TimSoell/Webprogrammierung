@@ -80,7 +80,8 @@ Grenze.
 **Entfernen.** Jeder Eintrag in der Liste hat einen Knopf „Entfernen", mit
 Rückfrage. Wer einen gültigen Nachweis entfernt und einen ermäßigten Tarif
 hat, zahlt ab dem nächsten Monatsersten den Standardpreis — derselbe Weg
-wie beim Ablauf, siehe unten.
+wie beim Ablauf, siehe unten. Wer danach rechtzeitig neu hochlädt, behält
+seinen Preis.
 
 Im Konto steht unter der Auswahl, was ein Upload mit dem schon hinterlegten
 Nachweis machen würde. Beim Senior ist der Button zusätzlich gesperrt. Das
@@ -90,6 +91,34 @@ ist Bequemlichkeit, keine Absicherung — verbindlich prüft der Endpunkt.
 Standardpreis gestellt** — nach derselben Regel wie jeder Tarifwechsel
 ([ADR-0010](../decisions/ADR-0010-tarifwechsel-zum-monatsersten.md)). Den
 laufenden Monat behält man zum ermäßigten Preis.
+
+**Ein neuer Nachweis nimmt diese Herabstufung zurück.** Wer vor dem
+Monatsersten wieder einen passenden Nachweis hochlädt, behält seinen Preis:
+`api/nachweise.php` verwirft die Vormerkung gleich beim Speichern, und die
+Kontoseite meldet „Der vorgemerkte Wechsel auf den Standardpreis entfällt".
+Beispiel: Der Ausweis läuft am 30.09. ab, am 01.10. entsteht die Vormerkung
+zum 01.11., am 02.10. kommt der neue Ausweis — der Vertrag läuft unverändert
+weiter. Dasselbe gilt, wenn jemand seinen Nachweis entfernt und neu hochlädt.
+
+Verworfen wird nur eine Vormerkung, die wie eine Herabstufung aussieht:
+
+| | |
+|---|---|
+| Laufender Vertrag | Preisgruppe „ermäßigt" oder „Senior" |
+| Vorgemerkt | **derselbe Tarif** zum Standardpreis |
+| Neuer Nachweis | passt zur Preisgruppe des laufenden Vertrags |
+
+Ein Seniorennachweis rettet also keinen Schülerpreis, und ein vorgemerkter
+Wechsel in einen anderen Tarif bleibt stehen.
+
+**Warum beim Hochladen und nicht bei jedem Aufruf.** Die Tabelle
+`mitgliedschaften` merkt sich nicht, ob eine Vormerkung automatisch entstand
+oder gewählt wurde — beide sehen gleich aus. Liefe die Rücknahme bei jedem
+Aufruf mit, könnte niemand mit gültigem Nachweis bewusst auf den
+Standardpreis wechseln: Die Vormerkung wäre beim nächsten Laden wieder weg.
+Ein Upload dagegen sagt eindeutig, dass jemand den ermäßigten Preis behalten
+will. Eine eigene Spalte hätte die Unterscheidung sauber gemacht, aber eine
+Schemaänderung in beiden Datenbanken verlangt.
 
 Ein Seniorennachweis läuft nie ab: Wer einmal 65 ist, bleibt es.
 
@@ -183,7 +212,7 @@ dieselbe Anzeige ohne wanderndes Licht und ohne Konfetti.
 | 3 Service | `assets/js/services/nachweise.js` |
 | 4 Endpunkt | `api/nachweise.php` |
 | Infrastruktur | `src/Ausweispruefung.php` (einzige Stelle mit einem KI-Aufruf) |
-| 5 Repository | `src/Repositories/NachweisRepository.php` |
+| 5 Repository | `src/Repositories/NachweisRepository.php`, `src/Repositories/MitgliedschaftRepository.php` (Herabstufung zurücknehmen) |
 | 6 Tabelle | `nachweise` in `database/schema.sql` |
 | CSS | `assets/css/components/auth.css`, `assets/css/components/tarifkarte.css`, `assets/css/components/ausweis-scan.css` |
 
@@ -199,19 +228,24 @@ dieselbe Anzeige ohne wanderndes Licht und ohne Konfetti.
       "hinweis": "Schülerausweis geprüft: gültig bis 31.07.2026, Name stimmt mit dem Konto überein.",
       "geprueftAm": "2025-09-12 09:15:02" }
   ],
-  "kiVerfuegbar": true
+  "kiVerfuegbar": true,
+  "herabstufungZurueckgenommen": false
 }
 ```
 
 Höchstens einer der Einträge ist gültig, die übrigen sind abgelaufen.
 `gueltigBis: null` heißt unbefristet und kommt nur bei `art: "senior"` vor.
 
+`herabstufungZurueckgenommen` ist nur nach einem POST `true`, und nur, wenn
+der Upload einen vorgemerkten Wechsel auf den Standardpreis verworfen hat.
+Die Kontoseite lädt dann den Tarifstand neu.
+
 ## Endpunkte
 
 | Methode | Pfad | Zweck | Antwort |
 |---|---|---|---|
 | GET | `api/nachweise.php` | eigene Nachweise, auch abgelaufene | Nachweisstand |
-| POST | `api/nachweise.php` | Bild prüfen lassen bzw. Datum eintragen, ersetzt den bisherigen Nachweis | 201, Nachweisstand |
+| POST | `api/nachweise.php` | Bild prüfen lassen bzw. Datum eintragen, ersetzt den bisherigen Nachweis, nimmt eine vorgemerkte Herabstufung zurück | 201, Nachweisstand |
 | DELETE | `api/nachweise.php` | eigenen Nachweis entfernen, `{ id }` | 200, Nachweisstand |
 
 Fehlerfälle des POST, alle mit deutscher Meldung für das Formular:
@@ -253,10 +287,14 @@ Sicherheit. Alles, was aus dem Browser kommt, ist manipulierbar.
   [`migration-vercel-supabase.md`](../migration-vercel-supabase.md)) läuft
   die Produktion bewusst ohne Schlüssel, also im Demo-Modus — damit keine
   echten Ausweise Fremder bei Google landen.
-- **Eine vorgemerkte Herabstufung bleibt stehen.** Ist der Wechsel auf den
-  Standardpreis einmal vorgemerkt (Nachweis abgelaufen oder entfernt), nimmt
-  ein danach hochgeladener Nachweis ihn nicht zurück. Man muss den Tarif auf
-  der Tarifseite noch einmal wählen.
+- **Eine Herabstufung, die schon gilt, bleibt.** Kommt der neue Nachweis
+  erst nach dem Monatsersten, läuft bereits der Vertrag zum Standardpreis.
+  Dann muss man den ermäßigten Preis auf der Tarifseite neu wählen, und er
+  gilt wie jeder Wechsel ab dem nächsten Monatsersten.
+- **Wer bewusst auf den Standardpreis wechselt und danach einen Nachweis
+  hochlädt, verliert diese Vormerkung.** Sie sieht genauso aus wie eine
+  automatische Herabstufung. Der Fall ist kaum denkbar und fällt zugunsten
+  des Mitglieds aus.
 - **Niemand kann eine Prüfung überstimmen.** Liest das Modell ein Datum
   falsch, hilft nur ein neuer Upload oder ein Eingriff in der Datenbank.
   Ein Admin-Bereich wäre ein eigenes Feature.

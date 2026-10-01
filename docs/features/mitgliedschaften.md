@@ -41,6 +41,14 @@ er, sind die Karten grau und ein Fenster erklärt, was zu tun ist. Läuft
 der ab, stellt das System den Vertrag zum nächsten Monatsersten auf den
 Standardpreis um.
 
+Diese automatische Vormerkung ist die einzige, die nicht nur auf der
+Tarifseite zurückgenommen werden kann: Lädt das Mitglied vor dem
+Monatsersten wieder einen passenden Nachweis hoch, verwirft
+`api/nachweise.php` sie und der Vertrag läuft unverändert weiter. Erkannt
+wird sie an ihrer Form — derselbe Tarif zum Standardpreis —, denn die
+Tabelle merkt sich nicht, wer eine Vormerkung angelegt hat. Einzelheiten
+unter [Nachweise](nachweise.md), Abschnitt „Die Regeln".
+
 ## Beteiligte Dateien
 
 | Schicht | Datei |
