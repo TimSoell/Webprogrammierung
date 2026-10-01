@@ -355,15 +355,54 @@
   text-decoration: underline;
 }
 
-/* --- Formular im Fenster --------------------------------------------------- */
-/* Felder und Meldung sehen aus wie im Login (auth.css). */
-.bewertung-formular {
+/* --- Formular und eigene Bewertung im Fenster ------------------------------- */
+/* Zu sehen ist immer nur eins von beiden, siehe bewertungen.js. Felder und
+   Meldung sehen aus wie im Login (auth.css). */
+.bewertung-formular,
+.bewertung-eigene {
   display: grid;
   margin-bottom: 28px;
   padding: 24px;
   border: 1px solid var(--line);
   background: var(--ink-soft);
   gap: 10px;
+}
+
+/* Das hidden-Attribut verliert sonst gegen display: grid. */
+.bewertung-formular[hidden],
+.bewertung-eigene[hidden] {
+  display: none;
+}
+
+/* Die eigene Bewertung steht schon in einem Kasten - die Karte darin
+   braucht keinen zweiten Rahmen. */
+.bewertung-eigene .bewertung {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+/* Unauffälliger Textknopf, beim Überfahren rot: Löschen ist endgültig. */
+.bewertung-loeschen {
+  margin-top: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  font: .85rem var(--body);
+  justify-self: start;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.bewertung-loeschen:hover {
+  color: var(--danger);
+}
+
+.bewertung-loeschen:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 3px;
 }
 
 .bewertung-formular-titel {
@@ -455,6 +494,10 @@
 
 .bewertung-formular-meldung:empty {
   display: none;
+}
+
+.bewertung-formular-meldung--erfolg {
+  border-left-color: var(--lime);
 }
 
 /* --- Karten im Fenster ----------------------------------------------------- */

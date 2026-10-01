@@ -11,7 +11,7 @@
  * @see         api/bewertungen.php
  */
 
-import { getJson, postJson } from './api.js';
+import { getJson, postJson, sendJson } from './api.js';
 
 /**
  * @typedef  {object} Bewertung
@@ -25,6 +25,8 @@ import { getJson, postJson } from './api.js';
  * @property {string|null} bild      Pfad ohne führenden Slash, relativ zur
  *                                   BASE_URL. null = kein Bild: Zitat-Kachel
  *                                   und Initialen im Fenster
+ * @property {boolean}     eigene    true bei der Bewertung der angemeldeten
+ *                                   Person; ohne Anmeldung immer false
  */
 
 /**
@@ -49,4 +51,14 @@ export async function bewertungenLaden() {
  */
 export async function bewertungAbgeben(sterne, text) {
   return postJson('api/bewertungen.php', { sterne: String(sterne), text });
+}
+
+/**
+ * Löscht die eigene Bewertung. Danach kann man eine neue schreiben.
+ *
+ * @returns {Promise<{geloescht: true}>}
+ * @throws {ApiError}  401 ohne Anmeldung · 404, wenn es keine eigene gibt
+ */
+export async function bewertungLoeschen() {
+  return sendJson('DELETE', 'api/bewertungen.php');
 }
