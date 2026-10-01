@@ -258,6 +258,18 @@
   }
 }
 
+/* "Mitgliedschaft." ist in der Mindestgröße der Schauschrift (4.3rem) rund
+   400px breit und ragte auf dem Handy über den Rand hinaus - die ganze
+   Seite ließ sich dann seitlich verschieben, Kopfzeile und Fenster saßen
+   nicht mehr mittig. Darunter wächst die Schrift deshalb mit der
+   Bildschirmbreite: 15vw sind bei 460px jene 4.3rem, ab dort gilt wieder
+   unverändert die Größe aus .display. */
+@media (max-width: 460px) {
+  .tarife-title {
+    font-size: 15vw;
+  }
+}
+
 /* --- Auswahl und Status auf der Karte ------------------------------------- */
 
 /* Kleiner Hinweis über dem Tarifnamen: "Aktueller Tarif" oder das Datum,

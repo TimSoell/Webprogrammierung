@@ -56,3 +56,24 @@
   }
 
 }
+
+/* "Datenschutz" ist in der Mindestgröße von 4rem 305px breit - auf sehr
+   schmalen Handys (320px) ein Pixel zu viel, und schon lässt sich die Seite
+   seitlich verschieben. 18vw sind bei 355px jene 4rem, darüber ändert sich
+   nichts. */
+@media (max-width: 355px) {
+  .legal-title {
+    font-size: 18vw;
+  }
+}
+
+/* Variante für eine Überschrift mit einem sehr langen Wort:
+   "Geschäftsbedingungen" braucht in der Mindestgröße 548px und passt erst
+   ab etwa 580px Bildschirmbreite. 10vw sind bei 640px jene 4rem, darüber
+   ändert sich nichts. Steht nach der Regel oben, damit sie auch unter 355px
+   gewinnt. */
+@media (max-width: 640px) {
+  .legal-title--lang {
+    font-size: 10vw;
+  }
+}
