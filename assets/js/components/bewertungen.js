@@ -5,7 +5,8 @@
  *              Bildkacheln im Abschnitt #bewertungen (drei zu sehen, mit
  *              Pfeilen weiterzudrehen) und das Fenster "Alle Bewertungen" mit
  *              Durchschnitt, allen Karten und - für Angemeldete - dem
- *              Formular zum Bewerten.
+ *              Formular zum Bewerten. Wer schon bewertet hat, sieht dort
+ *              statt des Formulars seine Bewertung und kann sie löschen.
  *
  *              Eine eigene Datei statt Code in index.page.js, weil Kacheln,
  *              Fenster und Formular zusammen zu lang für das Seitenskript
@@ -27,7 +28,7 @@
 import { $, $$ } from '../lib/dom.js';
 import { monatUeberschrift } from '../lib/datum.js';
 import { initModal } from './modal.js';
-import { bewertungAbgeben, bewertungenLaden } from '../services/bewertungen.js';
+import { bewertungAbgeben, bewertungenLaden, bewertungLoeschen } from '../services/bewertungen.js';
 
 /**
  * Element mit Klasse und Text - textContent, nie innerHTML.
@@ -314,6 +315,7 @@ export function initBewertungen() {
       kacheln.replaceChildren(...[...mitBild, ...ohneBild].map((b) => kachelBauen(b, baseUrl)));
       liste.replaceChildren(...bewertungen.map((b) => karteBauen(b, baseUrl)));
       pfeileAnpassen();
+      eigeneZeigen(bewertungen.find((b) => b.eigene) ?? null);
 
       if (bewertungen.length === 0) {
         meldung.textContent = 'Noch keine Bewertungen.';
@@ -331,23 +333,79 @@ export function initBewertungen() {
     }
   };
 
-  // --- Formular, nur für Angemeldete ----------------------------------------
+  // --- Formular und eigene Bewertung, nur für Angemeldete --------------------
+  // Pro Konto gibt es eine Bewertung. Wer schon bewertet hat, sieht sie
+  // statt des Formulars und kann sie löschen - danach ist das Formular
+  // wieder da.
   const formular = $('#bewertung-formular');
+  const eigeneBereich = $('#bewertung-eigene');
+  const eigeneMeldung = $('#bewertung-eigene-meldung');
+
+  /**
+   * Zeigt entweder das Formular oder "Deine Bewertung". Als Funktion und
+   * nicht als const, weil laden() sie weiter oben schon aufruft.
+   *
+   * @param {import('../services/bewertungen.js').Bewertung|null} eigene
+   * @returns {void}
+   */
+  function eigeneZeigen(eigene) {
+    if (!formular) {
+      return;
+    }
+
+    formular.hidden = eigene !== null;
+    eigeneBereich.hidden = eigene === null;
+    $('#bewertung-eigene-inhalt').replaceChildren(...(eigene ? [karteBauen(eigene, baseUrl)] : []));
+  }
 
   if (formular) {
     const wahl = $('.bewertung-wahl', formular);
     const formularMeldung = $('#bewertung-formular-meldung');
     const knopf = $('button[type="submit"]', formular);
 
-    // Füllt alle Sterne bis zum gewählten. Die Radio-Buttons selbst sind
-    // unsichtbar, zu sehen sind nur ihre Labels. RadioNodeList.value ist
-    // '', solange nichts gewählt ist -> 0.
-    wahl.addEventListener('change', () => {
+    /**
+     * Füllt alle Sterne bis zum gewählten. Die Radio-Buttons selbst sind
+     * unsichtbar, zu sehen sind nur ihre Labels. RadioNodeList.value ist
+     * '', solange nichts gewählt ist -> 0.
+     *
+     * @returns {void}
+     */
+    const sterneFuellen = () => {
       const gewaehlt = Number(formular.elements.sterne.value);
 
       $$('label', wahl).forEach((label, index) => {
         label.classList.toggle('bewertung-wahl-stern--voll', index < gewaehlt);
       });
+    };
+
+    /**
+     * Meldung unter "Deine Bewertung".
+     *
+     * @param {string} text
+     * @param {boolean} [erfolg]  true = grün statt rot
+     * @returns {void}
+     */
+    const eigeneMelden = (text, erfolg = false) => {
+      eigeneMeldung.textContent = text;
+      eigeneMeldung.classList.toggle('bewertung-formular-meldung--erfolg', erfolg);
+    };
+
+    wahl.addEventListener('change', sterneFuellen);
+
+    $('#bewertung-loeschen').addEventListener('click', async () => {
+      // Kein Rückgängig - deshalb einmal nachfragen.
+      if (!window.confirm('Deine Bewertung wirklich löschen?')) {
+        return;
+      }
+
+      eigeneMelden('');
+
+      try {
+        await bewertungLoeschen();
+        await laden();
+      } catch (fehler) {
+        eigeneMelden(fehler.message);
+      }
     });
 
     formular.addEventListener('submit', async (ereignis) => {
@@ -374,12 +432,15 @@ export function initBewertungen() {
       try {
         await bewertungAbgeben(sterne, text);
 
-        // Pro Konto gibt es eine Bewertung - das Formular hat damit
-        // seinen Zweck erfüllt.
-        formular.replaceWith(element('p', 'bewertungen-hinweis', 'Danke! Deine Bewertung steht jetzt in der Liste.'));
+        // Leeren, falls die Bewertung später gelöscht und neu geschrieben
+        // wird. laden() zeigt danach "Deine Bewertung" statt des Formulars.
+        formular.reset();
+        sterneFuellen();
         await laden();
+        eigeneMelden('Danke! Deine Bewertung steht jetzt in der Liste.', true);
       } catch (fehler) {
         formularMeldung.textContent = fehler.message;
+      } finally {
         knopf.disabled = false;
       }
     });

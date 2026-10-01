@@ -4,11 +4,13 @@
  * @layer       4 – API-Endpunkt
  * @description Die Bewertungen des Studios.
  *
- *                GET                     -> alle Bewertungen, die neueste zuerst
- *                POST  { sterne, text }  -> eigene Bewertung abgeben
+ *                GET                      -> alle Bewertungen, die neueste zuerst
+ *                POST    { sterne, text } -> eigene Bewertung abgeben
+ *                DELETE                   -> eigene Bewertung löschen
  *
- *              GET geht ohne Anmeldung, POST nur angemeldet (sonst 401).
- *              Pro Konto gibt es eine Bewertung (sonst 409).
+ *              GET geht ohne Anmeldung, POST und DELETE nur angemeldet
+ *              (sonst 401). Pro Konto gibt es eine Bewertung (sonst 409);
+ *              wer sie ändern will, löscht sie und schreibt eine neue.
  *
  *              Name und Mitgliedsstatus schickt der Browser NICHT mit - der
  *              Endpunkt liest beides selbst aus der Datenbank. Sonst könnte
@@ -33,7 +35,14 @@ try {
 
     // --- Lesen ---------------------------------------------------------------
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        Api::antworten($bewertungen->alleFinden());
+        // Angemeldet bekommt die eigene Bewertung das Feld eigene = true.
+        // Ohne Anmeldung gibt es kein 401: Lesen darf jeder.
+        $auth       = Auth::instanz();
+        $mitgliedId = $auth->isLoggedIn()
+            ? (new MitgliedRepository())->idFindenNachUserId($auth->getUserId())
+            : null;
+
+        Api::antworten($bewertungen->alleFinden($mitgliedId));
     }
 
     // --- Bewertung abgeben ---------------------------------------------------
@@ -85,6 +94,28 @@ try {
         $id = $bewertungen->anlegen($mitgliedId, $name, $warMitglied, (int) $sterne, $text);
 
         Api::antworten(['id' => $id], 201);
+    }
+
+    // --- Eigene Bewertung löschen --------------------------------------------
+    if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        $auth = Auth::instanz();
+
+        if (!$auth->isLoggedIn()) {
+            Api::fehler(401, 'Du bist nicht angemeldet.');
+        }
+
+        // Auch ohne Rumpf: eingabe() prüft den Content-Type (Schutz vor CSRF).
+        Api::eingabe();
+
+        // Welche Bewertung gelöscht wird, bestimmt die Sitzung, nicht die
+        // Anfrage - so kann niemand eine fremde löschen.
+        $mitgliedId = (new MitgliedRepository())->idFindenNachUserId($auth->getUserId());
+
+        if ($mitgliedId === null || !$bewertungen->loeschen($mitgliedId)) {
+            Api::fehler(404, 'Du hast keine Bewertung abgegeben.');
+        }
+
+        Api::antworten(['geloescht' => true]);
     }
 
     Api::fehler(405, 'Methode nicht erlaubt.');

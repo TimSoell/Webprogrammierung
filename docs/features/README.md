@@ -27,7 +27,7 @@ kommt: „Wo muss ich anfassen, wenn ich am Kursplan etwas ändern will?"
 | [Mitgliedschaften](mitgliedschaften.md) | in Arbeit | Felix |
 | [Nachweise](nachweise.md) | in Arbeit | Felix |
 | [Terminkalender](terminkalender.md) | fertig | Jonny |
-| [Bewertungen](bewertungen.md) | in Arbeit | Felix |
+| [Bewertungen](bewertungen.md) | fertig | Felix |
 | [Profilbilder](profilbilder.md) | fertig | Felix |
 | [Cookie-Banner](cookie-banner.md) | in Arbeit | Giani |
 

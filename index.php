@@ -246,8 +246,19 @@ require ROOT_PATH . '/partials/header.php';
       <div class="bewertungen-schnitt" id="bewertungen-schnitt" hidden></div>
 
 <?php if ($angemeldet): ?>
-      <form class="bewertung-formular" id="bewertung-formular" novalidate>
+      <!-- Pro Konto gibt es eine Bewertung. Wer schon bewertet hat, sieht
+           sie hier und kann sie löschen; sonst steht das Formular da. Was
+           davon sichtbar ist, entscheidet bewertungen.js nach dem Laden -
+           deshalb sind beide zuerst versteckt. -->
+      <div class="bewertung-eigene" id="bewertung-eigene" hidden>
         <h3 class="bewertung-formular-titel">Deine Bewertung</h3>
+        <ul class="bewertungen-liste" id="bewertung-eigene-inhalt"></ul>
+        <button class="bewertung-loeschen" id="bewertung-loeschen" type="button">Bewertung löschen</button>
+        <p class="bewertung-formular-meldung" id="bewertung-eigene-meldung" aria-live="polite"></p>
+      </div>
+
+      <form class="bewertung-formular" id="bewertung-formular" novalidate hidden>
+        <h3 class="bewertung-formular-titel">Bewertung schreiben</h3>
 
         <fieldset class="bewertung-wahl">
           <legend>Sterne</legend>
