@@ -170,6 +170,28 @@ require ROOT_PATH . '/partials/header.php';
       </div>
     </div>
 
+    <!-- Geht auf, wenn ein Mitglied eine Preisgruppe anklickt, für die sein
+         Nachweis fehlt. Um welchen Preis es geht, trägt das Seitenskript in
+         #nachweis-preis ein. -->
+    <div class="modal" id="nachweis-modal" role="dialog" aria-modal="true" aria-labelledby="nachweis-titel">
+      <div class="modal-card">
+        <button class="modal-close" id="nachweis-schliessen" type="button" aria-label="Fenster schließen">×</button>
+
+        <h2 id="nachweis-titel">Nachweis fehlt.</h2>
+        <p>
+          Für den <strong id="nachweis-preis">ermäßigten Preis</strong> fehlt
+          dein Nachweis. Lade ihn unter „Mein Konto“ hoch — danach kannst du
+          diese Preisgruppe buchen. Bis dahin siehst du hier nur, was sie
+          kosten würde.
+        </p>
+
+        <div class="wechsel-buttons">
+          <button class="button button--dark" id="nachweis-spaeter" type="button">Später</button>
+          <a class="button" id="nachweis-hochladen" href="<?= e(BASE_URL) ?>mein-konto.php">Jetzt hochladen</a>
+        </div>
+      </div>
+    </div>
+
   </main>
 
 <?php

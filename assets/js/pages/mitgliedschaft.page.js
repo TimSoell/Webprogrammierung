@@ -243,9 +243,17 @@ if (seite) {
     element.classList.toggle('tarifkarte--aktuell', stand.mitgliedschaft?.tarif === tarif.kennung);
     element.classList.toggle('tarifkarte--gewaehlt', istGewaehlt);
 
+    // Ohne Nachweis sind die Karten nur zum Ansehen da: Der Button sagt,
+    // was fehlt, und lässt sich nicht drücken. Das Ausgrauen macht das CSS.
+    const gesperrt = angemeldet && !preisgruppeErlaubt();
+
     const button = $('.tarifkarte-button', karte);
     button.textContent = istGewaehlt ? 'Ausgewählt' : 'Auswählen';
-    button.disabled = preis === null;
+    button.disabled = preis === null || gesperrt;
+
+    if (gesperrt) {
+      button.textContent = 'Nachweis fehlt';
+    }
 
     // aria-pressed statt disabled: Der Button bleibt für die Tastatur
     // erreichbar, und Screenreader sagen "gedrückt" statt gar nichts.
@@ -357,6 +365,10 @@ if (seite) {
         .dataset.gesperrt = stand.erlaubtePreisgruppen.includes(feld.value) ? 'nein' : 'ja';
     });
 
+    // Ist gerade eine gesperrte Gruppe angeklickt, graut das CSS über diese
+    // Klasse die Karten und den Button unten aus - siehe tarifkarte.css.
+    seite.classList.toggle('tarife-page--gesperrt', angemeldet && !preisgruppeErlaubt());
+
     aktionButton.disabled = angemeldet
       ? was === null || !preisgruppeErlaubt()
       : auswahl.tarif === null;
@@ -457,16 +469,37 @@ if (seite) {
   $('#wechsel-abbrechen').addEventListener('click', () => dialog?.close());
   bestaetigen.addEventListener('click', uebernehmen);
 
+  // Der Hinweis auf den fehlenden Nachweis hat keinen eigenen Button: Er
+  // geht auf, sobald jemand eine gesperrte Preisgruppe anklickt.
+  const nachweisFenster = initModal({
+    modalId: 'nachweis-modal',
+    openId: '',
+    closeId: 'nachweis-schliessen',
+    focusId: 'nachweis-hochladen',
+  });
+
+  $('#nachweis-spaeter').addEventListener('click', () => nachweisFenster.close());
+
   $('#preisgruppe').addEventListener('change', (ereignis) => {
     auswahl = { ...auswahl, preisgruppe: ereignis.target.value };
     zeichnen();
+
+    if (angemeldet && !preisgruppeErlaubt()) {
+      $('#nachweis-preis').textContent = auswahl.preisgruppe === 'senior'
+        ? 'Seniorenpreis'
+        : 'ermäßigten Preis';
+      nachweisFenster.open();
+    }
   });
 
   // Die letzte Bremse: Wer die Seite mit einer offenen Auswahl verlässt,
   // bekommt die Rückfrage des Browsers. Den Text bestimmt der Browser
   // selbst, eigene Formulierungen sind dort seit Jahren nicht mehr erlaubt.
+  // Eine gesperrte Preisgruppe zählt nicht als offene Auswahl - sie lässt
+  // sich ohnehin nicht übernehmen, und der Weg zum Hochladen des Nachweises
+  // soll nicht an einer Rückfrage hängen bleiben.
   window.addEventListener('beforeunload', (ereignis) => {
-    if (angemeldet && aenderung() !== null) {
+    if (angemeldet && aenderung() !== null && preisgruppeErlaubt()) {
       ereignis.preventDefault();
     }
   });
