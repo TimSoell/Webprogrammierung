@@ -10,6 +10,7 @@
  * @see         assets/js/services/auswahl.js
  * @see         assets/js/services/mitgliedschaften.js
  * @see         assets/js/components/meine-termine.js  (Karte "Meine Termine")
+ * @see         assets/js/components/profilbild.js     (Profilbild in den Stammdaten)
  * @see         assets/js/components/ausweis-scan.js
  * @see         assets/js/services/auslastung.js
  */
@@ -21,6 +22,7 @@ import { standLaden } from '../services/mitgliedschaften.js';
 import { alleLaden as nachweiseLaden, demoEintragen, hochladen } from '../services/nachweise.js';
 import { formularAbsenden, meldungZeigen } from '../components/auth-formular.js';
 import { meineTermineAufbauen } from '../components/meine-termine.js';
+import { profilbildEinrichten } from '../components/profilbild.js';
 import { scanStarten } from '../components/ausweis-scan.js';
 import { auslastungLaden, besuchEintragen, besuchEntfernen } from '../services/auslastung.js';
 
@@ -439,6 +441,7 @@ if (seite) {
     $('#konto-vorname').textContent = mitglied.vorname;
     $('#konto-nachname').textContent = mitglied.nachname;
     $('#konto-email').textContent = mitglied.email;
+    profilbildEinrichten(mitglied);
 
     mitgliedschaftZeigen(await standLaden());
     nachweiseZeigen(await nachweiseLaden());

@@ -59,9 +59,9 @@ Bewertung.
 ## Das Karussell
 
 Im Karussell stehen **alle** Bewertungen: zuerst die mit Bild, danach die
-ohne, jeweils die neueste zuerst. Bilder haben bisher nur die Beispiele aus
-`seed.sql` — neue Bewertungen stehen deshalb hinten im Karussell. Das ändert
-sich mit den Profilbildern.
+ohne, jeweils die neueste zuerst. Ein Bild haben die Beispiele aus
+`seed.sql` und alle, deren Verfasser ein freigegebenes Profilbild haben
+(siehe [Profilbilder](profilbilder.md)).
 
 Technisch ist es eine quer scrollende Liste mit `scroll-snap` in
 `bewertungen.css`; Wischen kommt dadurch vom Browser. Die Pfeile erscheinen
@@ -86,9 +86,10 @@ Lesen davonläuft.
 - `name` ist Vorname und erster Buchstabe des Nachnamens — die Seite ist
   öffentlich.
 - `mitglied` kommt aus der Spalte `war_mitglied`.
-- `bild` ist `null` bei Bewertungen echter Konten, bis es Profilbilder
-  gibt. Dann zeigt die Startseite eine Zitat-Kachel und das Fenster einen
-  kleinen Kreis mit den Initialen — ebenso, wenn die Datei fehlt.
+- `bild` ist bei Bewertungen echter Konten die Adresse des freigegebenen
+  Profilbilds (`api/profilbilder.php?mitglied=…&v=…`), sonst `null`. Ohne
+  Bild zeigt die Startseite eine Zitat-Kachel und das Fenster einen kleinen
+  Kreis mit den Initialen — ebenso, wenn die Datei fehlt.
 
 ## Endpunkte
 
@@ -115,11 +116,6 @@ der Produktionsdatenbank. Eingespielt wurde jeweils nur der Abschnitt
 
 ## Was fehlt noch
 
-- **Profilbilder** (Feature von Philipp, noch nicht im Repository): Jede
-  Person legt ein Profilbild an und bestimmt selbst, ob es freigegeben
-  ist. Sobald es das gibt, liefert `BewertungRepository::alleFinden()` für
-  Bewertungen mit Konto das freigegebene Profilbild als `bild`. Komponente,
-  Service und Seite bleiben dabei unverändert — sie kennen nur `bild`.
 - Die sechs KI-Bilder für die Beispiele in `assets/img/bewertungen/`
 - Bewertungen erscheinen sofort, ohne Freigabe. Für eine öffentliche
   Domain wäre eine Freigabe durch das Team zu überlegen.

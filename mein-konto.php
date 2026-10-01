@@ -40,12 +40,20 @@ require ROOT_PATH . '/partials/header.php';
       <div class="auth-cards">
         <div class="auth-card konto-uebersicht">
           <section class="konto-stammdaten" aria-labelledby="konto-stammdaten-titel">
-            <!-- Kopfzeile: Profilbild, Überschrift, Abmelden. Der Kreis zeigt
-                 ein neutrales Personen-Symbol, bis es Profilbilder gibt. -->
+            <!-- Kopfzeile: Profilbild, Überschrift, Abmelden. Der Kreis ist
+                 ein <label> um die Dateiauswahl: Ein Klick darauf öffnet sie.
+                 Ohne Bild zeigt er ein neutrales Personen-Symbol. Was beim
+                 Auswählen passiert, steht in assets/js/components/profilbild.js. -->
             <div class="konto-kopf">
-              <span class="konto-avatar" aria-hidden="true">
-                <svg viewBox="0 0 48 48" focusable="false"><circle cx="24" cy="19" r="8"/><path d="M9 44c1.5-9.5 7.5-14 15-14s13.5 4.5 15 14z"/></svg>
-              </span>
+              <label class="konto-avatar" id="konto-avatar" title="Profilbild ändern">
+                <input class="konto-visually-hidden" id="profilbild-datei" type="file" accept="image/jpeg,image/png,image/webp">
+                <span class="konto-avatar-kreis">
+                  <img class="konto-avatar-bild" id="konto-avatar-bild" alt="">
+                  <svg class="konto-avatar-platzhalter" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle cx="24" cy="19" r="8"/><path d="M9 44c1.5-9.5 7.5-14 15-14s13.5 4.5 15 14z"/></svg>
+                </span>
+                <span class="konto-avatar-kamera" aria-hidden="true"></span>
+                <span class="konto-visually-hidden">Profilbild ändern</span>
+              </label>
               <h2 class="auth-heading" id="konto-stammdaten-titel">Stammdaten</h2>
               <button class="konto-abmelden" id="abmelden" type="button">Abmelden</button>
             </div>
@@ -65,6 +73,16 @@ require ROOT_PATH . '/partials/header.php';
               </div>
             </dl>
 
+            <!-- Nur sichtbar, wenn es ein Profilbild gibt. -->
+            <div class="konto-profilbild-optionen" id="profilbild-optionen" hidden>
+              <label class="konto-schalter">
+                <input type="checkbox" id="profilbild-oeffentlich">
+                Profilbild bei meinen Bewertungen zeigen
+              </label>
+              <button class="konto-link" id="profilbild-entfernen" type="button">Bild entfernen</button>
+            </div>
+
+            <p class="auth-message" id="profilbild-meldung" role="alert"></p>
             <p class="auth-message" id="konto-meldung" role="alert"></p>
           </section>
 

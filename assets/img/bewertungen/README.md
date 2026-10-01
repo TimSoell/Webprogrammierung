@@ -30,8 +30,9 @@ Anderer Name oder Dateiname? Dann in `seed.sql` ändern und neu einspielen —
 nicht im PHP oder JavaScript suchen, dort steht kein Dateiname.
 
 Bewertungen echter Konten bekommen später **kein Bild aus diesem Ordner**,
-sondern das Profilbild, das die Person selbst anlegt und freigibt (Feature
-von Philipp). Bis dahin erscheinen sie als Zitat-Kachel.
+sondern das Profilbild, das die Person in „Mein Konto" hochlädt und
+freigibt (siehe `docs/features/profilbilder.md`). Ohne Profilbild erscheinen
+sie als Zitat-Kachel.
 
 ## Anforderungen an die Bilder
 

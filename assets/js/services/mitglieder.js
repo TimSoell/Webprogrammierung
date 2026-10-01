@@ -51,7 +51,11 @@ export async function abmelden() {
 /**
  * Lädt die Stammdaten des angemeldeten Mitglieds.
  *
- * @returns {Promise<{vorname: string, nachname: string, email: string}>}
+ * profilbild ist die Adresse des eigenen Profilbilds relativ zur BASE_URL,
+ * oder null, wenn es keins gibt. profilbildOeffentlich sagt, ob es bei den
+ * eigenen Bewertungen erscheint.
+ *
+ * @returns {Promise<{vorname: string, nachname: string, email: string, profilbild: string|null, profilbildOeffentlich: boolean}>}
  * @throws {ApiError}  401, wenn niemand (mehr) angemeldet ist
  */
 export async function angemeldetesMitgliedLaden() {
