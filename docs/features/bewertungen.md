@@ -7,9 +7,9 @@
 ## Was kann man damit
 
 Auf der Startseite steht vor „Komm rein." der Abschnitt **„Was andere
-sagen."**: ein **Karussell** aus Bildkacheln wie bei „Dein Programm", jede
-mit Bild, Sternen, Text, Name und der Angabe **Mitglied** oder **Kein
-Mitglied**. Drei Kacheln sind zu sehen (auf dem Handy eine). Die Pfeile
+sagen."**: ein **Karussell** aus dunklen Kacheln, jede mit einem großen
+Anführungszeichen, Sternen, Text, Name und der Angabe **Mitglied** oder
+**Kein Mitglied**. Drei Kacheln sind zu sehen (auf dem Handy eine). Die Pfeile
 stehen am Rechner links und rechts neben den Kacheln, so hoch wie diese und
 mit demselben Abstand wie die Kacheln untereinander; auf dem Handy stehen
 sie klein über den Kacheln. Sie sind in Glas-Optik fast unsichtbar (leicht
@@ -17,9 +17,10 @@ gerundete Ecken wie die Balken der Auslastung) und werden beim Überfahren
 mit der Maus gelb mit schwarzem Pfeil. Auf Geräten ohne Maus sind sie von
 Anfang an deutlicher zu sehen. Sie drehen um
 eine Kachel weiter, am Ende geht es von vorn los.
-Wischen und Touchpad funktionieren ebenfalls. Ohne Bild
-wird die Kachel zur **Zitat-Kachel**: ein großes Anführungszeichen statt
-des Fotos, keine Initialen. Darunter stehen der Durchschnitt und der Button
+Wischen und Touchpad funktionieren ebenfalls. Ein Bild steht **klein und
+rund vor dem Namen** (56 px, so groß wie in „Mein Konto" und im Fenster) –
+es füllt nicht die Kachel. Ohne Bild steht dort nur der Name, keine
+Initialen. Darunter stehen der Durchschnitt und der Button
 **„Alle Bewertungen"**.
 
 Der Button öffnet ein Fenster über der Startseite (wie der Kurskalender) mit
@@ -33,6 +34,9 @@ löschen"**. Nach dem Löschen (mit Rückfrage) ist das Formular wieder da.
 
 ## Entscheidungen (Team, 2026-09-30 und 2026-10-01)
 
+- **Bilder klein und rund, nicht über die ganze Kachel.** Zuerst füllte das
+  Bild die Kachel wie bei „Dein Programm". Mit echten Profilbildern war das
+  dem Team zu groß (2026-10-01).
 - **Keine Freigabe durch das Team.** Bewertungen und freigegebene
   Profilbilder erscheinen sofort. Eine Freigabe bräuchte eine eigene
   Verwaltungsseite samt Rollen – für die Studienarbeit bewusst weggelassen.
@@ -100,9 +104,9 @@ Lesen davonläuft.
 - `bild` ist bei Bewertungen echter Konten die Adresse des freigegebenen
   Profilbilds (`api/profilbilder.php?mitglied=…&v=…`), sonst `null`. Bei
   den Beispielen steht hier der Pfad aus der Spalte `bild`, sobald das Team
-  die KI-Bilder geliefert hat. Ohne Bild zeigt die Startseite eine
-  Zitat-Kachel und das Fenster einen kleinen Kreis mit den Initialen —
-  ebenso, wenn die Datei fehlt.
+  die KI-Bilder geliefert hat. Ohne Bild steht auf der Kachel nur der Name
+  und im Fenster ein kleiner Kreis mit den Initialen — ebenso, wenn die
+  Datei fehlt.
 - `eigene` ist `true` bei der Bewertung der angemeldeten Person, ohne
   Anmeldung immer `false`. Daran entscheidet die Seite, ob sie das Formular
   oder „Deine Bewertung" zeigt.

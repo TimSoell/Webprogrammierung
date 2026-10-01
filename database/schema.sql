@@ -840,7 +840,7 @@ CREATE TABLE IF NOT EXISTS bewertungen (
     -- Pfad relativ zur BASE_URL, z. B. 'assets/img/bewertungen/lea-m.jpg'.
     -- Nur die Beispielbewertungen haben hier ein Bild. Bewertungen mit
     -- Konto zeigen das freigegebene Profilbild aus der Tabelle profilbilder
-    -- (BewertungRepository); ohne Bild zeigt die Startseite eine Zitat-Kachel.
+    -- (BewertungRepository); ohne Bild steht auf der Kachel nur der Name.
     bild         varchar(255)  NULL,
 
     erstellt_am  timestamp(0)  NOT NULL DEFAULT LOCALTIMESTAMP(0),

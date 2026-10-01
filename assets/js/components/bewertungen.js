@@ -2,7 +2,7 @@
  * @file        assets/js/components/bewertungen.js
  * @layer       2 – Komponente
  * @description Die Bewertungen auf der Startseite: das Karussell aus
- *              Bildkacheln im Abschnitt #bewertungen (drei zu sehen, mit
+ *              Kacheln im Abschnitt #bewertungen (drei zu sehen, mit
  *              Pfeilen weiterzudrehen) und das Fenster "Alle Bewertungen" mit
  *              Durchschnitt, allen Karten und - für Angemeldete - dem
  *              Formular zum Bewerten. Wer schon bewertet hat, sieht dort
@@ -14,9 +14,10 @@
  *              Schließen des Fensters übernimmt modal.js, wie beim
  *              Kurskalender.
  *
- *              Fehlt das Bild einer Person, wird die Kachel zur
- *              Zitat-Kachel. Im Fenster stehen im kleinen Kreis die
- *              Initialen - wie bei den Coaches in programm-details.js.
+ *              Das Bild einer Person steht an beiden Stellen klein und rund
+ *              neben dem Namen. Fehlt es, steht auf der Kachel nur der Name;
+ *              im Fenster stehen im Kreis die Initialen - wie bei den
+ *              Coaches in programm-details.js.
  *
  *              KEIN innerHTML: Namen und Texte kommen aus einem Formular,
  *              das jeder mit Konto ausfüllen kann.
@@ -117,11 +118,12 @@ function bildBauen(bewertung, baseUrl) {
 }
 
 /**
- * Kachel für die Startseite: Bild über die ganze Fläche, darauf Sterne,
- * Text, Name und Status.
+ * Kachel für die Startseite: oben ein großes Anführungszeichen, darunter
+ * Sterne, Text, Name und Status. Gibt es ein Bild, steht es klein und rund
+ * vor dem Namen - so groß wie im Fenster und in "Mein Konto".
  *
- * Ohne Bild - oder wenn die Datei fehlt - wird daraus eine Zitat-Kachel:
- * ein großes Anführungszeichen statt des Fotos, keine Initialen.
+ * Ohne Bild - oder wenn die Datei fehlt - steht dort nur der Name, keine
+ * Initialen.
  *
  * @param {import('../services/bewertungen.js').Bewertung} bewertung
  * @param {string} baseUrl
@@ -131,30 +133,26 @@ function kachelBauen(bewertung, baseUrl) {
   const person = element('div', 'bewertung-kachel-person');
   person.append(element('p', 'bewertung-kachel-name', bewertung.name), statusBauen(bewertung.mitglied));
 
-  const inhalt = element('div', 'bewertung-kachel-inhalt');
-  inhalt.append(sterneBauen(bewertung.sterne), element('p', 'bewertung-kachel-text', bewertung.text), person);
+  const kopf = element('div', 'bewertung-kopf');
+  kopf.append(person);
 
-  const kachel = element('li', 'bewertung-kachel');
+  if (bewertung.bild !== null) {
+    const bild = element('img', 'bewertung-bild');
+    bild.src = baseUrl + bewertung.bild;
+    bild.alt = '';
+    bild.loading = 'lazy';
+    bild.addEventListener('error', () => bild.remove());
+    kopf.prepend(bild);
+  }
 
   const zeichen = element('span', 'bewertung-kachel-zeichen', '“');
   zeichen.setAttribute('aria-hidden', 'true');
 
-  if (bewertung.bild === null) {
-    kachel.classList.add('bewertung-kachel--zitat');
-    kachel.append(zeichen, inhalt);
-    return kachel;
-  }
+  const inhalt = element('div', 'bewertung-kachel-inhalt');
+  inhalt.append(sterneBauen(bewertung.sterne), element('p', 'bewertung-kachel-text', bewertung.text), kopf);
 
-  const bild = element('img', 'bewertung-kachel-bild');
-  bild.src = baseUrl + bewertung.bild;
-  bild.alt = '';
-  bild.loading = 'lazy';
-  bild.addEventListener('error', () => {
-    kachel.classList.add('bewertung-kachel--zitat');
-    bild.replaceWith(zeichen);
-  });
-
-  kachel.append(bild, inhalt);
+  const kachel = element('li', 'bewertung-kachel');
+  kachel.append(zeichen, inhalt);
 
   return kachel;
 }
@@ -300,9 +298,9 @@ export function initBewertungen() {
    * Lädt alle Bewertungen und zeigt sie an - beim Öffnen der Seite und
    * nach dem Abschicken einer neuen.
    *
-   * Ins Karussell kommen alle Bewertungen, die mit Bild zuerst: Die Kacheln
-   * leben vom Foto. Ein Bild haben die Beispiele aus seed.sql und alle
-   * Bewertungen, deren Verfasser ein freigegebenes Profilbild haben.
+   * Ins Karussell kommen alle Bewertungen, die mit Bild zuerst. Ein Bild
+   * haben die Beispiele aus seed.sql und alle Bewertungen, deren Verfasser
+   * ein freigegebenes Profilbild haben.
    *
    * @returns {Promise<void>}
    */

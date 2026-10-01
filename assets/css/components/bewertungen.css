@@ -2,12 +2,11 @@
  * @file        assets/css/components/bewertungen.css
  * @layer       Komponente
  * @description Die Bewertungen auf der Startseite: das Karussell aus
- *              Bildkacheln im hellen Abschnitt #bewertungen samt Pfeilen,
+ *              Kacheln im hellen Abschnitt #bewertungen samt Pfeilen,
  *              darunter Durchschnitt und Button, und das Fenster "Alle
  *              Bewertungen" mit Durchschnitt, Formular und Karten.
  * @see         index.php
  * @see         assets/js/components/bewertungen.js
- * @see         assets/css/components/program-card.css
  */
 
 /* --- Sterne ---------------------------------------------------------------- */
@@ -164,8 +163,10 @@
   }
 }
 
-/* Aufbau wie die Programmkacheln: Bild über die ganze Fläche, der Text
-   unten auf einem dunklen Verlauf. */
+/* Jede Kachel ist eine Zitat-Kachel: oben ein großes Anführungszeichen,
+   unten Sterne, Text und die Person. Ein Profilbild füllt NICHT die Kachel,
+   sondern steht klein und rund vor dem Namen - mit .bewertung-kopf und
+   .bewertung-bild, denselben Klassen wie im Fenster weiter unten. */
 .bewertung-kachel {
   position: relative;
   min-height: 480px;
@@ -173,29 +174,6 @@
   color: var(--paper);
   overflow: hidden;
   scroll-snap-align: start;
-}
-
-.bewertung-kachel-bild {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Verlauf, damit der Text auf jedem Foto lesbar bleibt. */
-.bewertung-kachel::after {
-  position: absolute;
-  inset: 0;
-  content: "";
-  background: linear-gradient(0deg, color-mix(in srgb, var(--ink) 94%, transparent), transparent 75%);
-  pointer-events: none;
-}
-
-/* Zitat-Kachel: kein Foto (kein Profilbild oder Datei fehlt). Statt der
-   Initialen steht oben ein großes Anführungszeichen, der Text wird größer. */
-.bewertung-kachel--zitat::after {
-  content: none;
 }
 
 .bewertung-kachel-zeichen {
@@ -206,12 +184,6 @@
   font: 800 10rem/1 var(--display);
 }
 
-.bewertung-kachel--zitat .bewertung-kachel-text {
-  font-size: 1.05rem;
-  -webkit-line-clamp: 9;
-  line-clamp: 9;
-}
-
 .bewertung-kachel-inhalt {
   position: absolute;
   z-index: 1;
@@ -220,17 +192,17 @@
   left: 25px;
 }
 
-/* Lange Texte werden nach sechs Zeilen abgeschnitten - ganz stehen sie
+/* Lange Texte werden nach neun Zeilen abgeschnitten - ganz stehen sie
    im Fenster "Alle Bewertungen". */
 .bewertung-kachel-text {
   display: -webkit-box;
   margin: 10px 0 16px;
-  font-size: .9rem;
+  font-size: 1.05rem;
   line-height: 1.5;
   overflow: hidden;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 6;
-  line-clamp: 6;
+  -webkit-line-clamp: 9;
+  line-clamp: 9;
 }
 
 .bewertung-kachel-person {
@@ -521,8 +493,9 @@
   gap: 14px;
 }
 
-/* Rund beschnitten. object-position oben, weil dieselben Hochformat-Bilder
-   auch auf den Kacheln stehen und das Gesicht dort in der oberen Hälfte sitzt. */
+/* Rund beschnitten, im Fenster wie auf den Kacheln der Startseite.
+   object-position oben, weil die Bilder der Beispielbewertungen Hochformat
+   haben und das Gesicht dort in der oberen Hälfte sitzt. */
 .bewertung-bild {
   flex: none;
   width: 56px;
@@ -592,6 +565,13 @@
 
   .bewertung-kachel {
     min-height: 390px;
+  }
+
+  /* Die Kachel ist hier niedriger: Mit mehr als sechs Zeilen und einem
+     Profilbild darunter stieße der Text oben ins Anführungszeichen. */
+  .bewertung-kachel-text {
+    -webkit-line-clamp: 6;
+    line-clamp: 6;
   }
 
   .modal-card--bewertungen {

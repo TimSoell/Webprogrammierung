@@ -23,8 +23,8 @@ import { getJson, postJson, sendJson } from './api.js';
  * @property {string}      text
  * @property {string}      datum     'JJJJ-MM-TT'
  * @property {string|null} bild      Pfad ohne führenden Slash, relativ zur
- *                                   BASE_URL. null = kein Bild: Zitat-Kachel
- *                                   und Initialen im Fenster
+ *                                   BASE_URL. null = kein Bild: nur der Name
+ *                                   auf der Kachel, Initialen im Fenster
  * @property {boolean}     eigene    true bei der Bewertung der angemeldeten
  *                                   Person; ohne Anmeldung immer false
  */

@@ -16,9 +16,9 @@ gespeichert und erscheint sofort im Kreis.
 
 Gibt es ein Bild, stehen unter den Stammdaten:
 
-- **„Profilbild bei meinen Bewertungen zeigen"** – anfangs an. Dann zeigt
-  jede eigene Bewertung auf der Startseite das Bild statt des
-  Anführungszeichens.
+- **„Profilbild bei meinen Bewertungen zeigen"** – anfangs an. Dann steht
+  das Bild bei jeder eigenen Bewertung auf der Startseite klein und rund
+  vor dem Namen.
 - **„Bild entfernen"** – nach einer Rückfrage.
 
 ## Wer sieht ein Bild

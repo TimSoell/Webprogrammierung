@@ -522,7 +522,7 @@ JOIN coaches c ON c.name = t.coach;
 --
 -- bild bleibt NULL, bis das Team die KI-Bilder liefert - sonst sucht die
 -- Startseite bei jedem Aufruf sechs Dateien, die es nicht gibt (404 in der
--- Konsole). Ohne Bild erscheinen die Beispiele als Zitat-Kacheln. Wie die
+-- Konsole). Ohne Bild steht auf den Kacheln nur der Name. Wie die
 -- Bilder später eingetragen werden: assets/img/bewertungen/README.md
 DELETE FROM bewertungen WHERE mitglied_id IS NULL;
 
