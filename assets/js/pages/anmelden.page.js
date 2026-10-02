@@ -78,6 +78,12 @@ if (seite) {
     });
   });
 
+  // Der Einladungslink aus "Freunde werben" endet auf #registrierung und
+  // soll direkt beim Registrieren landen, nicht beim Login.
+  if (window.location.hash === '#registrierung') {
+    $('#tab-registrierung').click();
+  }
+
   // --- Passwort vergessen ein- und ausblenden -------------------------------
   $('#link-vergessen').addEventListener('click', () => {
     formLogin.hidden = true;

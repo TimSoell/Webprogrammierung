@@ -19,6 +19,9 @@
  *              Die Seite ist öffentlich. Ob jemand angemeldet ist, steht in
  *              data-angemeldet - so wie in partials/header.php und ohne eine
  *              Anfrage, die für Gäste ohnehin nur 401 zurückgäbe.
+ *
+ *              Angemeldete lösen unten außerdem Gutscheine aus "Freunde
+ *              werben" ein - siehe docs/features/freunde-werben.md
  * @see         assets/js/pages/mitgliedschaft.page.js
  * @see         assets/css/components/tarifkarte.css
  * @see         docs/features/mitgliedschaften.md
@@ -93,6 +96,25 @@ require ROOT_PATH . '/partials/header.php';
           Der ermäßigte Preis gilt gegen Vorlage eines gültigen Schüler- oder
           Studierendenausweises, der Seniorenpreis ab 65 Jahren.
         </p>
+
+<?php if (Auth::instanz()->isLoggedIn()): ?>
+        <!-- Gutschein aus "Freunde werben". Nur für Angemeldete: Ein
+             Gutschein gehört immer zu einem Konto. Siehe
+             docs/features/freunde-werben.md -->
+        <form class="gutschein-form" id="gutschein" novalidate>
+          <label class="gutschein-label" for="gutschein-code">Gutschein einlösen</label>
+          <p class="gutschein-hinweis">
+            Für einen geworbenen Freund gibt es 3 Monate Basisplan gratis.
+            Deinen Code findest du unter
+            <a href="<?= e(BASE_URL) ?>mein-konto.php">Mein Konto</a>.
+          </p>
+          <div class="gutschein-eingabe">
+            <input class="gutschein-code" id="gutschein-code" name="code" maxlength="20" autocomplete="off" placeholder="SK-…">
+            <button class="button button--ghost" type="submit">Einlösen</button>
+          </div>
+          <p class="auth-message" id="gutschein-meldung" role="alert"></p>
+        </form>
+<?php endif; ?>
 
       </div>
     </section>

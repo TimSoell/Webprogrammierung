@@ -37,6 +37,10 @@ import { getJson, postJson } from './api.js';
  *                               automatisch stornieren
  * @property {number} storniert  nach anpassen(): so viele Kurse wurden
  *                               dabei storniert, sonst 0
+ * @property {{von: string, bis: string}|null} gratis  eingelöste Gutscheine
+ *                               aus "Freunde werben": in diesem Zeitraum
+ *                               (beide Tage einschließlich) kostet der
+ *                               Basisplan nichts. null = keiner läuft
  */
 
 /**

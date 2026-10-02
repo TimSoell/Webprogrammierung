@@ -3,7 +3,8 @@
  * @layer       2 – Seitenskript
  * @description Verhalten, das es NUR auf der Startseite gibt: das
  *              Hero-Video, das beim Laden einmal abläuft, das
- *              Auslastungsdiagramm und die Bewertungen.
+ *              Auslastungsdiagramm, die Bewertungen und das Fenster
+ *              "Freund einladen".
  *
  *              Eingebunden wird die Datei über die Variable $pageScript
  *              in index.php - nicht über main.js.
@@ -13,9 +14,11 @@
 import { $ } from '../lib/dom.js';
 import { diagrammZeichnen } from '../components/auslastung-diagramm.js';
 import { initBewertungen } from '../components/bewertungen.js';
+import { initFreundeWerben } from '../components/freunde-werben.js';
 import { auslastungLaden } from '../services/auslastung.js';
 
 initBewertungen();
+initFreundeWerben();
 
 // --- Hero-Video --------------------------------------------------------------
 

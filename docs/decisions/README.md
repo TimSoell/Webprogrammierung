@@ -45,3 +45,4 @@ Kein ADR für: Farbwerte, Textänderungen, das Anlegen einer einzelnen Datei.
 | [0018](ADR-0018-indexierung-bei-google.md) | Die Seite darf bei Google erscheinen | angenommen |
 | [0019](ADR-0019-profilbilder-in-der-datenbank.md) | Profilbilder liegen in der Datenbank und haben eine eigene Adresse | angenommen |
 | [0020](ADR-0020-nachweise-absichern.md) | Ein Nachweis je Mitglied, und er muss auf den Kontoinhaber lauten | angenommen |
+| [0021](ADR-0021-gutschein-als-gratiszeitraum.md) | Ein Gutschein ist ein Gratiszeitraum am Mitglied, kein Vertrag | angenommen |

@@ -1,0 +1,302 @@
+/**
+ * @file        assets/css/components/freunde-werben.css
+ * @layer       Komponente
+ * @description "Freunde werben" an allen vier Stellen: der Abschnitt ganz
+ *              unten auf der Startseite, das Fenster "Freund einladen", die
+ *              Karte unter "Mein Konto" und das Feld "Gutschein einlösen"
+ *              auf der Mitgliedschaftsseite.
+ *
+ *              Formularfelder und Meldungen kommen aus auth.css (.auth-form,
+ *              .auth-message), das Fenster aus modal.css. Hier steht nur,
+ *              was dazukommt.
+ * @see         index.php
+ * @see         mein-konto.php
+ * @see         mitgliedschaft.php
+ * @see         assets/js/components/freunde-werben.js
+ */
+
+/* --- Abschnitt auf der Startseite ------------------------------------------ */
+/* Aufgebaut wie .join direkt darüber, aber dunkel: So setzt sich der letzte
+   Abschnitt vom limefarbenen ab, und der Button darf lime sein. */
+.werben-inner {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.werben .section-title span {
+  color: var(--lime);
+}
+
+.werben-info {
+  max-width: 290px;
+  padding-bottom: 9px;
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+/* <button class="button"> zeigt sonst den Pfeil statt der Hand. */
+.werben-info .button {
+  cursor: pointer;
+}
+
+/* --- Fenster "Freund einladen" ---------------------------------------------- */
+/* Dunkel wie die Fenster für Kurskalender und Bewertungen. */
+.modal-card--werben {
+  max-height: calc(100vh - 48px);
+  border: 1px solid var(--line);
+  background: var(--ink);
+  color: var(--paper);
+  overflow-y: auto;
+}
+
+.modal-card--werben .modal-close {
+  color: var(--paper);
+}
+
+.modal-card--werben .modal-close:hover {
+  color: var(--lime);
+}
+
+/* .modal-card > p davor, weil modal.css jedem Absatz direkt in der Karte
+   die graue Schrift für helle Fenster gibt. */
+.werben-text,
+.modal-card--werben > p.werben-text {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+.werben-text a {
+  color: var(--lime);
+  text-decoration: underline;
+}
+
+.modal-card--werben .button {
+  cursor: pointer;
+}
+
+/* Ohne diese Zeilen würde display: grid das hidden-Attribut überstimmen,
+   mit dem das Skript zwischen Formular und Bestätigung wechselt. */
+.werben-formular[hidden],
+.werben-erfolg[hidden] {
+  display: none;
+}
+
+.werben-erfolg {
+  display: grid;
+  gap: 12px;
+}
+
+.werben-erfolg-text {
+  margin: 0;
+  padding: 12px 14px;
+  border-left: 3px solid var(--lime);
+  background: var(--ink-soft);
+  font-size: .9rem;
+  line-height: 1.45;
+}
+
+.werben-label {
+  margin-top: 6px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* Link und "Kopieren" nebeneinander, der Link nimmt den Rest. */
+.werben-link {
+  display: flex;
+  gap: 10px;
+}
+
+.werben-link input {
+  min-width: 0;
+  flex: 1;
+  padding: 13px;
+  border: 1px solid var(--line);
+  background: var(--ink-soft);
+  color: var(--paper);
+  font: .85rem var(--body);
+}
+
+.werben-link input:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 1px;
+}
+
+.werben-erfolg > .button {
+  justify-self: start;
+}
+
+/* --- Karte unter "Mein Konto" ----------------------------------------------- */
+.werben-zwischentitel {
+  margin: 18px 0 8px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* Linien durch gap auf eingefärbtem Raster, wie bei .meine-termine. */
+.werben-liste {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: 1px;
+  background: var(--line);
+  list-style: none;
+}
+
+.werben-eintrag,
+.werben-leer {
+  padding: 12px 14px;
+  background: var(--ink);
+}
+
+.werben-eintrag {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.werben-eintrag-text {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+/* Lange E-Mail-Adressen umbrechen, statt die Karte breiter zu drücken. */
+.werben-eintrag-text small {
+  color: var(--muted);
+  font-size: .8rem;
+  overflow-wrap: anywhere;
+}
+
+.werben-eintrag-status {
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font: 700 .64rem/1 var(--body);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.werben-eintrag-status--fertig {
+  border-color: var(--lime);
+  background: var(--lime);
+  color: var(--ink);
+}
+
+.werben-leer {
+  color: var(--muted);
+  font-size: .88rem;
+}
+
+.werben-aktionen {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+/* --- "Gutschein einlösen" auf der Mitgliedschaftsseite ---------------------- */
+.gutschein-form {
+  display: grid;
+  max-width: 520px;
+  margin-top: 48px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+  gap: 10px;
+  /* Der Sprung von "Mein Konto" landet sonst unter der fixierten Kopfzeile. */
+  scroll-margin-top: calc(var(--header-height) + 20px);
+}
+
+.gutschein-label {
+  font: 700 1.6rem var(--display);
+  text-transform: uppercase;
+}
+
+.gutschein-hinweis {
+  margin: 0;
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.5;
+}
+
+.gutschein-hinweis a {
+  color: var(--lime);
+  text-decoration: underline;
+}
+
+.gutschein-eingabe {
+  display: flex;
+  gap: 10px;
+}
+
+/* Großbuchstaben mit Abstand: So steht der Code auch unter "Mein Konto". */
+.gutschein-code {
+  min-width: 0;
+  flex: 1;
+  padding: 13px;
+  border: 1px solid var(--line);
+  background: var(--ink);
+  color: var(--paper);
+  font: .95rem var(--body);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.gutschein-code:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 1px;
+}
+
+.gutschein-eingabe .button {
+  cursor: pointer;
+}
+
+.gutschein-eingabe .button:disabled {
+  opacity: .6;
+  cursor: wait;
+  transform: none;
+}
+
+@media (max-width: 800px) {
+  .werben-inner {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .werben-info {
+    padding: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .modal-card--werben {
+    padding: 28px 20px;
+  }
+
+  /* Link und Knopf untereinander - nebeneinander bliebe vom Link nichts übrig. */
+  .werben-link,
+  .gutschein-eingabe {
+    flex-direction: column;
+  }
+
+  .werben-eintrag {
+    align-items: start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .gutschein-form {
+    scroll-margin-top: calc(var(--header-height-mobile) + 20px);
+  }
+}

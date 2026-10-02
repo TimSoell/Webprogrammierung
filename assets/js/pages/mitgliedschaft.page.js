@@ -28,6 +28,7 @@
 import { $, $$ } from '../lib/dom.js';
 import { alleLaden } from '../services/tarife.js';
 import { anpassen, standLaden } from '../services/mitgliedschaften.js';
+import { gutscheinEinloesen } from '../services/gutscheine.js';
 import { meldungZeigen } from '../components/auth-formular.js';
 import { initModal } from '../components/modal.js';
 
@@ -78,6 +79,7 @@ if (seite) {
     wechselAb: '',
     kurseAbWechsel: 0,
     storniert: 0,
+    gratis: null,
 
     // Gäste sehen alle Preise, dürfen aber ohnehin nichts abschließen.
     // Für Angemeldete überschreibt der Server diese Liste.
@@ -196,11 +198,26 @@ if (seite) {
       return 'Du hast noch keinen Tarif gewählt.';
     }
     if (stand.geplant !== null) {
-      return `Ab ${datumAnzeigen(stand.geplant.beginntAm)} wechselst du zu ${stand.geplant.name}.`;
+      return `Ab ${datumAnzeigen(stand.geplant.beginntAm)} wechselst du zu ${stand.geplant.name}.${gratisText()}`;
     }
 
     return `Dein Tarif: ${stand.mitgliedschaft.name}. `
-      + `Ein Wechsel würde ab ${datumAnzeigen(stand.wechselAb)} gelten.`;
+      + `Ein Wechsel würde ab ${datumAnzeigen(stand.wechselAb)} gelten.${gratisText()}`;
+  }
+
+  /**
+   * Der Zusatz zum eingelösten Gutschein aus "Freunde werben". Er gilt nur
+   * für den Basisplan - läuft der weder noch ist er vorgemerkt, bleibt der
+   * Zusatz weg, statt etwas zu versprechen, das gerade nicht gilt.
+   *
+   * @returns {string}  mit führendem Leerzeichen, oder ''
+   */
+  function gratisText() {
+    const basis = stand.mitgliedschaft?.tarif === 'basis' || stand.geplant?.tarif === 'basis';
+
+    return stand.gratis !== null && basis
+      ? ` Gutschein: Basisplan gratis bis ${datumAnzeigen(stand.gratis.bis)}.`
+      : '';
   }
 
   /**
@@ -498,6 +515,49 @@ if (seite) {
     auswahl = { ...auswahl, preisgruppe: ereignis.target.value };
     zeichnen();
   });
+
+  // --- Gutschein einlösen ------------------------------------------------------
+  // Das Formular gibt es nur für Angemeldete, siehe mitgliedschaft.php.
+  const gutscheinForm = $('#gutschein');
+
+  if (gutscheinForm) {
+    const gutscheinMeldung = $('#gutschein-meldung');
+    const gutscheinKnopf = $('button[type="submit"]', gutscheinForm);
+
+    gutscheinForm.addEventListener('submit', async (ereignis) => {
+      ereignis.preventDefault();
+
+      const code = gutscheinForm.elements.code.value.trim();
+
+      if (code === '') {
+        meldungZeigen(gutscheinMeldung, 'Bitte gib deinen Gutscheincode ein.');
+        return;
+      }
+
+      gutscheinKnopf.disabled = true;
+      meldungZeigen(gutscheinMeldung, '');
+
+      try {
+        const zeitraum = await gutscheinEinloesen(code);
+
+        // Der Tarifstand kennt den Gratiszeitraum - neu holen, damit die
+        // Leiste unten ihn sofort zeigt.
+        stand = await standLaden();
+        zeichnen();
+
+        gutscheinForm.reset();
+        meldungZeigen(
+          gutscheinMeldung,
+          `Eingelöst: Dein Basisplan ist vom ${datumAnzeigen(zeitraum.gratisVon)} bis ${datumAnzeigen(zeitraum.gratisBis)} gratis.`,
+          true,
+        );
+      } catch (fehler) {
+        meldungZeigen(gutscheinMeldung, fehler.message);
+      } finally {
+        gutscheinKnopf.disabled = false;
+      }
+    });
+  }
 
   // Die letzte Bremse: Wer die Seite mit einer offenen Auswahl verlässt,
   // bekommt die Rückfrage des Browsers. Den Text bestimmt der Browser

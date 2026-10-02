@@ -30,6 +30,7 @@ kommt: „Wo muss ich anfassen, wenn ich am Kursplan etwas ändern will?"
 | [Bewertungen](bewertungen.md) | fertig | Felix |
 | [Profilbilder](profilbilder.md) | fertig | Felix |
 | [Cookie-Banner](cookie-banner.md) | in Arbeit | Giani |
+| [Freunde werben](freunde-werben.md) | fertig | Jonny |
 
 Der Aufbau eines Features ist am Beispiel-Feature beschrieben — siehe
 [`../ARCHITECTURE.md`](../ARCHITECTURE.md).
