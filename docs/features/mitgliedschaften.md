@@ -132,13 +132,18 @@ Der Tarifstand, wie ihn `services/mitgliedschaften.js` liefert:
   "geplant":        { "tarif": "premium", "name": "Premium", "beginntAm": "2026-10-01", "…": "…" },
   "wechselAb":      "2026-10-01",
   "kurseAbWechsel": 2,
-  "storniert":      0
+  "storniert":      0,
+  "gratis":         null
 }
 ```
 
 `kurseAbWechsel`: gebuchte Kurse ab `wechselAb`, also so viele, wie ein
 Wechsel auf einen Tarif ohne Kurse stornieren würde. `storniert`: nach einem
 POST die Zahl der tatsächlich stornierten Kurse, sonst 0.
+
+`gratis`: `{ "von", "bis" }`, wenn ein Gutschein aus „Freunde werben" eingelöst
+ist - in diesem Zeitraum kostet der Basisplan nichts. Sonst `null`. Siehe
+[freunde-werben.md](freunde-werben.md).
 
 `mitgliedschaft` und `geplant` sind einzeln `null`, wenn es sie nicht gibt.
 Kein Tarif gewählt zu haben ist kein Fehler: Man registriert sich zuerst und

@@ -76,4 +76,24 @@ final class MitgliedRepository
 
         return $stmt->fetch() ?: null;
     }
+
+    /**
+     * Gibt es zu dieser E-Mail schon ein Konto? "Freunde werben" fragt damit,
+     * ob eine Einladung überhaupt noch zu einer Registrierung führen kann.
+     *
+     * Liest users, die Tabelle der Login-Bibliothek - nur lesend. Geschrieben
+     * wird dort ausschließlich über src/Auth.php.
+     *
+     * @param string $email  normalisiert (Auth::emailNormalisieren)
+     * @return bool
+     */
+    public function emailVergeben(string $email): bool
+    {
+        $stmt = Database::connection()->prepare(
+            'SELECT 1 FROM "users" WHERE email = ?'
+        );
+        $stmt->execute([$email]);
+
+        return $stmt->fetchColumn() !== false;
+    }
 }

@@ -10,6 +10,7 @@
  * @see         assets/js/services/auswahl.js
  * @see         assets/js/services/mitgliedschaften.js
  * @see         assets/js/components/meine-termine.js  (Karte "Meine Termine")
+ * @see         assets/js/components/freunde-werben.js (Karte "Freunde werben")
  * @see         assets/js/components/ausweis-scan.js
  * @see         assets/js/services/auslastung.js
  */
@@ -21,6 +22,7 @@ import { standLaden } from '../services/mitgliedschaften.js';
 import { alleLaden as nachweiseLaden, demoEintragen, hochladen } from '../services/nachweise.js';
 import { formularAbsenden, meldungZeigen } from '../components/auth-formular.js';
 import { meineTermineAufbauen } from '../components/meine-termine.js';
+import { kontoWerbenAufbauen } from '../components/freunde-werben.js';
 import { scanStarten } from '../components/ausweis-scan.js';
 import { auslastungLaden, besuchEintragen, besuchEntfernen } from '../services/auslastung.js';
 
@@ -453,6 +455,9 @@ if (seite) {
 
   // Fängt seine Fehler selbst ab und zeigt sie in der eigenen Karte.
   meineTermineAufbauen();
+
+  // Ebenso: Einladungen und Gutscheine in der Karte "Freunde werben".
+  kontoWerbenAufbauen();
 
   // Eigener try/catch: Ein Fehler hier soll die Stammdaten oben nicht
   // mitreißen, und umgekehrt.

@@ -29,6 +29,7 @@ kommt: „Wo muss ich anfassen, wenn ich am Kursplan etwas ändern will?"
 | [Terminkalender](terminkalender.md) | fertig | Jonny |
 | [Bewertungen](bewertungen.md) | in Arbeit | Felix |
 | [Cookie-Banner](cookie-banner.md) | in Arbeit | Giani |
+| [Freunde werben](freunde-werben.md) | fertig | Jonny |
 
 Der Aufbau eines Features ist am Beispiel-Feature beschrieben — siehe
 [`../ARCHITECTURE.md`](../ARCHITECTURE.md).

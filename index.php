@@ -4,7 +4,8 @@
  * @layer       1 – Seite
  * @description Die Startseite. Hero-Video, Hero, Studio-Vorstellung, die
  *              drei Programme, Philosophie, die Bewertungen samt Fenster
- *              "Alle Bewertungen" und der Aufruf zur Mitgliedschaft.
+ *              "Alle Bewertungen", der Aufruf zur Mitgliedschaft und ganz
+ *              unten "Freunde werben" samt Fenster "Freund einladen".
  *
  *              Diese Datei enthält bewusst NUR Inhalt und Struktur.
  *              Kein CSS, kein JavaScript, kein SQL. Das Aussehen liegt in
@@ -28,8 +29,9 @@ $pageDescription = 'SCHWITZKASTEN Athletic Club — Dein neues Fitnessstudio in 
 $pageScript      = 'index.page.js';
 $pageHasPreloader = true;
 
-// Entscheidet nur, ob im Fenster "Alle Bewertungen" das Formular oder der
-// Link zur Anmeldung steht. isLoggedIn() liest die Session, nicht die Datenbank.
+// Entscheidet nur, ob in den Fenstern "Alle Bewertungen" und "Freund
+// einladen" das Formular oder der Link zur Anmeldung steht. isLoggedIn()
+// liest die Session, nicht die Datenbank.
 $angemeldet = Auth::instanz()->isLoggedIn();
 
 require ROOT_PATH . '/partials/head.php';
@@ -226,6 +228,21 @@ require ROOT_PATH . '/partials/header.php';
       </div>
     </section>
 
+    <!-- Freunde werben: der letzte Abschnitt der Seite. Der Button öffnet
+         das Fenster weiter unten, siehe docs/features/freunde-werben.md -->
+    <section class="werben" id="freunde-werben" aria-labelledby="werben-heading">
+      <div class="wrap werben-inner">
+        <div>
+          <p class="eyebrow">Zu zweit schwitzt es sich besser</p>
+          <h2 class="display section-title" id="werben-heading">Bring wen<br><span>mit.</span></h2>
+        </div>
+        <div class="werben-info">
+          <p>Lade einen Freund ein. Registriert er sich, trainierst du 3 Monate gratis im Basisplan.</p>
+          <button class="button" id="werben-oeffnen" type="button">Freund einladen</button>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <!-- Das Fenster "Alle Bewertungen". Öffnen und Schließen übernimmt
@@ -271,6 +288,60 @@ require ROOT_PATH . '/partials/header.php';
 <?php endif; ?>
 
       <ul class="bewertungen-liste" id="bewertungen-liste"></ul>
+    </div>
+  </div>
+
+  <!-- Das Fenster "Freund einladen". Öffnen und Schließen übernimmt
+       assets/js/components/modal.js, das Formular
+       assets/js/components/freunde-werben.js. -->
+  <div class="modal" id="werben-modal" role="dialog" aria-modal="true" aria-labelledby="werben-modal-titel">
+    <div class="modal-card modal-card--werben">
+      <button class="modal-close" id="werben-schliessen" type="button" aria-label="Fenster schließen">×</button>
+
+      <h2 id="werben-modal-titel">Freund einladen.</h2>
+
+<?php if ($angemeldet): ?>
+      <form class="auth-form werben-formular" id="werben-formular" novalidate>
+        <p class="werben-text">
+          Registriert sich dein Freund mit genau dieser E-Mail, bekommst du
+          einen Gutschein: 3 Monate Basisplan gratis.
+        </p>
+
+        <label for="werben-name">Name deines Freundes</label>
+        <input id="werben-name" name="name" maxlength="120" autocomplete="off" required>
+
+        <label for="werben-email">E-Mail deines Freundes</label>
+        <input id="werben-email" name="email" type="email" maxlength="249" autocomplete="off" required>
+
+        <button class="button" type="submit">Einladung eintragen</button>
+        <p class="auth-message" id="werben-meldung" role="alert"></p>
+      </form>
+
+      <!-- Erscheint nach dem Absenden an Stelle des Formulars. -->
+      <div class="werben-erfolg" id="werben-erfolg" hidden>
+        <p class="werben-erfolg-text" id="werben-erfolg-text" role="status"></p>
+
+        <label class="werben-label" for="werben-link">Link zum Weitergeben</label>
+        <div class="werben-link">
+          <input id="werben-link" readonly>
+          <button class="button" id="werben-kopieren" type="button">Link kopieren</button>
+        </div>
+
+        <p class="werben-text">
+          Wir verschicken keine E-Mail - gib den Link selbst weiter. Deinen
+          Gutschein findest du danach unter
+          <a href="<?= e(BASE_URL) ?>mein-konto.php">Mein Konto</a>.
+        </p>
+
+        <button class="button button--ghost" id="werben-weitere" type="button">Weiteren Freund einladen</button>
+      </div>
+<?php else: ?>
+      <p class="werben-text">
+        Für jeden Freund, der sich registriert, bekommst du 3 Monate Basisplan
+        gratis. <a href="<?= e(BASE_URL) ?>anmelden.php">Melde dich an</a>,
+        um jemanden einzuladen - sonst wissen wir nicht, wem der Gutschein gehört.
+      </p>
+<?php endif; ?>
     </div>
   </div>
 

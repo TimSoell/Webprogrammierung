@@ -225,6 +225,30 @@ require ROOT_PATH . '/partials/header.php';
 
           <p class="auth-message" id="auswahl-meldung" role="alert"></p>
         </div>
+
+        <!-- Freunde werben. Beide Listen füllt
+             assets/js/components/freunde-werben.js, eingeladen wird im
+             Fenster auf der Startseite. -->
+        <div class="auth-card konto-werben">
+          <h2 class="auth-heading">Freunde werben</h2>
+          <p class="auth-hint">
+            Für jeden Freund, der sich registriert, bekommst du einen
+            Gutschein: 3 Monate Basisplan gratis.
+          </p>
+
+          <h3 class="werben-zwischentitel">Deine Gutscheine</h3>
+          <ul class="werben-liste" id="konto-gutscheine"></ul>
+
+          <h3 class="werben-zwischentitel">Deine Einladungen</h3>
+          <ul class="werben-liste" id="konto-einladungen"></ul>
+
+          <p class="auth-message" id="konto-werben-meldung" role="alert"></p>
+
+          <div class="werben-aktionen">
+            <a class="button" href="<?= e(BASE_URL) ?>index.php#freunde-werben">Freund einladen</a>
+            <a class="button button--ghost" href="<?= e(BASE_URL) ?>mitgliedschaft.php#gutschein">Gutschein einlösen</a>
+          </div>
+        </div>
       </div>
 
     </div>

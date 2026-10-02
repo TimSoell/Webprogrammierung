@@ -10,9 +10,14 @@
  *              Das Konto (E-Mail, Passwort) legt die Login-Bibliothek in der
  *              Tabelle users an, die Stammdaten (Vor- und Nachname) legt
  *              MitgliedRepository in der Tabelle mitglieder an.
+ *
+ *              Wurde die E-Mail über "Freunde werben" eingeladen, bekommt der
+ *              Werber hier seinen Gutschein - siehe
+ *              docs/features/freunde-werben.md
  * @see         assets/js/services/mitglieder.js
  * @see         src/Auth.php
  * @see         src/Repositories/MitgliedRepository.php
+ * @see         src/Repositories/EmpfehlungRepository.php
  */
 
 declare(strict_types=1);
@@ -21,6 +26,8 @@ require __DIR__ . '/../src/bootstrap.php';
 
 use Delight\Auth\TooManyRequestsException;
 use Delight\Auth\UserAlreadyExistsException;
+use Repositories\EmpfehlungRepository;
+use Repositories\GutscheinRepository;
 use Repositories\MitgliedRepository;
 
 header('Content-Type: application/json; charset=utf-8');
@@ -66,12 +73,21 @@ try {
         }
 
         try {
-            (new MitgliedRepository())->anlegen($userId, $vorname, $nachname);
+            $mitgliedId = (new MitgliedRepository())->anlegen($userId, $vorname, $nachname);
         } catch (Throwable $fehler) {
             // Ohne Stammdaten wäre das Konto halb fertig und die E-Mail-Adresse
             // trotzdem belegt. Also wieder entfernen, damit ein neuer Versuch geht.
             $auth->admin()->deleteUserById($userId);
             throw $fehler;
+        }
+
+        // Freunde werben: Wurde diese E-Mail eingeladen, bekommt der Werber
+        // seinen Gutschein. Scheitert das, ist die Registrierung trotzdem
+        // geglückt - das neue Mitglied soll davon nichts merken.
+        try {
+            (new EmpfehlungRepository())->registrierungVerbuchen($email, $mitgliedId, GutscheinRepository::neuerCode());
+        } catch (Throwable $fehler) {
+            error_log((string) $fehler);
         }
 
         $auth->login($email, $passwort);

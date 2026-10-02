@@ -69,6 +69,8 @@ Im Supabase-Dashboard unter **Table Editor**. Das ersetzt phpMyAdmin.
 | `probetrainings` | Terminkalender | gebuchte Probetrainings |
 | `sitzungen` | Hosting auf Vercel | PHP-Sitzungen, siehe [ADR-0017](../docs/decisions/ADR-0017-postgresql-auf-supabase.md) |
 | `bewertungen` | Bewertungen | Bewertungen der Konten, dazu Beispiele ohne Konto aus `seed.sql` |
+| `empfehlungen` | Freunde werben | wer wen mit welcher E-Mail eingeladen hat |
+| `gutscheine` | Freunde werben | Gutscheine der Werber samt Gratiszeitraum, siehe [ADR-0021](../docs/decisions/ADR-0021-gutschein-als-gratiszeitraum.md) |
 
 **`seed.sql` neu einspielen löscht alle Buchungen.** Kursbuchungen und
 Probetrainings hängen über Fremdschlüssel an Programmen und Coaches, die

@@ -37,6 +37,7 @@
  * @see         assets/js/services/mitgliedschaften.js
  * @see         src/Repositories/MitgliedschaftRepository.php
  * @see         src/Repositories/KursbuchungRepository.php
+ * @see         src/Repositories/GutscheinRepository.php
  * @see         src/Repositories/TarifRepository.php
  */
 
@@ -44,6 +45,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/../src/bootstrap.php';
 
+use Repositories\GutscheinRepository;
 use Repositories\KursbuchungRepository;
 use Repositories\MitgliedRepository;
 use Repositories\MitgliedschaftRepository;
@@ -173,6 +175,11 @@ try {
 
             // Nur nach einem POST ungleich 0: so viele wurden gerade storniert.
             'storniert'      => $storniert,
+
+            // Eingelöste Gutscheine aus "Freunde werben": { von, bis } oder
+            // null. In diesem Zeitraum kostet der BASISPLAN nichts - ob er
+            // gerade läuft, prüft die Seite an mitgliedschaft und geplant.
+            'gratis'         => (new GutscheinRepository())->gratiszeitFinden($mitgliedId),
 
             // Damit die Seite die Preisgruppen sperren kann, für die noch
             // kein Nachweis vorliegt. Die eigentliche Sperre sitzt im POST
