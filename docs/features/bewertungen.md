@@ -1,16 +1,22 @@
 # Feature: Bewertungen
 
-**Status:** in Arbeit
+**Status:** fertig
 **Verantwortlich:** Felix
-**Zuletzt geprüft:** 2026-09-30
+**Zuletzt geprüft:** 2026-10-01
 
 ## Was kann man damit
 
 Auf der Startseite steht vor „Komm rein." der Abschnitt **„Was andere
 sagen."**: ein **Karussell** aus Bildkacheln wie bei „Dein Programm", jede
 mit Bild, Sternen, Text, Name und der Angabe **Mitglied** oder **Kein
-Mitglied**. Drei Kacheln sind zu sehen (auf dem Handy eine), die Pfeile
-oben rechts drehen um eine Kachel weiter; am Ende geht es von vorn los.
+Mitglied**. Drei Kacheln sind zu sehen (auf dem Handy eine). Die Pfeile
+stehen am Rechner links und rechts neben den Kacheln, so hoch wie diese und
+mit demselben Abstand wie die Kacheln untereinander; auf dem Handy stehen
+sie klein über den Kacheln. Sie sind in Glas-Optik fast unsichtbar (leicht
+gerundete Ecken wie die Balken der Auslastung) und werden beim Überfahren
+mit der Maus gelb mit schwarzem Pfeil. Auf Geräten ohne Maus sind sie von
+Anfang an deutlicher zu sehen. Sie drehen um
+eine Kachel weiter, am Ende geht es von vorn los.
 Wischen und Touchpad funktionieren ebenfalls. Ohne Bild
 wird die Kachel zur **Zitat-Kachel**: ein großes Anführungszeichen statt
 des Fotos, keine Initialen. Darunter stehen der Durchschnitt und der Button
@@ -19,10 +25,20 @@ des Fotos, keine Initialen. Darunter stehen der Durchschnitt und der Button
 Der Button öffnet ein Fenster über der Startseite (wie der Kurskalender) mit
 dem Durchschnitt und allen Bewertungen. Wer angemeldet ist, vergibt dort über
 ein Formular 1 bis 5 Sterne und schreibt einen Text dazu. Ohne Anmeldung
-steht an Stelle des Formulars ein Link zur Anmeldung. Pro Konto gibt es eine
-Bewertung.
+steht an Stelle des Formulars ein Link zur Anmeldung.
 
-## Entscheidungen (Team, 2026-09-30)
+Pro Konto gibt es eine Bewertung. Wer schon bewertet hat, sieht im Fenster
+statt des Formulars **„Deine Bewertung"** mit dem Link **„Bewertung
+löschen"**. Nach dem Löschen (mit Rückfrage) ist das Formular wieder da.
+
+## Entscheidungen (Team, 2026-09-30 und 2026-10-01)
+
+- **Keine Freigabe durch das Team.** Bewertungen und freigegebene
+  Profilbilder erscheinen sofort. Eine Freigabe bräuchte eine eigene
+  Verwaltungsseite samt Rollen – für die Studienarbeit bewusst weggelassen.
+  Für einen echten Betrieb wäre das der erste Nachtrag.
+- **Löschen statt Ändern.** Wer seine Bewertung ändern will, löscht sie und
+  schreibt eine neue. Datum und Mitgliedsstatus gelten dann für die neue.
 
 - **Kein Menüpunkt und keine eigene Seite.** Die Bewertungen stehen auf der
   Startseite, alle weiteren im Fenster.
@@ -53,9 +69,9 @@ Bewertung.
 ## Das Karussell
 
 Im Karussell stehen **alle** Bewertungen: zuerst die mit Bild, danach die
-ohne, jeweils die neueste zuerst. Bilder haben bisher nur die Beispiele aus
-`seed.sql` — neue Bewertungen stehen deshalb hinten im Karussell. Das ändert
-sich mit den Profilbildern.
+ohne, jeweils die neueste zuerst. Ein Bild haben die Beispiele aus
+`seed.sql` und alle, deren Verfasser ein freigegebenes Profilbild haben
+(siehe [Profilbilder](profilbilder.md)).
 
 Technisch ist es eine quer scrollende Liste mit `scroll-snap` in
 `bewertungen.css`; Wischen kommt dadurch vom Browser. Die Pfeile erscheinen
@@ -73,16 +89,23 @@ Lesen davonläuft.
   "sterne": 5,
   "text": "Seit einem halben Jahr im Strength-Programm. …",
   "datum": "2026-09-24",
-  "bild": "assets/img/bewertungen/lea-m.jpg"
+  "bild": null,
+  "eigene": false
 }
 ```
 
 - `name` ist Vorname und erster Buchstabe des Nachnamens — die Seite ist
   öffentlich.
 - `mitglied` kommt aus der Spalte `war_mitglied`.
-- `bild` ist `null` bei Bewertungen echter Konten, bis es Profilbilder
-  gibt. Dann zeigt die Startseite eine Zitat-Kachel und das Fenster einen
-  kleinen Kreis mit den Initialen — ebenso, wenn die Datei fehlt.
+- `bild` ist bei Bewertungen echter Konten die Adresse des freigegebenen
+  Profilbilds (`api/profilbilder.php?mitglied=…&v=…`), sonst `null`. Bei
+  den Beispielen steht hier der Pfad aus der Spalte `bild`, sobald das Team
+  die KI-Bilder geliefert hat. Ohne Bild zeigt die Startseite eine
+  Zitat-Kachel und das Fenster einen kleinen Kreis mit den Initialen —
+  ebenso, wenn die Datei fehlt.
+- `eigene` ist `true` bei der Bewertung der angemeldeten Person, ohne
+  Anmeldung immer `false`. Daran entscheidet die Seite, ob sie das Formular
+  oder „Deine Bewertung" zeigt.
 
 ## Endpunkte
 
@@ -90,10 +113,15 @@ Lesen davonläuft.
 |---|---|---|---|
 | GET | `api/bewertungen.php` | alle Bewertungen, neueste zuerst | Array von Bewertungen |
 | POST | `api/bewertungen.php` | eigene Bewertung, `{ "sterne": "5", "text": "…" }` | `{ "id": 7 }`, 201 |
+| DELETE | `api/bewertungen.php` | eigene Bewertung löschen | `{ "geloescht": true }` |
 
 POST antwortet mit 401 ohne Anmeldung, 400 bei fehlenden Sternen, leerem
 oder zu langem Text (über 1000 Zeichen) und 409, wenn das Konto schon
 bewertet hat. Name und Mitgliedsstatus ergänzt der Endpunkt selbst.
+
+DELETE antwortet mit 401 ohne Anmeldung und 404, wenn das Konto keine
+Bewertung hat. Welche Bewertung gelöscht wird, bestimmt die Sitzung – eine
+fremde zu löschen ist nicht möglich.
 
 ## Woher kommen die Daten aktuell
 
@@ -109,12 +137,7 @@ der Produktionsdatenbank. Eingespielt wurde jeweils nur der Abschnitt
 
 ## Was fehlt noch
 
-- **Profilbilder** (Feature von Philipp, noch nicht im Repository): Jede
-  Person legt ein Profilbild an und bestimmt selbst, ob es freigegeben
-  ist. Sobald es das gibt, liefert `BewertungRepository::alleFinden()` für
-  Bewertungen mit Konto das freigegebene Profilbild als `bild`. Komponente,
-  Service und Seite bleiben dabei unverändert — sie kennen nur `bild`.
-- Die sechs KI-Bilder für die Beispiele in `assets/img/bewertungen/`
-- Bewertungen erscheinen sofort, ohne Freigabe. Für eine öffentliche
-  Domain wäre eine Freigabe durch das Team zu überlegen.
-- Eigene Bewertung ändern oder löschen gibt es nicht
+- Die sechs KI-Bilder für die Beispiele (Team). Bis dahin steht in der
+  Spalte `bild` der Beispiele `NULL`, damit die Seite keine fehlenden
+  Dateien sucht. Wie die Bilder eingetragen werden, steht in
+  `assets/img/bewertungen/README.md`.

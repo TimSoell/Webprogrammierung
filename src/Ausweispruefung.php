@@ -3,7 +3,8 @@
  * @file        src/Ausweispruefung.php
  * @layer       Infrastruktur (Unterbau für Schicht 4 - Endpunkte)
  * @description Liest aus dem Foto eines Ausweises heraus, um welche Art von
- *              Nachweis es sich handelt und bis wann er gilt.
+ *              Nachweis es sich handelt, auf wen er ausgestellt ist und bis
+ *              wann er gilt.
  *
  *              Die einzige Stelle im Projekt, die mit einem KI-Dienst
  *              spricht - so wie src/Database.php die einzige Stelle mit einer
@@ -81,13 +82,17 @@ final class Ausweispruefung
     /**
      * Liest die Angaben aus einem Ausweisfoto.
      *
-     * Gibt immer alle vier Felder zurück. Was nicht lesbar war, ist ein
+     * Gibt immer alle Felder zurück. Was nicht lesbar war, ist ein
      * leerer String - der Endpunkt entscheidet dann, ob das für die
      * gewünschte Art des Nachweises reicht.
      *
+     * Einen frei formulierten Satz liefert das Modell absichtlich NICHT:
+     * Darin stünden Name und Geburtsdatum, und der Satz würde gespeichert.
+     * Den Hinweis für die Tabelle baut der Endpunkt selbst.
+     *
      * @param string $bildRoh  Das Bild als Binärdaten (nicht base64)
      * @param string $mimeTyp  'image/jpeg', 'image/png' oder 'image/webp'
-     * @return array{art: string, gueltigBis: string, geburtsdatum: string, hinweis: string, modell: string}
+     * @return array{art: string, vorname: string, nachname: string, gueltigBis: string, geburtsdatum: string, modell: string}
      * @throws RuntimeException  wenn der Dienst nicht erreichbar ist oder
      *                           unerwartet antwortet
      */
@@ -125,11 +130,12 @@ final class Ausweispruefung
                     'type'       => 'OBJECT',
                     'properties' => [
                         'art'          => ['type' => 'STRING'],
+                        'vorname'      => ['type' => 'STRING'],
+                        'nachname'     => ['type' => 'STRING'],
                         'gueltigBis'   => ['type' => 'STRING'],
                         'geburtsdatum' => ['type' => 'STRING'],
-                        'hinweis'      => ['type' => 'STRING'],
                     ],
-                    'required' => ['art', 'gueltigBis', 'geburtsdatum', 'hinweis'],
+                    'required' => ['art', 'vorname', 'nachname', 'gueltigBis', 'geburtsdatum'],
                 ],
             ],
         ]);
@@ -148,13 +154,16 @@ final class Ausweispruefung
         . 'Studierenden- oder Semesterausweis, "senior" bei einem Personalausweis, '
         . 'Reisepass oder Führerschein, sonst "unbekannt".'
         . "\n"
+        . 'vorname: alle aufgedruckten Vornamen der Person, auf die der Ausweis '
+        . 'ausgestellt ist, durch Leerzeichen getrennt, ohne Titel.'
+        . "\n"
+        . 'nachname: der aufgedruckte Nachname dieser Person, ohne Titel.'
+        . "\n"
         . 'gueltigBis: das aufgedruckte Ablaufdatum des Ausweises als JJJJ-MM-TT. '
         . 'Steht nur ein Semester da (z. B. "SS 2027"), nimm dessen letzten Tag: '
         . 'Sommersemester endet am 30.09., Wintersemester am 31.03.'
         . "\n"
         . 'geburtsdatum: das aufgedruckte Geburtsdatum als JJJJ-MM-TT.'
-        . "\n"
-        . 'hinweis: ein kurzer deutscher Satz, was du auf dem Dokument siehst.'
         . "\n\n"
         . 'Was nicht lesbar ist oder nicht auf dem Dokument steht, gibst du als '
         . 'leeren String zurück. Rate nicht und rechne kein Datum aus, das nicht '
@@ -221,7 +230,7 @@ final class Ausweispruefung
      * Holt das Ergebnis aus der API-Antwort.
      *
      * @param array<string, mixed> $antwort
-     * @return array{art: string, gueltigBis: string, geburtsdatum: string, hinweis: string, modell: string}
+     * @return array{art: string, vorname: string, nachname: string, gueltigBis: string, geburtsdatum: string, modell: string}
      * @throws RuntimeException
      */
     private static function ergebnisLesen(array $antwort, string $modell): array
@@ -249,9 +258,10 @@ final class Ausweispruefung
 
         return [
             'art'          => (string) ($ergebnis['art'] ?? 'unbekannt'),
+            'vorname'      => (string) ($ergebnis['vorname'] ?? ''),
+            'nachname'     => (string) ($ergebnis['nachname'] ?? ''),
             'gueltigBis'   => (string) ($ergebnis['gueltigBis'] ?? ''),
             'geburtsdatum' => (string) ($ergebnis['geburtsdatum'] ?? ''),
-            'hinweis'      => mb_substr((string) ($ergebnis['hinweis'] ?? ''), 0, 255),
             'modell'       => $modell,
         ];
     }

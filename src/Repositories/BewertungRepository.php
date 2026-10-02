@@ -26,14 +26,25 @@ final class BewertungRepository
      * Alle Bewertungen, die neueste zuerst - in der Form, die
      * assets/js/services/bewertungen.js beschreibt.
      *
-     * @return list<array{id: int, name: string, mitglied: bool, sterne: int, text: string, datum: string, bild: string|null}>
+     * Das Bild ist das freigegebene Profilbild der Person, sonst das Bild
+     * aus der Spalte bild (nur bei den Beispielen aus seed.sql), sonst null.
+     *
+     * eigene markiert die Bewertung der anfragenden Person - daran erkennt
+     * die Seite, ob sie das Formular oder "Deine Bewertung" zeigt. Die
+     * mitglied_id selbst verlässt das Repository nicht.
+     *
+     * @param int|null $eigeneMitgliedId  mitglieder.id der angemeldeten Person, null ohne Anmeldung
+     * @return list<array{id: int, name: string, mitglied: bool, sterne: int, text: string, datum: string, bild: string|null, eigene: bool}>
      */
-    public function alleFinden(): array
+    public function alleFinden(?int $eigeneMitgliedId = null): array
     {
         $stmt = Database::connection()->prepare(
-            'SELECT id, name, war_mitglied, sterne, text, erstellt_am::date AS datum, bild
-               FROM bewertungen
-              ORDER BY erstellt_am DESC, id DESC'
+            'SELECT b.id, b.mitglied_id, b.name, b.war_mitglied, b.sterne, b.text, b.erstellt_am::date AS datum, b.bild,
+                    p.mitglied_id AS profilbild_von,
+                    extract(epoch FROM p.geaendert_am)::bigint AS profilbild_version
+               FROM bewertungen b
+               LEFT JOIN profilbilder p ON p.mitglied_id = b.mitglied_id AND p.oeffentlich = 1
+              ORDER BY b.erstellt_am DESC, b.id DESC'
         );
         $stmt->execute();
 
@@ -44,8 +55,29 @@ final class BewertungRepository
             'sterne'   => (int) $zeile['sterne'],
             'text'     => $zeile['text'],
             'datum'    => $zeile['datum'],
-            'bild'     => $zeile['bild'],
+            'bild'     => $zeile['profilbild_von'] !== null
+                ? ProfilbildRepository::url((int) $zeile['profilbild_von'], (int) $zeile['profilbild_version'])
+                : $zeile['bild'],
+            // Die Beispiele haben mitglied_id NULL und sind nie die eigene.
+            'eigene'   => $eigeneMitgliedId !== null && $zeile['mitglied_id'] !== null
+                && (int) $zeile['mitglied_id'] === $eigeneMitgliedId,
         ], $stmt->fetchAll());
+    }
+
+    /**
+     * Löscht die Bewertung dieses Mitglieds. Danach kann es neu bewerten.
+     *
+     * @param int $mitgliedId  mitglieder.id, NICHT users.id
+     * @return bool            false, wenn es keine Bewertung gab
+     */
+    public function loeschen(int $mitgliedId): bool
+    {
+        $stmt = Database::connection()->prepare(
+            'DELETE FROM bewertungen WHERE mitglied_id = ?'
+        );
+        $stmt->execute([$mitgliedId]);
+
+        return $stmt->rowCount() === 1;
     }
 
     /**

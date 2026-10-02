@@ -40,7 +40,23 @@ require ROOT_PATH . '/partials/header.php';
       <div class="auth-cards">
         <div class="auth-card konto-uebersicht">
           <section class="konto-stammdaten" aria-labelledby="konto-stammdaten-titel">
-            <h2 class="auth-heading" id="konto-stammdaten-titel">Stammdaten</h2>
+            <!-- Kopfzeile: Profilbild, Überschrift, Abmelden. Der Kreis ist
+                 ein <label> um die Dateiauswahl: Ein Klick darauf öffnet sie.
+                 Ohne Bild zeigt er ein neutrales Personen-Symbol. Was beim
+                 Auswählen passiert, steht in assets/js/components/profilbild.js. -->
+            <div class="konto-kopf">
+              <label class="konto-avatar" id="konto-avatar" title="Profilbild ändern">
+                <input class="konto-visually-hidden" id="profilbild-datei" type="file" accept="image/jpeg,image/png,image/webp">
+                <span class="konto-avatar-kreis">
+                  <img class="konto-avatar-bild" id="konto-avatar-bild" alt="">
+                  <svg class="konto-avatar-platzhalter" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><circle cx="24" cy="19" r="8"/><path d="M9 44c1.5-9.5 7.5-14 15-14s13.5 4.5 15 14z"/></svg>
+                </span>
+                <span class="konto-avatar-kamera" aria-hidden="true"></span>
+                <span class="konto-visually-hidden">Profilbild ändern</span>
+              </label>
+              <h2 class="auth-heading" id="konto-stammdaten-titel">Stammdaten</h2>
+              <button class="konto-abmelden" id="abmelden" type="button">Abmelden</button>
+            </div>
 
             <dl class="auth-data">
               <div>
@@ -57,14 +73,23 @@ require ROOT_PATH . '/partials/header.php';
               </div>
             </dl>
 
-            <p class="auth-message" id="konto-meldung" role="alert"></p>
+            <!-- Nur sichtbar, wenn es ein Profilbild gibt. -->
+            <div class="konto-profilbild-optionen" id="profilbild-optionen" hidden>
+              <label class="konto-schalter">
+                <input type="checkbox" id="profilbild-oeffentlich">
+                Profilbild bei meinen Bewertungen zeigen
+              </label>
+              <button class="konto-link" id="profilbild-entfernen" type="button">Bild entfernen</button>
+            </div>
 
-            <button class="button button--ghost" id="abmelden" type="button">Abmelden</button>
+            <p class="auth-message" id="profilbild-meldung" role="alert"></p>
+            <p class="auth-message" id="konto-meldung" role="alert"></p>
           </section>
 
+          <!-- Überschrift nur für Screenreader: Im Entwurf stehen die Termine
+               ohne eigene Überschrift, das Datum reicht als Einstieg. -->
           <section class="konto-termine" aria-labelledby="konto-termine-titel">
-            <h2 class="auth-heading" id="konto-termine-titel">Meine Termine</h2>
-            <p class="auth-hint">Deine gebuchten Kurse und Probetrainings. Stornieren geht bis zum Beginn.</p>
+            <h2 class="konto-visually-hidden" id="konto-termine-titel">Meine Termine</h2>
 
             <!-- Füllt assets/js/components/meine-termine.js aus
                  api/kursbuchungen.php und api/probetrainings.php. -->
@@ -79,6 +104,11 @@ require ROOT_PATH . '/partials/header.php';
         <!-- Welcher der beiden Blöcke sichtbar ist, entscheidet das
              Seitenskript: Ohne gewählten Tarif gibt es nichts anzuzeigen. -->
         <div class="auth-card konto-mitgliedschaft">
+<?php if (is_file(ROOT_PATH . '/assets/img/konto-mitgliedschaft.png')): ?>
+          <!-- Dezente Strichzeichnung im Hintergrund. Erscheint erst, wenn das
+               Team die Datei abgelegt hat - siehe assets/img/README.md. -->
+          <img class="konto-zeichnung" src="<?= e(BASE_URL) ?>assets/img/konto-mitgliedschaft.png" alt="">
+<?php endif; ?>
           <h2 class="auth-heading">Mitgliedschaft</h2>
 
           <dl class="auth-data" id="konto-tarif-daten" hidden>
@@ -144,8 +174,9 @@ require ROOT_PATH . '/partials/header.php';
           <h2 class="auth-heading">Nachweise</h2>
           <p class="auth-hint">
             Schüler-, Studierenden- und Seniorenpreise gelten nur mit Nachweis.
-            Fotografiere deinen Ausweis — wir lesen das Datum aus und löschen
-            das Bild sofort danach.
+            Fotografiere deinen Ausweis — wir lesen Name und Datum aus und
+            löschen das Bild sofort danach. Der Name muss zu deinem Konto
+            passen, und es gilt immer nur ein Nachweis.
           </p>
 
           <ul class="nachweis-liste" id="nachweis-liste"></ul>
@@ -162,8 +193,8 @@ require ROOT_PATH . '/partials/header.php';
               <option value="senior">Senior (ab 65, Lichtbildausweis)</option>
             </select>
 
-            <!-- Steht hier, wenn für die gewählte Art schon ein gültiger
-                 Nachweis vorliegt. Text und Sichtbarkeit setzt das
+            <!-- Steht hier, wenn schon ein gültiger Nachweis vorliegt, den
+                 ein Upload ersetzen würde. Text und Sichtbarkeit setzt das
                  Seitenskript; der Endpunkt lehnt Doppelte ohnehin ab. -->
             <p class="auth-hint nachweis-vorhanden" id="nachweis-vorhanden" hidden></p>
 

@@ -36,9 +36,18 @@ laufenden Tarif klickt und bestätigt, nimmt die Vormerkung zurück.
 
 Die Preisgruppe zu wechseln zählt als Wechsel: Sie steht im Vertrag und
 bestimmt den Beitrag. Für die beiden ermäßigten Preisgruppen braucht es
-zusätzlich einen gültigen Nachweis — siehe [Nachweise](nachweise.md). Läuft
+zusätzlich einen gültigen Nachweis — siehe [Nachweise](nachweise.md). Fehlt
+er, sind die Karten grau und ein Fenster erklärt, was zu tun ist. Läuft
 der ab, stellt das System den Vertrag zum nächsten Monatsersten auf den
 Standardpreis um.
+
+Diese automatische Vormerkung ist die einzige, die nicht nur auf der
+Tarifseite zurückgenommen werden kann: Lädt das Mitglied vor dem
+Monatsersten wieder einen passenden Nachweis hoch, verwirft
+`api/nachweise.php` sie und der Vertrag läuft unverändert weiter. Erkannt
+wird sie an ihrer Form — derselbe Tarif zum Standardpreis —, denn die
+Tabelle merkt sich nicht, wer eine Vormerkung angelegt hat. Einzelheiten
+unter [Nachweise](nachweise.md), Abschnitt „Die Regeln".
 
 ## Beteiligte Dateien
 
@@ -46,7 +55,7 @@ Standardpreis um.
 |---|---|
 | 1 Seite | `mitgliedschaft.php`, `mein-konto.php` |
 | 2 Seitenskript | `assets/js/pages/mitgliedschaft.page.js`, `assets/js/pages/mein-konto.page.js` |
-| 2 Komponente | `assets/js/components/modal.js` (für die Rückfrage mitbenutzt) |
+| 2 Komponente | `assets/js/components/modal.js` (für die Rückfrage und das Fenster „Nachweis fehlt" mitbenutzt) |
 | 3 Service | `assets/js/services/tarife.js`, `assets/js/services/mitgliedschaften.js` |
 | 4 Endpunkt | `api/tarife.php`, `api/mitgliedschaften.php` |
 | 5 Repository | `src/Repositories/TarifRepository.php`, `src/Repositories/MitgliedschaftRepository.php` |
@@ -175,9 +184,12 @@ entscheidet der Server**, nicht der Browser:
 
 ## Woher kommen die Daten aktuell
 
-Aus MySQL. Die vier Tarife und ihre zwölf Preise stehen in
-`database/seed.sql` und müssen einmal eingespielt werden — ohne das ist die
-Seite leer.
+Aus PostgreSQL bei Supabase, siehe
+[ADR-0017](../decisions/ADR-0017-postgresql-auf-supabase.md). Die vier
+Tarife und ihre zwölf Preise stehen in `database/seed.sql` und müssen einmal
+eingespielt sein — ohne das ist die Seite leer. Eingespielt wird über den
+SQL Editor im Supabase-Dashboard, nach `schema.sql`. Die Datei darf mehrfach
+laufen: Die Tarife werden dabei aktualisiert, Verträge bleiben unangetastet.
 
 ## Was fehlt noch
 

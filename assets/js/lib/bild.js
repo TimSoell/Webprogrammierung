@@ -54,6 +54,43 @@ export async function verkleinern(datei) {
 }
 
 /**
+ * Schneidet ein Bild quadratisch aus der Mitte zu und verkleinert es - für
+ * Profilbilder, die rund angezeigt werden.
+ *
+ * Wie verkleinern() immer JPEG und nie größer als das Original.
+ *
+ * @param {File} datei   Die vom Nutzer ausgewählte Datei
+ * @param {number} kante Kantenlänge des Ergebnisses in Pixeln
+ * @returns {Promise<{daten: string, mimeTyp: string}>}
+ *          daten ist base64 OHNE das "data:image/jpeg;base64," davor
+ * @throws {Error}  wenn die Datei kein lesbares Bild ist
+ */
+export async function quadratVerkleinern(datei, kante) {
+  const bild = await laden(datei);
+
+  // Das größte Quadrat, das ins Bild passt, genau aus der Mitte.
+  const seite = Math.min(bild.width, bild.height);
+  const ziel = Math.min(kante, seite);
+  const flaeche = document.createElement('canvas');
+
+  flaeche.width = ziel;
+  flaeche.height = ziel;
+
+  flaeche.getContext('2d').drawImage(
+    bild,
+    (bild.width - seite) / 2, (bild.height - seite) / 2, seite, seite,
+    0, 0, ziel, ziel,
+  );
+
+  const datenUrl = flaeche.toDataURL('image/jpeg', 0.85);
+
+  return {
+    daten: datenUrl.slice(datenUrl.indexOf(',') + 1),
+    mimeTyp: 'image/jpeg',
+  };
+}
+
+/**
  * Lädt eine Datei in ein Image-Objekt, damit sie gezeichnet werden kann.
  *
  * @param {File} datei

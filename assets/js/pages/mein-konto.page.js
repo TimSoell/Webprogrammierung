@@ -11,6 +11,7 @@
  * @see         assets/js/services/mitgliedschaften.js
  * @see         assets/js/components/meine-termine.js  (Karte "Meine Termine")
  * @see         assets/js/components/freunde-werben.js (Karte "Freunde werben")
+ * @see         assets/js/components/profilbild.js     (Profilbild in den Stammdaten)
  * @see         assets/js/components/ausweis-scan.js
  * @see         assets/js/services/auslastung.js
  */
@@ -19,10 +20,16 @@ import { $ } from '../lib/dom.js';
 import { abmelden, angemeldetesMitgliedLaden } from '../services/mitglieder.js';
 import { auswahlEntfernen, meineAuswahlLaden } from '../services/auswahl.js';
 import { standLaden } from '../services/mitgliedschaften.js';
-import { alleLaden as nachweiseLaden, demoEintragen, hochladen } from '../services/nachweise.js';
+import {
+  alleLaden as nachweiseLaden,
+  demoEintragen,
+  entfernen as nachweisEntfernen,
+  hochladen,
+} from '../services/nachweise.js';
 import { formularAbsenden, meldungZeigen } from '../components/auth-formular.js';
 import { meineTermineAufbauen } from '../components/meine-termine.js';
 import { kontoWerbenAufbauen } from '../components/freunde-werben.js';
+import { profilbildEinrichten } from '../components/profilbild.js';
 import { scanStarten } from '../components/ausweis-scan.js';
 import { auslastungLaden, besuchEintragen, besuchEntfernen } from '../services/auslastung.js';
 
@@ -175,14 +182,74 @@ if (seite) {
   const nachweisArt = $('#nachweis-art');
 
   /**
-   * Bis wann je Art schon ein gültiger Nachweis vorliegt.
+   * Der gültige Nachweis des Mitglieds - es gibt höchstens einen, ein neuer
+   * ersetzt ihn. null, solange keiner hinterlegt ist.
    *
-   * Schlüssel ist die Art, Wert das Ablaufdatum - oder null für
-   * unbefristet. Fehlt die Art, gibt es keinen gültigen Nachweis.
-   *
-   * @type {Record<string, string|null>}
+   * @type {import('../services/nachweise.js').Nachweis|null}
    */
-  let vorhandeneNachweise = {};
+  let gueltigerNachweis = null;
+
+  /**
+   * Macht aus dem Ablaufdatum eines Nachweises den Text für die Anzeige.
+   * Ein Nachweis ohne Datum ist unbefristet - das gibt es nur bei Senioren.
+   *
+   * @param {string|null} gueltigBis  'JJJJ-MM-TT' oder null
+   * @returns {string}
+   */
+  const bisAnzeigen = (gueltigBis) => (gueltigBis === null
+    ? 'unbefristet'
+    : `bis ${datumAnzeigen(gueltigBis)}`);
+
+  /**
+   * Baut eine Zeile der Nachweisliste samt Knopf zum Entfernen.
+   *
+   * @param {import('../services/nachweise.js').Nachweis} nachweis
+   * @param {boolean} abgelaufen
+   * @returns {HTMLLIElement}
+   */
+  const nachweisZeile = (nachweis, abgelaufen) => {
+    const zeile = document.createElement('li');
+    zeile.className = 'nachweis-eintrag';
+    zeile.dataset.abgelaufen = abgelaufen ? 'ja' : 'nein';
+
+    const text = document.createElement('span');
+    text.textContent = `${NACHWEISARTEN[nachweis.art]} — ${bisAnzeigen(nachweis.gueltigBis)}`
+      + (abgelaufen ? ' (abgelaufen)' : '')
+      + (nachweis.quelle === 'demo' ? ' · im Demo-Modus eingetragen' : '');
+
+    const knopf = document.createElement('button');
+    knopf.type = 'button';
+    knopf.className = 'nachweis-entfernen';
+    knopf.textContent = 'Entfernen';
+    knopf.setAttribute('aria-label', `${NACHWEISARTEN[nachweis.art]} entfernen`);
+
+    knopf.addEventListener('click', async () => {
+      // Die Rückfrage nennt die Folge: Ein gültiger Nachweis hält den
+      // ermäßigten Preis, ein abgelaufener nicht mehr.
+      const frage = abgelaufen
+        ? 'Diesen abgelaufenen Nachweis wirklich entfernen?'
+        : 'Nachweis wirklich entfernen? Ohne gültigen Nachweis gilt für einen '
+          + 'ermäßigten Tarif ab dem nächsten Monatsersten der Standardpreis.';
+
+      if (!window.confirm(frage)) {
+        return;
+      }
+
+      knopf.disabled = true;
+
+      try {
+        nachweiseZeigen(await nachweisEntfernen(nachweis.id));
+        meldungZeigen(nachweisMeldung, 'Nachweis entfernt.', true);
+      } catch (fehler) {
+        meldungZeigen(nachweisMeldung, fehler.message);
+        knopf.disabled = false;
+      }
+    });
+
+    zeile.append(text, knopf);
+
+    return zeile;
+  };
 
   /**
    * Zeichnet die Liste der Nachweise und schaltet das Formular zwischen
@@ -193,42 +260,14 @@ if (seite) {
    */
   function nachweiseZeigen(stand) {
     const heute = new Date().toISOString().slice(0, 10);
+    const istAbgelaufen = (nachweis) => nachweis.gueltigBis !== null && nachweis.gueltigBis < heute;
 
-    // Je Art den besten noch gültigen Nachweis merken: unbefristet schlägt
-    // befristet, sonst gewinnt der, der am längsten gilt. Dieselbe Regel
-    // wie in NachweisRepository::gueltigenFindenNachArt().
-    vorhandeneNachweise = {};
-    stand.nachweise.forEach((nachweis) => {
-      if (nachweis.gueltigBis !== null && nachweis.gueltigBis < heute) {
-        return;
-      }
-
-      const bisher = vorhandeneNachweise[nachweis.art];
-
-      if (!(nachweis.art in vorhandeneNachweise)
-        || (bisher !== null && (nachweis.gueltigBis === null || nachweis.gueltigBis > bisher))) {
-        vorhandeneNachweise[nachweis.art] = nachweis.gueltigBis;
-      }
-    });
+    gueltigerNachweis = stand.nachweise.find((nachweis) => !istAbgelaufen(nachweis)) ?? null;
 
     $('#nachweis-leer').hidden = stand.nachweise.length > 0;
-    $('#nachweis-liste').replaceChildren(...stand.nachweise.map((nachweis) => {
-      const zeile = document.createElement('li');
-
-      // Ein Nachweis ohne Datum ist unbefristet - das gibt es nur bei Senioren.
-      const abgelaufen = nachweis.gueltigBis !== null && nachweis.gueltigBis < heute;
-      const bis = nachweis.gueltigBis === null
-        ? 'unbefristet'
-        : `bis ${datumAnzeigen(nachweis.gueltigBis)}`;
-
-      zeile.className = 'nachweis-eintrag';
-      zeile.dataset.abgelaufen = abgelaufen ? 'ja' : 'nein';
-      zeile.textContent = `${NACHWEISARTEN[nachweis.art]} — ${bis}`
-        + (abgelaufen ? ' (abgelaufen)' : '')
-        + (nachweis.quelle === 'demo' ? ' · im Demo-Modus eingetragen' : '');
-
-      return zeile;
-    }));
+    $('#nachweis-liste').replaceChildren(
+      ...stand.nachweise.map((nachweis) => nachweisZeile(nachweis, istAbgelaufen(nachweis))),
+    );
 
     // Ohne Schlüssel gibt es nichts auszulesen, dann wird das Datum getippt.
     $('#nachweis-bild-feld').hidden = !stand.kiVerfuegbar;
@@ -238,8 +277,8 @@ if (seite) {
   }
 
   /**
-   * Sagt unter der Auswahl, ob für die gewählte Art schon ein gültiger
-   * Nachweis vorliegt - und sperrt den Button, wo ein weiterer Upload
+   * Sagt unter der Auswahl, was ein Upload mit dem schon hinterlegten
+   * Nachweis machen würde - und sperrt den Button, wo ein weiterer Upload
    * nichts ändern kann.
    *
    * Das ist nur die Bequemlichkeit. Die verbindliche Prüfung steht in
@@ -250,26 +289,31 @@ if (seite) {
   function vorhandenenHinweisZeigen() {
     const hinweis = $('#nachweis-vorhanden');
     const button = $('#nachweis-form button[type="submit"]');
-    const art = nachweisArt.value;
 
-    if (!(art in vorhandeneNachweise)) {
+    if (gueltigerNachweis === null) {
       hinweis.hidden = true;
       button.disabled = false;
 
       return;
     }
 
-    const bis = vorhandeneNachweise[art];
+    const bis = gueltigerNachweis.gueltigBis;
+    const gleicheArt = gueltigerNachweis.art === nachweisArt.value;
 
-    // Unbefristet gibt es nur beim Senior. Da kann kein zweiter Ausweis
-    // etwas verbessern, also bleibt der Button gesperrt.
-    hinweis.textContent = bis === null
-      ? 'Diesen Nachweis hast du schon hinterlegt, er gilt unbefristet. Ein weiterer Upload ändert nichts.'
-      : `Du hast dafür schon einen Nachweis bis ${datumAnzeigen(bis)}. `
-        + 'Lade nur einen hoch, der länger gilt - oder wähle eine andere Art.';
+    if (!gleicheArt) {
+      hinweis.textContent = `Du hast schon einen Nachweis hinterlegt (${NACHWEISARTEN[gueltigerNachweis.art]}, `
+        + `${bisAnzeigen(bis)}). Es gilt immer nur einer - ein neuer ersetzt ihn.`;
+    } else if (bis === null) {
+      // Unbefristet gibt es nur beim Senior. Da kann kein zweiter Ausweis
+      // derselben Art etwas verbessern, also bleibt der Button gesperrt.
+      hinweis.textContent = 'Diesen Nachweis hast du schon hinterlegt, er gilt unbefristet. Ein weiterer Upload ändert nichts.';
+    } else {
+      hinweis.textContent = `Du hast dafür schon einen Nachweis bis ${datumAnzeigen(bis)}. `
+        + 'Lade nur einen hoch, der länger gilt - er ersetzt den bisherigen.';
+    }
 
     hinweis.hidden = false;
-    button.disabled = bis === null;
+    button.disabled = gleicheArt && bis === null;
   }
 
   // Beim Seniorennachweis wird nicht das Ablaufdatum gebraucht, sondern das
@@ -321,6 +365,16 @@ if (seite) {
 
       nachweiseZeigen(stand);
       formular.reset();
+
+      if (stand.herabstufungZurueckgenommen) {
+        // Oben auf der Seite steht noch der vorgemerkte Wechsel auf den
+        // Standardpreis. Den gibt es nicht mehr, also neu laden.
+        mitgliedschaftZeigen(await standLaden());
+        meldungZeigen(nachweisMeldung, 'Nachweis gespeichert. Der vorgemerkte Wechsel auf den Standardpreis entfällt, dein Preis bleibt wie bisher.', true);
+
+        return;
+      }
+
       meldungZeigen(nachweisMeldung, 'Nachweis gespeichert. Der Preis steht dir ab sofort offen.', true);
     });
 
@@ -441,6 +495,7 @@ if (seite) {
     $('#konto-vorname').textContent = mitglied.vorname;
     $('#konto-nachname').textContent = mitglied.nachname;
     $('#konto-email').textContent = mitglied.email;
+    profilbildEinrichten(mitglied);
 
     mitgliedschaftZeigen(await standLaden());
     nachweiseZeigen(await nachweiseLaden());

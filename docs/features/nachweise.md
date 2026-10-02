@@ -2,7 +2,7 @@
 
 **Status:** in Arbeit
 **Verantwortlich:** Felix
-**Zuletzt geprüft:** 2026-09-21
+**Zuletzt geprüft:** 2026-10-01
 
 ## Was kann man damit
 
@@ -10,11 +10,20 @@ Unter „Mein Konto" gibt es den Bereich **Nachweise**. Wer den ermäßigten
 Preis für Schülerinnen, Schüler und Studierende oder den Seniorenpreis
 nutzen will, fotografiert dort seinen Ausweis und lädt ihn hoch. Das Bild
 wird ausgelesen, das Ergebnis gespeichert und **das Bild sofort verworfen**.
+Der Ausweis muss auf die Person lauten, der das Konto gehört, und es gilt
+immer nur ein Nachweis — siehe „Die Regeln".
 
 Danach steht die passende Preisgruppe auf der Tarifseite zur Verfügung.
 Ohne Nachweis ist die Preisgruppe abgedunkelt und gestrichelt umrandet: Man
 sieht, was der Preis wäre, und darf die Gruppe auch anklicken — buchen lässt
-sie sich aber nicht. Den Grund nennt die Aktionsleiste im Klartext.
+sie sich aber nicht. Solange die gesperrte Gruppe gewählt ist, sind alle
+vier Tarifkarten und der Button unten grau und gestrichelt statt
+limefarben, und auf den Karten steht „Nachweis fehlt" statt „Auswählen".
+Zwischen den Preisgruppen lässt sich frei hin- und herschalten. Erst wer
+dann einen Tarif anklickt, bekommt das Fenster „Nachweis fehlt" mit einem
+Knopf, der direkt zu „Mein Konto" führt. Die Aktionsleiste nennt den Grund
+weiterhin im Klartext — limefarben, damit der Satz zwischen den grauen
+Karten auffällt.
 
 Damit lässt sich die Mitgliedschaft vollständig online abschließen — bei
 anderen Studios muss man mit dem Ausweis an den Tresen. Das ist der Punkt
@@ -24,31 +33,92 @@ des Features.
 
 | | |
 |---|---|
-| Schüler- und Studierendenausweis | gilt bis zum aufgedruckten Ablaufdatum |
+| Name auf dem Ausweis | muss zum Namen im Konto passen |
+| Schüler- und Studierendenausweis | gilt bis zum aufgedruckten Ablaufdatum, höchstens aber ein Jahr im Voraus (Schüler: zwei) |
 | Senior | ab 65 Jahren, gilt unbefristet |
 | Standardpreis | braucht nie einen Nachweis |
-| Zweiter Nachweis derselben Art | nur, wenn er **länger** gilt als der vorhandene |
+| Anzahl | **höchstens ein gültiger Nachweis** je Mitglied, ein neuer ersetzt den bisherigen |
+| Neuer Nachweis derselben Art | nur, wenn er **länger** gilt als der vorhandene |
 | Zweiter Seniorennachweis | gar nicht - der erste gilt unbefristet |
+| Prüfversuche | drei, danach kommt alle acht Stunden einer dazu |
 
-Denselben Ausweis zweimal hochzuladen ergab früher zwei gleiche Einträge in
-der Liste. Das lehnt `api/nachweise.php` jetzt mit **409** ab: Ein weiterer
-Nachweis derselben Art wird nur gespeichert, wenn sein Ablaufdatum nach dem
-des vorhandenen liegt. Eine andere Art bleibt jederzeit möglich — wer einen
-Studierendenausweis hinterlegt hat, kann weiterhin einen Seniorennachweis
-nachreichen.
+Die Gründe stehen in
+[ADR-0020](../decisions/ADR-0020-nachweise-absichern.md).
 
-Beim Senior greift die Sperre schon, **bevor** das Bild an die Prüfung geht:
-Ein unbefristeter Nachweis lässt sich durch nichts verbessern, also wird kein
-Kontingent der kostenlosen Stufe dafür verbraucht.
+**Der Namensabgleich.** Ohne ihn könnte ein Vater den Schülerausweis seines
+Sohnes hochladen. Das Modell liest Vor- und Nachname, verglichen wird in
+`api/nachweise.php`: Der Nachname muss gleich sein, der Vorname aus dem
+Konto muss unter den Vornamen auf dem Ausweis stehen — dort stehen oft
+mehrere, im Konto meist nur der Rufname. Groß- und Kleinschreibung, Umlaute
+(`Müller` = `MUELLER`), Akzente und Bindestriche zählen nicht. Passt der
+Name nicht oder ist keiner zu lesen, antwortet der Endpunkt mit **422**.
 
-Im Konto steht der Hinweis unter der Auswahl, sobald für die gewählte Art
-schon etwas vorliegt. Beim Senior ist der Button zusätzlich gesperrt. Das ist
-Bequemlichkeit, keine Absicherung — verbindlich prüft der Endpunkt.
+**Ein Nachweis je Mitglied.** Senior und Schüler zugleich gibt es nicht.
+Wird ein neuer Nachweis gespeichert, löscht
+`NachweisRepository::anlegen()` den bisher gültigen in derselben
+Transaktion. Wer vom Schüler zum Studenten wird, lädt also einfach den
+neuen Ausweis hoch. Abgelaufene Nachweise bleiben als Historie stehen.
+
+Denselben Ausweis noch einmal hochzuladen lehnt der Endpunkt mit **409** ab:
+Ein weiterer Nachweis derselben Art wird nur gespeichert, wenn sein
+Ablaufdatum nach dem des vorhandenen liegt. Beim Senior greift die Sperre
+schon, **bevor** das Bild an die Prüfung geht: Ein unbefristeter Nachweis
+lässt sich durch nichts verbessern, also wird kein Kontingent der
+kostenlosen Stufe dafür verbraucht.
+
+**Die Höchstdauer.** Steht auf einem Studierendenausweis „gültig bis 2099",
+gilt der Nachweis trotzdem nur ein Jahr ab heute, danach ist ein neuer
+Upload fällig. Das fängt verlesene Jahreszahlen ab und Ausweise, die für
+das ganze Studium ausgestellt sind. Gekürzt wird, nicht abgelehnt.
+
+**Die Prüfversuche.** Jede Prüfung kostet eine Anfrage aus dem
+Tageskontingent der kostenlosen Stufe. Nach drei Versuchen antwortet der
+Endpunkt mit **429**. Gezählt wird mit der Drosselung der Login-Bibliothek —
+wie beim Login ist sie mit `debug = true` aus, lokal gibt es also keine
+Grenze.
+
+**Entfernen.** Jeder Eintrag in der Liste hat einen Knopf „Entfernen", mit
+Rückfrage. Wer einen gültigen Nachweis entfernt und einen ermäßigten Tarif
+hat, zahlt ab dem nächsten Monatsersten den Standardpreis — derselbe Weg
+wie beim Ablauf, siehe unten. Wer danach rechtzeitig neu hochlädt, behält
+seinen Preis.
+
+Im Konto steht unter der Auswahl, was ein Upload mit dem schon hinterlegten
+Nachweis machen würde. Beim Senior ist der Button zusätzlich gesperrt. Das
+ist Bequemlichkeit, keine Absicherung — verbindlich prüft der Endpunkt.
 
 **Läuft ein Nachweis ab, wird der Vertrag zum nächsten Monatsersten auf den
 Standardpreis gestellt** — nach derselben Regel wie jeder Tarifwechsel
 ([ADR-0010](../decisions/ADR-0010-tarifwechsel-zum-monatsersten.md)). Den
 laufenden Monat behält man zum ermäßigten Preis.
+
+**Ein neuer Nachweis nimmt diese Herabstufung zurück.** Wer vor dem
+Monatsersten wieder einen passenden Nachweis hochlädt, behält seinen Preis:
+`api/nachweise.php` verwirft die Vormerkung gleich beim Speichern, und die
+Kontoseite meldet „Der vorgemerkte Wechsel auf den Standardpreis entfällt".
+Beispiel: Der Ausweis läuft am 30.09. ab, am 01.10. entsteht die Vormerkung
+zum 01.11., am 02.10. kommt der neue Ausweis — der Vertrag läuft unverändert
+weiter. Dasselbe gilt, wenn jemand seinen Nachweis entfernt und neu hochlädt.
+
+Verworfen wird nur eine Vormerkung, die wie eine Herabstufung aussieht:
+
+| | |
+|---|---|
+| Laufender Vertrag | Preisgruppe „ermäßigt" oder „Senior" |
+| Vorgemerkt | **derselbe Tarif** zum Standardpreis |
+| Neuer Nachweis | passt zur Preisgruppe des laufenden Vertrags |
+
+Ein Seniorennachweis rettet also keinen Schülerpreis, und ein vorgemerkter
+Wechsel in einen anderen Tarif bleibt stehen.
+
+**Warum beim Hochladen und nicht bei jedem Aufruf.** Die Tabelle
+`mitgliedschaften` merkt sich nicht, ob eine Vormerkung automatisch entstand
+oder gewählt wurde — beide sehen gleich aus. Liefe die Rücknahme bei jedem
+Aufruf mit, könnte niemand mit gültigem Nachweis bewusst auf den
+Standardpreis wechseln: Die Vormerkung wäre beim nächsten Laden wieder weg.
+Ein Upload dagegen sagt eindeutig, dass jemand den ermäßigten Preis behalten
+will. Eine eigene Spalte hätte die Unterscheidung sauber gemacht, aber eine
+Schemaänderung in beiden Datenbanken verlangt.
 
 Ein Seniorennachweis läuft nie ab: Wer einmal 65 ist, bleibt es.
 
@@ -57,8 +127,8 @@ Ein Seniorennachweis läuft nie ab: Wer einmal 65 ist, bleibt es.
 Das ist der wichtigste Abschnitt dieser Datei.
 
 **Gespeichert wird:** Art des Nachweises, Gültigkeitsdatum, ob per KI oder im
-Demo-Modus geprüft, welches Modell geprüft hat, und ein Satz, was auf dem
-Dokument zu sehen war.
+Demo-Modus geprüft, welches Modell geprüft hat, und ein Satz, was geprüft
+wurde.
 
 **Nicht gespeichert wird:** das Bild, ein Pfad zu einem Bild, der Name,
 die Ausweisnummer, das Geburtsdatum. Es gibt keinen Upload-Ordner. Das Bild
@@ -66,7 +136,13 @@ existiert nur für die Dauer einer Anfrage im Arbeitsspeicher.
 
 Für das Alter heißt das: Das Geburtsdatum wird einmal gelesen, gegen 65
 geprüft und verworfen. In der Tabelle steht danach nur noch
-`art = 'senior'` mit `gueltig_bis = NULL`.
+`art = 'senior'` mit `gueltig_bis = NULL`. Für den Namen gilt dasselbe: Er
+wird gelesen, mit dem Konto verglichen und verworfen. Der Name aus dem
+Konto geht dabei nicht an das Modell.
+
+**Den gespeicherten Satz baut der Endpunkt selbst.** Das Modell liefert
+keinen freien Text — sonst stünden Name oder Geburtsdatum darin, und die
+Zusage oben wäre falsch.
 
 **Ausweisdaten verlassen für die Prüfung den Server.** Zum Testen und
 Vorführen werden ausschließlich erfundene Ausweise benutzt, keine echten.
@@ -76,7 +152,8 @@ Vorführen werden ausschließlich erfundene Ausweise benutzt, keine echten.
 | | Wenn `ki.api_key` in `config/config.php` gesetzt ist | Wenn nicht |
 |---|---|---|
 | Formular | Feld für ein Foto | Feld für ein Datum |
-| Prüfung | Modell liest das Datum vom Bild | Datum wird eingetippt |
+| Prüfung | Modell liest Name und Datum vom Bild | Datum wird eingetippt |
+| Namensabgleich, Prüfversuche | ja | nein — ohne Bild gibt es keinen Namen |
 | `quelle` in der Tabelle | `'ki'` | `'demo'` |
 
 Geprüft wird über die **Gemini-API von Google** auf der kostenlosen Stufe,
@@ -130,12 +207,12 @@ dieselbe Anzeige ohne wanderndes Licht und ohne Konfetti.
 |---|---|
 | 1 Seite | `mein-konto.php`, `mitgliedschaft.php` |
 | 2 Seitenskript | `assets/js/pages/mein-konto.page.js`, `assets/js/pages/mitgliedschaft.page.js` |
-| 2 Komponente | `assets/js/components/ausweis-scan.js` (Animation während der Prüfung) |
+| 2 Komponente | `assets/js/components/ausweis-scan.js` (Animation während der Prüfung), `assets/js/components/modal.js` (Fenster „Nachweis fehlt") |
 | Hilfsmittel | `assets/js/lib/bild.js` (verkleinert das Foto vor dem Upload) |
 | 3 Service | `assets/js/services/nachweise.js` |
 | 4 Endpunkt | `api/nachweise.php` |
 | Infrastruktur | `src/Ausweispruefung.php` (einzige Stelle mit einem KI-Aufruf) |
-| 5 Repository | `src/Repositories/NachweisRepository.php` |
+| 5 Repository | `src/Repositories/NachweisRepository.php`, `src/Repositories/MitgliedschaftRepository.php` (Herabstufung zurücknehmen) |
 | 6 Tabelle | `nachweise` in `database/schema.sql` |
 | CSS | `assets/css/components/auth.css`, `assets/css/components/tarifkarte.css`, `assets/css/components/ausweis-scan.css` |
 
@@ -144,33 +221,41 @@ dieselbe Anzeige ohne wanderndes Licht und ohne Konfetti.
 ```json
 {
   "nachweise": [
-    { "art": "student", "gueltigBis": "2027-03-31", "quelle": "ki",
-      "hinweis": "Studierendenausweis der DHBW, gültig bis 31.03.2027.",
-      "geprueftAm": "2026-09-21 11:40:24" },
-    { "art": "senior", "gueltigBis": null, "quelle": "ki",
-      "hinweis": "Personalausweis, Geburtsdatum 02.04.1956.",
-      "geprueftAm": "2026-09-21 11:40:54" }
+    { "id": 7, "art": "student", "gueltigBis": "2027-03-31", "quelle": "ki",
+      "hinweis": "Studierendenausweis geprüft: gültig bis 31.03.2027, Name stimmt mit dem Konto überein.",
+      "geprueftAm": "2026-10-01 14:37:33" },
+    { "id": 3, "art": "schueler", "gueltigBis": "2026-07-31", "quelle": "ki",
+      "hinweis": "Schülerausweis geprüft: gültig bis 31.07.2026, Name stimmt mit dem Konto überein.",
+      "geprueftAm": "2025-09-12 09:15:02" }
   ],
-  "kiVerfuegbar": true
+  "kiVerfuegbar": true,
+  "herabstufungZurueckgenommen": false
 }
 ```
 
+Höchstens einer der Einträge ist gültig, die übrigen sind abgelaufen.
 `gueltigBis: null` heißt unbefristet und kommt nur bei `art: "senior"` vor.
+
+`herabstufungZurueckgenommen` ist nur nach einem POST `true`, und nur, wenn
+der Upload einen vorgemerkten Wechsel auf den Standardpreis verworfen hat.
+Die Kontoseite lädt dann den Tarifstand neu.
 
 ## Endpunkte
 
 | Methode | Pfad | Zweck | Antwort |
 |---|---|---|---|
 | GET | `api/nachweise.php` | eigene Nachweise, auch abgelaufene | Nachweisstand |
-| POST | `api/nachweise.php` | prüfen und speichern | Nachweisstand, 201 — **409**, wenn schon ein gleich guter Nachweis dieser Art vorliegt |
-| POST | `api/nachweise.php` | Bild prüfen lassen bzw. Datum eintragen | 201, Nachweisstand |
+| POST | `api/nachweise.php` | Bild prüfen lassen bzw. Datum eintragen, ersetzt den bisherigen Nachweis, nimmt eine vorgemerkte Herabstufung zurück | 201, Nachweisstand |
+| DELETE | `api/nachweise.php` | eigenen Nachweis entfernen, `{ id }` | 200, Nachweisstand |
 
 Fehlerfälle des POST, alle mit deutscher Meldung für das Formular:
 
 | Code | Wann |
 |---|---|
 | 400 | kein Bild, falsches Format, größer als 3 MB |
-| 422 | Dokument passt nicht zur gewählten Art · kein Datum lesbar · Ausweis abgelaufen · noch keine 65 |
+| 409 | es liegt schon ein gleich guter Nachweis dieser Art vor |
+| 422 | Dokument passt nicht zur gewählten Art · kein Name lesbar · Name passt nicht zum Konto · kein Datum lesbar · Ausweis abgelaufen · noch keine 65 |
+| 429 | Prüfversuche aufgebraucht |
 | 502 | Prüfdienst nicht erreichbar |
 
 Der Upload geht **als base64 im JSON**, nicht als `multipart/form-data` —
@@ -187,12 +272,32 @@ Sicherheit. Alles, was aus dem Browser kommt, ist manipulierbar.
 ## Was fehlt noch
 
 - **Fälschungen werden nicht erkannt.** Das Modell liest ab, was dasteht.
-  Ein sauber gebautes Falsifikat kommt durch.
+  Ein sauber gebautes Falsifikat kommt durch — auch eines mit geändertem
+  Namen.
+- **Der Name im Konto ist eine Selbstauskunft.** Wer ein Konto auf den
+  Namen des Ausweisinhabers anlegt, kommt durch den Namensabgleich. Derselbe
+  Ausweis funktioniert auch in mehreren Konten mit gleichem Namen. Sicher
+  würde das erst mit einer Kontrolle am Empfang.
+- **Der Name im Konto lässt sich nicht ändern.** Wer sich als „Max"
+  registriert hat und „Maximilian" heißt, scheitert am Namensabgleich.
+- **Name und Datum müssen auf derselben Seite des Ausweises stehen.**
+  Hochgeladen wird ein Bild.
+- **Im Demo-Modus greift keine dieser Prüfungen.** Jede Person tippt ihr
+  Datum selbst ein. Laut Migrationsplan (Entscheidung E5 in
+  [`migration-vercel-supabase.md`](../migration-vercel-supabase.md)) läuft
+  die Produktion bewusst ohne Schlüssel, also im Demo-Modus — damit keine
+  echten Ausweise Fremder bei Google landen.
+- **Eine Herabstufung, die schon gilt, bleibt.** Kommt der neue Nachweis
+  erst nach dem Monatsersten, läuft bereits der Vertrag zum Standardpreis.
+  Dann muss man den ermäßigten Preis auf der Tarifseite neu wählen, und er
+  gilt wie jeder Wechsel ab dem nächsten Monatsersten.
+- **Wer bewusst auf den Standardpreis wechselt und danach einen Nachweis
+  hochlädt, verliert diese Vormerkung.** Sie sieht genauso aus wie eine
+  automatische Herabstufung. Der Fall ist kaum denkbar und fällt zugunsten
+  des Mitglieds aus.
 - **Niemand kann eine Prüfung überstimmen.** Liest das Modell ein Datum
   falsch, hilft nur ein neuer Upload oder ein Eingriff in der Datenbank.
   Ein Admin-Bereich wäre ein eigenes Feature.
-- **Nachweise lassen sich nicht löschen.** Wer einen hochgeladen hat, wird
-  ihn über die Oberfläche nicht wieder los.
 - **Die Herabstufung läuft bei jedem Aufruf mit**, statt einmal nachts.
   Ohne Cronjob ist das der einzige Weg — siehe
   [ADR-0011](../decisions/ADR-0011-ausweispruefung-mit-ki.md), Konsequenzen.

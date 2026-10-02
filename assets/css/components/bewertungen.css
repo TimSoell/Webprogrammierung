@@ -47,16 +47,39 @@
 }
 
 /* --- Karussell auf der Startseite ------------------------------------------ */
+/* Am Rechner: Pfeil links, Kacheln, Pfeil rechts. Die Pfeile sind so hoch wie
+   die Kacheln (Grid streckt sie auf die Zeilenhöhe) und haben denselben
+   Abstand zu ihnen wie die Kacheln untereinander. Abstand über margin statt
+   gap: Sind die Pfeile ausgeblendet, bleibt so kein leerer Rand stehen. */
+.bewertungen-karussell {
+  --kachel-abstand: 18px;
+  --pfeil-breite: 52px;
+
+  display: grid;
+  grid-template-areas: "zurueck liste weiter";
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.bewertungen-pfeil--zurueck {
+  margin-right: var(--kachel-abstand);
+  grid-area: zurueck;
+}
+
+.bewertungen-pfeil--weiter {
+  margin-left: var(--kachel-abstand);
+  grid-area: weiter;
+}
+
 /* Eine quer scrollende Reihe: drei Kacheln passen hinein, der Rest liegt
    daneben. scroll-snap lässt jede Kachel sauber am linken Rand einrasten -
    beim Wischen wie beim Blättern mit den Pfeilen (bewertungen.js). */
 .bewertungen-kacheln {
-  --kachel-abstand: 18px;
-
   display: grid;
+  min-width: 0;
   margin: 0;
   padding: 0;
   gap: var(--kachel-abstand);
+  grid-area: liste;
   grid-auto-columns: calc((100% - 2 * var(--kachel-abstand)) / 3);
   grid-auto-flow: column;
   list-style: none;
@@ -72,37 +95,73 @@
   display: none;
 }
 
-.bewertungen-pfeile {
-  display: flex;
-  gap: 10px;
+/* Die Pfeile in Glas-Optik: fast durchsichtig, leicht weichgezeichnet, mit
+   feiner heller Kante und weichem Schatten - im Ruhezustand kaum zu sehen.
+   Die Ecken leicht gerundet wie die Balken der Auslastung.
+
+   Das Pfeilsymbol bleibt trotzdem erkennbar: Sein Grau hat gut 3:1 Kontrast
+   zum Hintergrund, das Minimum für Bedienelemente (WCAG 1.4.11). */
+.bewertungen-pfeil {
+  display: grid;
+  width: var(--pfeil-breite);
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--glanz) 70%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--glanz) 28%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--glanz) 80%, transparent),
+    0 6px 20px color-mix(in srgb, var(--ink) 6%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  backdrop-filter: blur(14px) saturate(1.4);
+  color: color-mix(in srgb, var(--ink) 50%, var(--paper));
+  cursor: pointer;
+  place-items: center;
+  transition: background .25s, border-color .25s, box-shadow .25s, color .25s, transform .15s;
 }
 
-/* Das hidden-Attribut verliert sonst gegen display: flex. */
-.bewertungen-pfeile[hidden] {
+/* Das hidden-Attribut verliert sonst gegen display: grid. */
+.bewertungen-pfeil[hidden] {
   display: none;
 }
 
-.bewertungen-pfeil {
-  display: grid;
-  width: 52px;
-  height: 52px;
-  border: 1px solid var(--ink);
-  background: transparent;
-  color: var(--ink);
-  font: 700 1.3rem var(--body);
-  cursor: pointer;
-  place-items: center;
-  transition: background .2s, color .2s;
+/* Ein schlanker Winkel statt eines Textpfeils. */
+.bewertungen-pfeil svg {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.75;
 }
 
-.bewertungen-pfeil:hover {
-  background: var(--ink);
-  color: var(--paper);
+/* Mit der Maus darüber oder per Tastatur ausgewählt: in der Markenfarbe,
+   deutlich sichtbar, mit weichem Leuchten. */
+.bewertungen-pfeil:hover,
+.bewertungen-pfeil:focus-visible {
+  border-color: var(--lime);
+  background: var(--lime);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--lime-dark) 35%, transparent);
+  color: var(--ink);
 }
 
 .bewertungen-pfeil:focus-visible {
   outline: 2px solid var(--lime-dark);
   outline-offset: 2px;
+}
+
+/* Beim Klicken gibt der Pfeil kurz ein wenig nach. */
+.bewertungen-pfeil:active {
+  transform: scale(.96);
+}
+
+/* Auf Geräten ohne Mauszeiger (Handy, Tablet) gibt es kein Überfahren -
+   dort sind die Pfeile von Anfang an deutlicher zu sehen. */
+@media (hover: none) {
+  .bewertungen-pfeil {
+    background: color-mix(in srgb, var(--glanz) 65%, transparent);
+    color: var(--ink);
+  }
 }
 
 /* Aufbau wie die Programmkacheln: Bild über die ganze Fläche, der Text
@@ -296,15 +355,54 @@
   text-decoration: underline;
 }
 
-/* --- Formular im Fenster --------------------------------------------------- */
-/* Felder und Meldung sehen aus wie im Login (auth.css). */
-.bewertung-formular {
+/* --- Formular und eigene Bewertung im Fenster ------------------------------- */
+/* Zu sehen ist immer nur eins von beiden, siehe bewertungen.js. Felder und
+   Meldung sehen aus wie im Login (auth.css). */
+.bewertung-formular,
+.bewertung-eigene {
   display: grid;
   margin-bottom: 28px;
   padding: 24px;
   border: 1px solid var(--line);
   background: var(--ink-soft);
   gap: 10px;
+}
+
+/* Das hidden-Attribut verliert sonst gegen display: grid. */
+.bewertung-formular[hidden],
+.bewertung-eigene[hidden] {
+  display: none;
+}
+
+/* Die eigene Bewertung steht schon in einem Kasten - die Karte darin
+   braucht keinen zweiten Rahmen. */
+.bewertung-eigene .bewertung {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+/* Unauffälliger Textknopf, beim Überfahren rot: Löschen ist endgültig. */
+.bewertung-loeschen {
+  margin-top: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  font: .85rem var(--body);
+  justify-self: start;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.bewertung-loeschen:hover {
+  color: var(--danger);
+}
+
+.bewertung-loeschen:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 3px;
 }
 
 .bewertung-formular-titel {
@@ -398,6 +496,10 @@
   display: none;
 }
 
+.bewertung-formular-meldung--erfolg {
+  border-left-color: var(--lime);
+}
+
 /* --- Karten im Fenster ----------------------------------------------------- */
 .bewertungen-liste {
   display: grid;
@@ -467,9 +569,25 @@
     grid-auto-columns: 100%;
   }
 
-  /* Der Abschnittskopf steht hier untereinander (section-head.css). */
-  .bewertungen-pfeile {
-    margin-top: 22px;
+  /* Auf dem Handy stehen beide Pfeile klein und quadratisch nebeneinander
+     über den Kacheln - daneben wäre für eine Kachel kein Platz. */
+  .bewertungen-karussell {
+    grid-template-areas:
+      "zurueck weiter ."
+      "liste   liste  liste";
+    grid-template-columns: auto auto minmax(0, 1fr);
+  }
+
+  .bewertungen-pfeil {
+    height: var(--pfeil-breite);
+  }
+
+  .bewertungen-pfeil--zurueck {
+    margin: 0 10px 22px 0;
+  }
+
+  .bewertungen-pfeil--weiter {
+    margin: 0 0 22px;
   }
 
   .bewertung-kachel {
@@ -498,5 +616,9 @@
 
   .bewertungen-pfeil {
     transition: none;
+  }
+
+  .bewertungen-pfeil:active {
+    transform: none;
   }
 }

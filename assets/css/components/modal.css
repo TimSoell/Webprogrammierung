@@ -1,8 +1,8 @@
 /**
  * @file        assets/css/components/modal.css
  * @layer       Komponente
- * @description Die Overlay-Fenster: Kurskalender und Rückfrage beim
- *              Tarifwechsel.
+ * @description Die Overlay-Fenster: Kurskalender, Rückfrage beim
+ *              Tarifwechsel und Hinweis auf den fehlenden Nachweis.
  *
  *              Sichtbarkeit wird ausschließlich über die Klasse .open
  *              gesteuert, gesetzt von assets/js/components/modal.js.

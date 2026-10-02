@@ -194,18 +194,24 @@ require ROOT_PATH . '/partials/header.php';
             <p class="eyebrow">Stimmen aus dem Club</p>
             <h2 class="display section-title" id="bewertungen-heading">Was andere<br>sagen.</h2>
           </div>
-
-          <!-- Blättern im Karussell. Erscheint nur, wenn nicht alle Kacheln
-               auf einmal zu sehen sind - das entscheidet bewertungen.js. -->
-          <div class="bewertungen-pfeile" id="bewertungen-pfeile" hidden>
-            <button class="bewertungen-pfeil" id="bewertungen-zurueck" type="button" aria-label="Vorherige Bewertung">←</button>
-            <button class="bewertungen-pfeil" id="bewertungen-weiter" type="button" aria-label="Nächste Bewertung">→</button>
-          </div>
         </div>
 
-        <!-- Die Kacheln trägt assets/js/components/bewertungen.js ein. Die
-             Liste scrollt quer: drei Kacheln zu sehen, der Rest daneben. -->
-        <ul class="bewertungen-kacheln" id="bewertungen-kacheln" aria-label="Bewertungen, zum Blättern quer scrollen"></ul>
+        <!-- Das Karussell. Die Kacheln trägt assets/js/components/bewertungen.js
+             ein; die Liste scrollt quer: drei Kacheln zu sehen, der Rest
+             daneben. Die Pfeile stehen am Rechner links und rechts neben der
+             Liste, auf dem Handy darüber. Sie erscheinen nur, wenn nicht alle
+             Kacheln auf einmal zu sehen sind - das entscheidet bewertungen.js.
+             Das Pfeilsymbol ist ein SVG; Strichstärke und Farbe setzt
+             bewertungen.css. -->
+        <div class="bewertungen-karussell">
+          <button class="bewertungen-pfeil bewertungen-pfeil--zurueck" id="bewertungen-zurueck" type="button" aria-label="Vorherige Bewertung" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7"/></svg>
+          </button>
+          <ul class="bewertungen-kacheln" id="bewertungen-kacheln" aria-label="Bewertungen, zum Blättern quer scrollen"></ul>
+          <button class="bewertungen-pfeil bewertungen-pfeil--weiter" id="bewertungen-weiter" type="button" aria-label="Nächste Bewertung" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
         <p class="bewertungen-meldung" id="bewertungen-meldung" role="status">Bewertungen werden geladen …</p>
 
         <div class="bewertungen-fuss" id="bewertungen-fuss" hidden>
@@ -257,8 +263,19 @@ require ROOT_PATH . '/partials/header.php';
       <div class="bewertungen-schnitt" id="bewertungen-schnitt" hidden></div>
 
 <?php if ($angemeldet): ?>
-      <form class="bewertung-formular" id="bewertung-formular" novalidate>
+      <!-- Pro Konto gibt es eine Bewertung. Wer schon bewertet hat, sieht
+           sie hier und kann sie löschen; sonst steht das Formular da. Was
+           davon sichtbar ist, entscheidet bewertungen.js nach dem Laden -
+           deshalb sind beide zuerst versteckt. -->
+      <div class="bewertung-eigene" id="bewertung-eigene" hidden>
         <h3 class="bewertung-formular-titel">Deine Bewertung</h3>
+        <ul class="bewertungen-liste" id="bewertung-eigene-inhalt"></ul>
+        <button class="bewertung-loeschen" id="bewertung-loeschen" type="button">Bewertung löschen</button>
+        <p class="bewertung-formular-meldung" id="bewertung-eigene-meldung" aria-live="polite"></p>
+      </div>
+
+      <form class="bewertung-formular" id="bewertung-formular" novalidate hidden>
+        <h3 class="bewertung-formular-titel">Bewertung schreiben</h3>
 
         <fieldset class="bewertung-wahl">
           <legend>Sterne</legend>

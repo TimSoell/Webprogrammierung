@@ -22,6 +22,7 @@
   --muted: #9b9f96;                     /* Nebentext */
   --line: rgba(240, 239, 233, .16);     /* Trennlinien auf dunklem Grund */
   --danger: #ff6b57;                    /* Fehlermeldungen */
+  --glanz: #ffffff;                     /* Glanzlicht auf Glas-Flächen */
 
   /* --- Schriften -------------------------------------------------------- */
   --display: "Barlow Condensed", Impact, sans-serif;   /* Ueberschriften */

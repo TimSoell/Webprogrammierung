@@ -4,7 +4,8 @@
  * @layer       4 – API-Endpunkt
  * @description Anmelden, Abmelden und "Wer ist gerade angemeldet?".
  *
- *                GET     -> { vorname, nachname, email } oder 401
+ *                GET     -> { vorname, nachname, email, profilbild,
+ *                             profilbildOeffentlich } oder 401
  *                POST    { email, passwort } -> anmelden
  *                DELETE  -> abmelden
  *
@@ -26,6 +27,7 @@ use Delight\Auth\InvalidEmailException;
 use Delight\Auth\InvalidPasswordException;
 use Delight\Auth\TooManyRequestsException;
 use Repositories\MitgliedRepository;
+use Repositories\ProfilbildRepository;
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -37,12 +39,20 @@ try {
             Api::fehler(401, 'Du bist nicht angemeldet.');
         }
 
-        $mitglied = (new MitgliedRepository())->findenNachUserId($auth->getUserId());
+        $mitglieder = new MitgliedRepository();
+        $mitglied   = $mitglieder->findenNachUserId($auth->getUserId());
+        $mitgliedId = $mitglieder->idFindenNachUserId($auth->getUserId());
+
+        // Adresse des eigenen Profilbilds - das Bild selbst liefert
+        // api/profilbilder.php, damit diese Antwort klein bleibt.
+        $profilbild = $mitgliedId === null ? null : (new ProfilbildRepository())->standFinden($mitgliedId);
 
         Api::antworten([
-            'vorname'  => $mitglied['vorname'] ?? '',
-            'nachname' => $mitglied['nachname'] ?? '',
-            'email'    => $auth->getEmail(),
+            'vorname'               => $mitglied['vorname'] ?? '',
+            'nachname'              => $mitglied['nachname'] ?? '',
+            'email'                 => $auth->getEmail(),
+            'profilbild'            => $profilbild['url'] ?? null,
+            'profilbildOeffentlich' => $profilbild['oeffentlich'] ?? true,
         ]);
     }
 

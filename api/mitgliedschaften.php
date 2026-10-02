@@ -109,6 +109,9 @@ try {
      * Herabgestuft wird nach derselben Regel wie jeder Wechsel: zum nächsten
      * Monatsersten. Wer bereits einen Wechsel vorgemerkt hat, wird in Ruhe
      * gelassen - der ersetzt den Vertrag ohnehin.
+     *
+     * Zurückgenommen wird diese Vormerkung nicht hier, sondern in
+     * api/nachweise.php, sobald ein passender neuer Nachweis hochgeladen wird.
      */
     $ermaessigungPruefen = static function () use ($mitgliedschaften, $nachweise, $tarife, $mitgliedId): void {
         $laufend = $mitgliedschaften->aktiveFinden($mitgliedId);

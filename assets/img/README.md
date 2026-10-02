@@ -11,6 +11,12 @@ HTML verlinkt. Eigene Dateien liegen bisher nur hier:
   [README dort](coaches/README.md)
 - `bewertungen/` — KI-generierte Bilder zu den Beispielbewertungen auf der
   Startseite, siehe die [README dort](bewertungen/README.md)
+- `konto-mitgliedschaft.png` — **kommt noch vom Team.** Dezente
+  Strichzeichnung im Hintergrund der Karte „Mitgliedschaft" auf
+  `mein-konto.php`. PNG mit **durchsichtigem Hintergrund**, helle Linien,
+  etwa 600 × 600 px, unter 150 KB. Die Seite blendet sie selbst auf 22 %
+  ab. Solange die Datei fehlt, bleibt die Stelle leer – sobald sie mit genau
+  diesem Namen hier liegt, erscheint sie von allein.
 
 ## Wenn eigene Bilder dazukommen
 

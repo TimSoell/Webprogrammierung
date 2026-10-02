@@ -4,6 +4,9 @@
  * @description Die vier Tarifkarten auf mitgliedschaft.php, dazu der
  *              Umschalter für die Preisgruppe und der Seitenkopf.
  *
+ *              Ist eine Preisgruppe ohne Nachweis angeklickt, werden Karten
+ *              und Button grau - siehe ganz unten.
+ *
  *              Ob eine Leistung im Tarif enthalten ist, steht als
  *              data-enthalten="ja|nein" am <li>. Das Häkchen davor erzeugt
  *              CSS über ::before - so steht kein Symbol im HTML, und das
@@ -255,6 +258,18 @@
   }
 }
 
+/* "Mitgliedschaft." ist in der Mindestgröße der Schauschrift (4.3rem) rund
+   400px breit und ragte auf dem Handy über den Rand hinaus - die ganze
+   Seite ließ sich dann seitlich verschieben, Kopfzeile und Fenster saßen
+   nicht mehr mittig. Darunter wächst die Schrift deshalb mit der
+   Bildschirmbreite: 15vw sind bei 460px jene 4.3rem, ab dort gilt wieder
+   unverändert die Größe aus .display. */
+@media (max-width: 460px) {
+  .tarife-title {
+    font-size: 15vw;
+  }
+}
+
 /* --- Auswahl und Status auf der Karte ------------------------------------- */
 
 /* Kleiner Hinweis über dem Tarifnamen: "Aktueller Tarif" oder das Datum,
@@ -319,7 +334,8 @@
 
 /* --- Bestätigungsfenster -------------------------------------------------- */
 /* Das Fenster selbst (Rahmen, Hintergrund, Schließen) kommt aus
-   components/modal.css. Hier steht nur, was der Inhalt braucht. */
+   components/modal.css. Hier steht nur, was der Inhalt braucht.
+   .wechsel-buttons nutzt auch das Fenster "Nachweis fehlt" mit. */
 
 .wechsel-daten {
   display: grid;
@@ -420,8 +436,11 @@
   gap: 10px;
 }
 
+/* text-align für den Link im Nachweis-Fenster: Anders als ein <button>
+   richtet ein <a> umbrochenen Text nicht von selbst mittig aus. */
 .wechsel-buttons .button {
   flex: 1;
+  text-align: center;
 }
 
 /* --- Gesperrte Preisgruppen ----------------------------------------------- */
@@ -436,9 +455,10 @@
    Überlegung wie beim Haken in der Leistungsliste weiter oben - die
    Information darf nie allein an der Farbe hängen.
 
-   Den Grund nennt ohnehin die Aktionsleiste im Klartext ("Für den
-   ermäßigten Preis fehlt dein Nachweis"), und die eigentliche Sperre sitzt
-   im Endpunkt, nicht hier. */
+   Den Grund nennt die Aktionsleiste im Klartext ("Für den ermäßigten Preis
+   fehlt dein Nachweis") und ein Fenster, das aufgeht, sobald man dann
+   einen Tarif anklickt. Die eigentliche Sperre sitzt im Endpunkt, nicht
+   hier. */
 .preisgruppe-option[data-gesperrt="ja"] span {
   border-style: dashed;
   border-color: rgba(240, 239, 233, .2);
@@ -461,4 +481,58 @@
   background: rgba(0, 0, 0, .3);
   color: var(--paper);
   font-weight: 400;
+}
+
+/* --- Karten bei gesperrter Preisgruppe ------------------------------------ */
+
+/* Ist eine gesperrte Preisgruppe angeklickt, setzt das Seitenskript
+   .tarife-page--gesperrt an <main>. Dann verlieren die Karten und der Button
+   unten alles Limefarbene: Lime heißt auf dieser Seite "das kannst du
+   wählen", und genau das stimmt ohne Nachweis nicht. Einzige Ausnahme ist
+   der Hinweissatz in der Leiste unten, siehe am Ende dieses Abschnitts.
+
+   Die Preise bleiben lesbar - man soll sehen, was es kosten würde.
+
+   Wie bei der Preisgruppe oben hängt die Information nicht allein an der
+   Farbe: Der Rand wird gestrichelt, und auf jedem Button steht "Nachweis
+   fehlt" (das setzt das Seitenskript). */
+.tarife-page--gesperrt .tarifkarte {
+  border-style: dashed;
+  border-color: rgba(240, 239, 233, .2);
+  box-shadow: none;
+}
+
+.tarife-page--gesperrt .tarifkarte-name,
+.tarife-page--gesperrt .tarifkarte-status,
+.tarife-page--gesperrt .tarifkarte-betrag,
+.tarife-page--gesperrt .tarifkarte-beschreibung,
+.tarife-page--gesperrt .tarifkarte-leistung,
+.tarife-page--gesperrt .tarifkarte-leistung[data-enthalten="ja"]::before {
+  color: var(--muted);
+}
+
+/* Die Buttons auf den Karten sind hier NICHT disabled: Ein Klick öffnet das
+   Fenster "Nachweis fehlt". Aussehen sollen sie trotzdem wie gesperrt.
+
+   :hover steht dabei, weil die Regeln weiter oben den Button beim
+   Überfahren sonst wieder lime färben und anheben würden. */
+.tarife-page--gesperrt .tarifkarte-button,
+.tarife-page--gesperrt .tarifkarte-button:hover,
+.tarife-page--gesperrt .tarife-aktion .button:disabled,
+.tarife-page--gesperrt .tarife-aktion .button:disabled:hover {
+  border-style: dashed;
+  border-color: rgba(240, 239, 233, .2);
+  background: transparent;
+  color: var(--muted);
+  opacity: 1;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Der Satz in der Leiste unten ("Für den ermäßigten Preis fehlt dein
+   Nachweis ...") ist dann das Einzige in Lime. Zwischen lauter Grau fällt
+   er so auf - er erklärt, warum sich nichts wählen lässt. In diesem Zustand
+   steht dort immer genau dieser Hinweis, siehe zeichnen() im Seitenskript. */
+.tarife-page--gesperrt .tarife-aktion-text {
+  color: var(--lime);
 }

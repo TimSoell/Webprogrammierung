@@ -35,7 +35,7 @@ Kein ADR für: Farbwerte, Textänderungen, das Anlegen einer einzelnen Datei.
 | [0008](ADR-0008-gemerkte-auswahl-am-konto.md) | Gemerkte Auswahl liegt am Konto, nicht nur im Browser | angenommen |
 | [0009](ADR-0009-mitgliedschaften-datenmodell.md) | Tarife im Katalog, Verträge mit eingefrorenem Preis | angenommen |
 | [0010](ADR-0010-tarifwechsel-zum-monatsersten.md) | Tarifwechsel gelten zum Monatsersten und brauchen eine Bestätigung | angenommen |
-| [0011](ADR-0011-ausweispruefung-mit-ki.md) | Ausweise werden per KI geprüft, das Bild wird nie gespeichert | angenommen |
+| [0011](ADR-0011-ausweispruefung-mit-ki.md) | Ausweise werden per KI geprüft, das Bild wird nie gespeichert | angenommen, Hinweissatz vom Modell ersetzt durch 0020 |
 | [0012](ADR-0012-gemini-statt-claude.md) | Die Ausweisprüfung läuft über Gemini auf der kostenlosen Stufe | angenommen |
 | [0013](ADR-0013-auslastung-und-besuche.md) | Auslastung als Summe aus fester Kurve und gezählten Besuchen | angenommen |
 | [0014](ADR-0014-terminkalender-wochenplan.md) | Termine als Wochenplan, Buchungen mit Datum | angenommen |
@@ -43,4 +43,6 @@ Kein ADR für: Farbwerte, Textänderungen, das Anlegen einer einzelnen Datei.
 | [0016](ADR-0016-hosting-auf-vercel.md) | Hosting auf Vercel mit der Laufzeit vercel-php | angenommen, noindex ersetzt durch 0018 |
 | [0017](ADR-0017-postgresql-auf-supabase.md) | PostgreSQL bei Supabase, Sitzungen in der Datenbank | angenommen |
 | [0018](ADR-0018-indexierung-bei-google.md) | Die Seite darf bei Google erscheinen | angenommen |
+| [0019](ADR-0019-profilbilder-in-der-datenbank.md) | Profilbilder liegen in der Datenbank und haben eine eigene Adresse | angenommen |
+| [0020](ADR-0020-nachweise-absichern.md) | Ein Nachweis je Mitglied, und er muss auf den Kontoinhaber lauten | angenommen |
 | [0021](ADR-0021-gutschein-als-gratiszeitraum.md) | Ein Gutschein ist ein Gratiszeitraum am Mitglied, kein Vertrag | angenommen |
