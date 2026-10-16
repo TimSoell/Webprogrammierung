@@ -51,7 +51,7 @@ require ROOT_PATH . '/partials/header.php';
 
       <section class="auth-card empfang-karte" aria-labelledby="empfang-titel">
         <div class="empfang-titelzeile">
-          <h2 class="auth-heading" id="empfang-titel">Konten bestätigen</h2>
+          <h2 class="auth-heading" id="empfang-titel">Identität mit öffentlichem Dokument bestätigen</h2>
           <p class="empfang-anzahl" id="empfang-anzahl" aria-live="polite"></p>
         </div>
 

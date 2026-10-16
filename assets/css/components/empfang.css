@@ -236,6 +236,13 @@
 
 /* --- Schmal: jede Tabellenzeile ein Block ------------------------------------ */
 @media (max-width: 760px) {
+  /* Die Überschrift ist lang - der Zähler kommt darunter statt daneben. */
+  .empfang-titelzeile {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0;
+  }
+
   .empfang-werkzeuge {
     flex-wrap: wrap;
   }
