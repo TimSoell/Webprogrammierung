@@ -18,6 +18,7 @@ import { getJson, sendJson } from './api.js';
  * @property {number} stunde   0 bis 23
  * @property {number} basis    Typische Auslastung aus der Datenbank
  * @property {number} gebucht  Angekündigte Besuche und Check-ins
+ * @property {number} checkins Tatsächliche Check-ins, Teilmenge von gebucht
  * @property {number} gesamt   Größerer Wert aus basis und gebucht
  */
 

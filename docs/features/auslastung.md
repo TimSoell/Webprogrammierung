@@ -61,8 +61,8 @@ Antwort von `GET api/auslastung.php`:
   "stand": "2026-09-21T15:39:42+02:00",
   "jetzt": { "personen": 37, "prozent": 22, "stufe": "entspannt", "stunde": 15 },
   "verlauf": [
-    { "stunde": 0, "basis": 3, "gebucht": 0, "gesamt": 3 },
-    { "stunde": 15, "basis": 37, "gebucht": 5, "gesamt": 37 }
+    { "stunde": 0, "basis": 3, "gebucht": 0, "checkins": 0, "gesamt": 3 },
+    { "stunde": 15, "basis": 37, "gebucht": 5, "checkins": 2, "gesamt": 37 }
   ],
   "meine": [
     { "id": 7, "beginn": "2026-09-21 18:00:00", "ende": "2026-09-21 19:30:00", "art": "geplant" }
@@ -180,3 +180,12 @@ veröffentlicht sein; das SQL ergänzt nur die Daten.
 - Über ein angemeldetes Testkonto einen Besuch eintragen und entfernen:
   Die grüne Füllung wächst und kehrt anschließend zum vorherigen Wert zurück.
 - Browser: Uhrzeiten, Teilfüllung, Überschreitung und Konsole prüfen.
+
+## Hovercard je Stunde
+
+Beim Überfahren eines Stundenbalkens zeigt eine Karte Uhrzeit, übliche
+Auslastung, tatsächliche Check-ins (`art = jetzt`) und Ankündigungen
+(`art = geplant`) getrennt. Alle Zahlen zählen Besuche, deren Zeitraum die
+jeweilige Stunde berührt. Geplante Besuche werden nicht automatisch zu
+Check-ins, wenn ihre Startzeit verstreicht. Die Karte öffnet auch per
+Tastaturfokus oder Antippen; Escape schließt sie.

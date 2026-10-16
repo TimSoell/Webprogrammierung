@@ -89,13 +89,14 @@ try {
 
         for ($stunde = 0; $stunde < 24; $stunde++) {
             $basiswert = $basis[$stunde] ?? 0;
-            $gebucht   = $proStunde[$stunde] ?? 0;
+            $gebucht   = $proStunde[$stunde]['gebucht'];
 
             $verlauf[] = [
-                'stunde'  => $stunde,
-                'basis'   => $basiswert,
-                'gebucht' => $gebucht,
-                'gesamt'  => max($basiswert, $gebucht),
+                'stunde'   => $stunde,
+                'basis'    => $basiswert,
+                'gebucht'  => $gebucht,
+                'checkins' => $proStunde[$stunde]['checkins'],
+                'gesamt'   => max($basiswert, $gebucht),
             ];
         }
 
