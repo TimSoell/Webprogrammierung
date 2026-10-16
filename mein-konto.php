@@ -317,7 +317,8 @@ require ROOT_PATH . '/partials/header.php';
           <h2 class="auth-heading">Freunde werben</h2>
           <p class="auth-hint">
             Für jeden Freund, der sich registriert, bekommst du einen
-            Gutschein: 3 Monate Basisplan gratis.
+            Gutschein: 3 Monate Basisplan gratis. Einlösen kannst du ihn,
+            sobald das Konto deines Freundes am Empfang bestätigt ist.
           </p>
 
           <h3 class="werben-zwischentitel">Deine Gutscheine</h3>

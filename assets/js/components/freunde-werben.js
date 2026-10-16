@@ -192,14 +192,22 @@ export async function kontoWerbenAufbauen() {
   try {
     const [{ gutscheine }, { einladungen }] = await Promise.all([gutscheineLaden(), einladungenLaden()]);
 
+    // Drei Stände: eingelöst, einlösbar - oder wartend, bis das Konto des
+    // Freundes am Empfang bestätigt ist.
+    const gutscheinStand = (g) => {
+      if (g.eingeloest) {
+        return [`Basisplan gratis vom ${datumAnzeigen(g.gratisVon)} bis ${datumAnzeigen(g.gratisBis)}`, 'eingelöst', false];
+      }
+      if (!g.freigegeben) {
+        return [`3 Monate Basisplan gratis · einlösbar, sobald ${g.freund} am Empfang bestätigt ist`, 'wartet', false];
+      }
+
+      return ['3 Monate Basisplan gratis', 'einlösbar', true];
+    };
+
     gutscheinListe.replaceChildren(...(gutscheine.length === 0
       ? [leer('Noch kein Gutschein. Er kommt, sobald sich ein eingeladener Freund registriert.')]
-      : gutscheine.map((g) => eintragBauen(
-        g.code,
-        g.eingeloest ? `Basisplan gratis vom ${datumAnzeigen(g.gratisVon)} bis ${datumAnzeigen(g.gratisBis)}` : '3 Monate Basisplan gratis',
-        g.eingeloest ? 'eingelöst' : 'einlösbar',
-        !g.eingeloest,
-      ))));
+      : gutscheine.map((g) => eintragBauen(g.code, ...gutscheinStand(g)))));
 
     einladungListe.replaceChildren(...(einladungen.length === 0
       ? [leer('Du hast noch niemanden eingeladen.')]

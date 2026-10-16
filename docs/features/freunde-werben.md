@@ -2,7 +2,7 @@
 
 **Status:** fertig
 **Verantwortlich:** Jonny
-**Zuletzt geprüft:** 2026-10-02
+**Zuletzt geprüft:** 2026-10-16
 
 ## Was kann man damit
 
@@ -16,6 +16,8 @@ Registriert sich jemand mit genau dieser E-Mail, bekommt der Werber einen
 in der Karte **„Freunde werben"**, zusammen mit seinen Einladungen und deren
 Stand (offen oder registriert).
 
+Einlösen kann er ihn erst, wenn das Personal das Konto des Freundes **am
+Empfang bestätigt** hat — bis dahin steht der Gutschein auf „wartet".
 Eingelöst wird der Code auf der Mitgliedschaftsseite unter **„Gutschein
 einlösen"**. Danach steht in der Leiste dort, bis wann der Basisplan gratis ist.
 
@@ -40,8 +42,9 @@ Formulars den Link zum Login.
 ```
 1. Werber trägt Freund ein      POST api/empfehlungen.php   -> Zeile in empfehlungen, offen
 2. Werber gibt den Link weiter  (außerhalb der Seite)
-3. Freund registriert sich      POST api/mitglieder.php     -> Einladung erfüllt, Gutschein für den Werber
-4. Werber löst den Code ein     POST api/gutscheine.php     -> gratis_von / gratis_bis eingetragen
+3. Freund registriert sich      POST api/mitglieder.php     -> Einladung erfüllt, Gutschein für den Werber (wartet)
+4. Personal bestätigt Freund    PUT  api/empfang.php        -> Gutschein freigegeben
+5. Werber löst den Code ein     POST api/gutscheine.php     -> gratis_von / gratis_bis eingetragen
 ```
 
 Schritt 3 hängt allein an der **E-Mail**: Stimmt sie mit einer offenen
@@ -64,6 +67,12 @@ Gutschein anlegen passieren in einer Transaktion
 
 **Gutschein**
 
+- Er ist erst **freigegeben**, wenn das Konto des Geworbenen am Empfang
+  bestätigt ist (`mitglieder.bestaetigt_am`). Sonst ließe sich mit erfundenen
+  Konten Gratiszeit sammeln, siehe
+  [ADR-0026](../decisions/ADR-0026-schutz-vor-falschen-konten.md). Löscht ein
+  Admin das Konto des Geworbenen, verschwinden Einladung und noch nicht
+  eingelöster Gutschein mit ([Unstimmigkeiten](unstimmigkeiten.md)).
 - Er gehört dem Werber. **Nur er** kann ihn einlösen — ein erratener oder
   weitergegebener Code nützt niemand anderem. Für fremde und für erfundene
   Codes kommt dieselbe Antwort (404).
@@ -91,7 +100,8 @@ Gutschein anlegen passieren in einer Transaktion
 
 ```json
 { "gutscheine": [
-  { "code": "SK-E44HP2ZW", "eingeloest": true, "gratisVon": "2026-11-01", "gratisBis": "2027-01-31" }
+  { "code": "SK-E44HP2ZW", "eingeloest": true, "freigegeben": true, "freund": "Max Freund",
+    "gratisVon": "2026-11-01", "gratisBis": "2027-01-31" }
 ] }
 ```
 
@@ -108,7 +118,7 @@ Gutschein nicht eingelöst ist.
 | GET | `api/empfehlungen.php` | eigene Einladungen | siehe oben |
 | POST | `api/empfehlungen.php` | `{ name, email }` einladen | 201 `{ "eingeladen": true }` · 400 · 409 schon eingeladen, schon registriert oder zu viele offen |
 | GET | `api/gutscheine.php` | eigene Gutscheine | siehe oben |
-| POST | `api/gutscheine.php` | `{ code }` einlösen | `{ gratisVon, gratisBis }` · 404 · 409 schon eingelöst oder kein Basisplan |
+| POST | `api/gutscheine.php` | `{ code }` einlösen | `{ gratisVon, gratisBis }` · 404 · 409 schon eingelöst, noch nicht freigegeben oder kein Basisplan |
 
 Alle vier antworten ohne Anmeldung mit 401.
 
