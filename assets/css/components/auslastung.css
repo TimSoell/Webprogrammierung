@@ -84,7 +84,7 @@
   height: auto;
 }
 
-/* Der untere Teil jedes Balkens: die typische Auslastung aus der Datenbank. */
+/* Hintergrund jedes Balkens: die typische Auslastung aus der Datenbank. */
 .auslastung-balken {
   fill: #3a423d;
 }
@@ -93,8 +93,7 @@
   fill: #58635b;
 }
 
-/* Der obere Teil: angekuendigte Besuche. Bewusst die Markenfarbe - das ist
-   der Teil, der bei der Vorfuehrung waechst. */
+/* Die Füllung von unten: angekündigte Besuche und Check-ins. */
 .auslastung-balken-gebucht {
   fill: var(--lime);
 }

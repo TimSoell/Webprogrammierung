@@ -5,15 +5,9 @@
  * @description Liest die typische Auslastungskurve (Tabelle auslastung_basis)
  *              und verwaltet die angekündigten Besuche (Tabelle besuche).
  *
- *              Die angezeigte Auslastung ist immer eine SUMME aus zwei
- *              Quellen:
- *
- *                Basiswert  - die erfundene Kurve aus auslastung_basis
- *                Besuche    - echte Zeilen aus besuche
- *
- *              Nur der zweite Teil verändert sich, wenn jemand eincheckt.
- *              Genau das macht die Vorführung sichtbar: die Kurve steht,
- *              der Aufschlag wächst.
+ *              Die typische Kurve bleibt als grauer Vergleich sichtbar.
+ *              Besuche (geplant und jetzt) füllen sie im Diagramm grün aus.
+ *              Die API nimmt den größeren Wert als gesamte Auslastung.
  *
  *              Alle Methoden, die auf besuche schreiben oder löschen,
  *              bekommen die mitglied_id als ERSTEN Parameter und filtern in

@@ -166,7 +166,7 @@ require ROOT_PATH . '/partials/header.php';
             <p class="eyebrow">Live aus dem Studio</p>
             <h2 class="display section-title" id="auslastung-heading">Wie voll<br><span>ist es?</span></h2>
           </div>
-          <p class="section-lead">Die Kurve zeigt, wie viel an einem Tag wie heute üblicherweise los ist. Angekündigte Besuche kommen oben drauf — als Mitglied kannst du deinen im Konto eintragen.</p>
+          <p class="section-lead">Grau zeigt, wie viel zu dieser Zeit üblicherweise los ist. Angekündigte Besuche und Check-ins füllen die Balken grün — als Mitglied kannst du deinen Besuch im Konto eintragen.</p>
         </div>
 
         <div class="auslastung-jetzt" id="auslastung-jetzt" hidden>
@@ -183,7 +183,7 @@ require ROOT_PATH . '/partials/header.php';
 
         <ul class="auslastung-legende">
           <li><i class="auslastung-punkt auslastung-punkt--basis"></i>Üblich zu dieser Zeit</li>
-          <li><i class="auslastung-punkt auslastung-punkt--gebucht"></i>Angekündigte Besuche</li>
+          <li><i class="auslastung-punkt auslastung-punkt--gebucht"></i>Angekündigte Besuche &amp; Check-ins</li>
         </ul>
       </div>
     </section>

@@ -1,6 +1,6 @@
 # ADR-0013 — Auslastung als Summe aus fester Kurve und gezählten Besuchen
 
-**Status:** angenommen
+**Status:** ersetzt durch ADR-0022
 **Datum:** 2026-09-21
 
 ## Kontext

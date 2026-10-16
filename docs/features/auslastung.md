@@ -2,7 +2,7 @@
 
 **Status:** in Arbeit
 **Verantwortlich:** offen
-**Zuletzt geprueft:** 2026-09-21
+**Zuletzt geprueft:** 2026-10-16
 
 ## Was kann man damit
 
@@ -12,26 +12,30 @@ Tagesverlauf ist. Ueber dem Diagramm steht die aktuelle Zahl mit einer Ampel
 
 Angemeldete Mitglieder koennen unter **Mein Konto** sagen, wann sie kommen -
 entweder sofort ("Jetzt einchecken") oder fuer eine Uhrzeit spaeter. Jeder
-so eingetragene Besuch erhoeht die Auslastung unmittelbar. Das ist der Kern
-der Vorfuehrung: man traegt sich ein, wechselt zur Startseite und sieht den
-Balken wachsen.
+so eingetragene Besuch vergrößert die grüne Füllung. Übersteigt die Anzahl
+der Besuche den Durchschnitt, wächst der Balken darüber hinaus.
 
 ## Woher kommen die Daten
 
-Die angezeigte Zahl ist immer eine **Summe aus zwei Quellen**:
+Die Balkenhöhe ist das **Maximum aus Durchschnitt und erfassten Besuchen**:
 
 | Anteil | Quelle | Aendert sich |
 |---|---|---|
 | Basiswert | Tabelle `auslastung_basis` | nie im Betrieb |
-| Aufschlag | Tabelle `besuche` | bei jedem Check-in |
+| Grüne Füllung | Tabelle `besuche`, beide Besuchsarten | bei jedem Check-in und jeder Ankündigung |
 
 Der Basiswert ist **erfunden**. Ein echtes Studio wuerde ihn aus
 Drehkreuzdaten gewinnen; hier steht er in einer Tabelle, damit die Vorhersage
 aus der Datenbank kommt und nicht aus dem Quelltext. Wer die Kurve aendern
 will, aendert `database/seed.sql` - kein PHP.
 
-Im Diagramm sind die beiden Anteile getrennt zu sehen: der Basiswert gedeckt,
-der Aufschlag in der Markenfarbe obendrauf.
+Der Durchschnitt bildet den grauen Hintergrund. Besuche füllen ihn von unten
+grün, ohne Addition zum Durchschnitt. Sind mehr Besuche erfasst als üblich,
+wächst der grüne Balken über den Durchschnitt hinaus. Stunden sind als
+`9:00` statt `9` beschriftet. Die aktuelle Zahl und Ampel verwenden ebenfalls
+das Maximum, zählen Besuche aber minutengenau zum aktuellen Zeitpunkt.
+Die Stundenbalken zählen dagegen alle Besuche, die die Stunde berühren.
+Siehe [ADR-0022](../decisions/ADR-0022-auslastung-als-fuellung.md).
 
 ## Beteiligte Dateien
 
@@ -43,6 +47,7 @@ der Aufschlag in der Markenfarbe obendrauf.
 | 3 Service | `assets/js/services/auslastung.js` |
 | 4 Endpunkt | `api/auslastung.php` |
 | 5 Repository | `src/Repositories/AuslastungRepository.php` |
+| 5 Demo-Daten | `src/Repositories/AuslastungDemoRepository.php` (nur CLI) |
 | 6 Datenbank | `database/schema.sql`, `database/seed.sql` |
 | CSS | `assets/css/components/auslastung.css` |
 
@@ -54,10 +59,10 @@ Antwort von `GET api/auslastung.php`:
 {
   "kapazitaet": 170,
   "stand": "2026-09-21T15:39:42+02:00",
-  "jetzt": { "personen": 42, "prozent": 25, "stufe": "entspannt", "stunde": 15 },
+  "jetzt": { "personen": 37, "prozent": 22, "stufe": "entspannt", "stunde": 15 },
   "verlauf": [
     { "stunde": 0, "basis": 3, "gebucht": 0, "gesamt": 3 },
-    { "stunde": 15, "basis": 37, "gebucht": 5, "gesamt": 42 }
+    { "stunde": 15, "basis": 37, "gebucht": 5, "gesamt": 37 }
   ],
   "meine": [
     { "id": 7, "beginn": "2026-09-21 18:00:00", "ende": "2026-09-21 19:30:00", "art": "geplant" }
@@ -120,22 +125,15 @@ prueft je Stunde, ob der Zeitraum sie ueberlappt.
 1. Startseite oeffnen, Abschnitt "Wie voll ist es?" - Zahl merken
 2. Anmelden, **Mein Konto**, Karte "Mein Besuch"
 3. "Jetzt einchecken" klicken
-4. Zurueck zur Startseite: die Zahl ist um eins hoeher, der lime Aufsatz auf
-   der aktuellen Stunde waechst
+4. Zurück zur Startseite: die grüne Füllung der aktuellen Stunde wächst.
+   Die aktuelle Zahl wächst, sobald mehr Besuche als der Durchschnitt vorliegen.
 
 Die Startseite laedt alle 20 Sekunden von selbst nach. Wer beide Seiten in
 zwei Tabs offen hat, sieht die Aenderung also auch ohne Neuladen - das wirkt
 in der Vorfuehrung am besten.
 
-Fuer eine Vorfuehrung mit mehr Bewegung lassen sich Besuche direkt eintragen:
-
-```sql
-INSERT INTO besuche (mitglied_id, beginn, ende, art)
-SELECT 1, NOW(), NOW() + INTERVAL 90 MINUTE, 'jetzt'
-  FROM auslastung_basis LIMIT 20;
-```
-
-Und wieder weg mit `DELETE FROM besuche;`.
+Demo-Daten werden über `AuslastungDemoRepository::heuteEintragen()` ergänzt
+(siehe unten). Echte Besuche werden dabei weder gelöscht noch ersetzt.
 
 ## Was fehlt noch
 
@@ -145,3 +143,32 @@ Und wieder weg mit `DELETE FROM besuche;`.
   Skala waechst dann mit, damit nichts abgeschnitten wird.
 - Ein Mitglied kann beliebig viele Besuche fuer verschiedene Zeiten
   eintragen. Nur Ueberschneidungen sind gesperrt.
+
+## Demo-Daten für die Entwicklungsdatenbank
+
+`AuslastungDemoRepository` legt 150 gesperrte Demo-Mitglieder mit Adressen
+`auslastung-demo-…@example.invalid` an. Sie besitzen keine verwendbaren
+Zugangsdaten. Besuche dauern 90 Minuten: 24 ab 8:00, 18 ab 11:00, 120 ab
+16:00, 65 ab 19:00 sowie bis zu 45 ab dem aktuellen Zeitpunkt. Überschneidungen
+je Demo-Mitglied werden vermieden. So sieht man Teilfüllungen und Balken,
+die über den Durchschnitt hinauswachsen.
+
+Aus dem Projektordner ausführen (macOS mit XAMPP; andernfalls `php` verwenden):
+
+```sh
+/Applications/XAMPP/xamppfiles/bin/php -r 'define("CONFIG", require "config/config.php"); date_default_timezone_set("Europe/Berlin"); require "src/Database.php"; require "src/Repositories/AuslastungRepository.php"; require "src/Repositories/AuslastungDemoRepository.php"; echo (new Repositories\AuslastungDemoRepository())->heuteEintragen(), " Demo-Besuche eingetragen", PHP_EOL;'
+```
+
+Der Aufruf ist nur in der CLI und mit dem Entwicklungsziel aus der
+Konfigurationsvorlage erlaubt. Er ersetzt ausschließlich heutige Besuche
+der genannten Demo-Konten. Echte Benutzerkonten und ihre Besuche bleiben
+erhalten und werden gemeinsam mit den Demo-Besuchen gezählt. Die Daten
+sind an den heutigen Tag gebunden; für eine spätere Vorführung erneut ausführen.
+
+## Prüfung
+
+- Diagrammtests ohne zusätzliche Pakete: `node --test tests/*.test.mjs`.
+- API: `gesamt = max(basis, gebucht)` in allen 24 Stunden.
+- Über ein angemeldetes Testkonto einen Besuch eintragen und entfernen:
+  Die grüne Füllung wächst und kehrt anschließend zum vorherigen Wert zurück.
+- Browser: Uhrzeiten, Teilfüllung, Überschreitung und Konsole prüfen.
