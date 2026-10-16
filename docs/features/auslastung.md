@@ -165,6 +165,14 @@ der genannten Demo-Konten. Echte Benutzerkonten und ihre Besuche bleiben
 erhalten und werden gemeinsam mit den Demo-Besuchen gezählt. Die Daten
 sind an den heutigen Tag gebunden; für eine spätere Vorführung erneut ausführen.
 
+Für eine ausdrücklich gewünschte Vorführung in Produktion kann der
+Projektinhaber `src/Repositories/auslastung-demo.sql` im SQL Editor des
+entsprechenden Supabase-Projekts ausführen. Das Skript verwendet Berliner
+Zeit und ersetzt ausschließlich heutige Besuche seiner gesperrten
+Demo-Mitglieder. Der CLI-Aufruf oben bleibt auf die Entwicklungsdatenbank
+beschränkt. Die neue Diagrammdarstellung muss zusätzlich auf Vercel
+veröffentlicht sein; das SQL ergänzt nur die Daten.
+
 ## Prüfung
 
 - Diagrammtests ohne zusätzliche Pakete: `node --test tests/*.test.mjs`.
