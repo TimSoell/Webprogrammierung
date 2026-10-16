@@ -29,8 +29,8 @@ Konto am Empfang mit dem Personalausweis bestätigt hat. Warum, steht in
 
 **Das Personal** meldet sich hier genauso an. Es hat ein normales Konto mit
 der Rolle `EMPLOYEE` der Bibliothek und ruft den Empfang über seine Adresse
-auf — einen Link dorthin gibt es nirgends. Vergeben wird die Rolle nur im
-Supabase-Dashboard, siehe [Empfang](empfang.md).
+auf — einen Link dorthin gibt es nirgends. Vergeben wird die Rolle von einem
+Admin, siehe [Personal verwalten](personal-verwalten.md).
 
 ## Beteiligte Dateien
 

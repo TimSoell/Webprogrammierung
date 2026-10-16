@@ -1,6 +1,6 @@
 # ADR-0023 — Der Name ist bis zur Bestätigung am Empfang änderbar, und das Personal bestätigt jede Person einmal
 
-**Status:** angenommen, wer zum Empfang muss, Beginn der Frist, gezeigter Ausweis, Liste und „Ablehnen" ersetzt durch [ADR-0024](ADR-0024-empfang-bestaetigt-konto-mit-personalausweis.md)
+**Status:** angenommen, wer zum Empfang muss, Beginn der Frist, gezeigter Ausweis, Liste und „Ablehnen" ersetzt durch [ADR-0024](ADR-0024-empfang-bestaetigt-konto-mit-personalausweis.md); Vergabe der Rolle Personal nur im Dashboard ersetzt durch [ADR-0025](ADR-0025-admin-verwaltet-personal.md)
 **Datum:** 2026-10-16
 
 **Ergänzt [ADR-0020](ADR-0020-nachweise-absichern.md).** Dessen Regeln gelten

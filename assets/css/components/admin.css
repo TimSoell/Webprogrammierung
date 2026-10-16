@@ -1,0 +1,41 @@
+/**
+ * @file        assets/css/components/admin.css
+ * @layer       Komponente
+ * @description Die Seite für Admins: das Feld für die E-Mail-Adresse mit dem
+ *              Knopf "Zum Personal machen" daneben, auf schmalen
+ *              Bildschirmen untereinander.
+ *
+ *              Karte, Formular und Meldungen kommen aus auth.css, Gerüst und
+ *              Tabelle aus empfang.css - diese Datei regelt nur, was es nur
+ *              hier gibt.
+ * @see         admin.php
+ * @see         assets/css/components/auth.css
+ * @see         assets/css/components/empfang.css
+ */
+
+.admin-formular {
+  margin-bottom: 28px;
+}
+
+.admin-eingabe {
+  display: flex;
+  gap: 10px;
+}
+
+.admin-eingabe input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* auth.css setzt Knöpfe im Formular mit Abstand unter das letzte Feld -
+   hier steht der Knopf daneben. */
+.admin-formular .admin-eingabe .button {
+  margin-top: 0;
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .admin-eingabe {
+    flex-direction: column;
+  }
+}
