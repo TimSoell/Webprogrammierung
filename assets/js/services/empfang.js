@@ -18,6 +18,7 @@ import { getJson, sendJson } from './api.js';
  * @property {number} mitgliedId          zum Bestätigen und Ablehnen
  * @property {string} vorname             so, wie er im Konto steht
  * @property {string} nachname
+ * @property {string} email               unterscheidet Personen gleichen Namens
  * @property {'schueler'|'student'|'senior'} art
  * @property {string|null} gueltigBis     'JJJJ-MM-TT', null = unbefristet (Senior)
  * @property {string} geprueftAm          Zeitstempel des Uploads

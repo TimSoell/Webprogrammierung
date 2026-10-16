@@ -1,78 +1,226 @@
 /**
  * @file        assets/css/components/empfang.css
  * @layer       Komponente
- * @description Die Liste auf der Seite des Empfangs: je Mitglied Name,
- *              Nachweis und Frist, daneben Bestätigen und Ablehnen.
+ * @description Die Seite des Empfangs: oben Titel und Erklärung, darunter
+ *              eine breite Karte mit Suche, Filter und der Tabelle der
+ *              offenen Ausweise - je Zeile Person, Nachweis, Status und die
+ *              Knöpfe Bestätigen und Ablehnen. Auf schmalen Bildschirmen
+ *              wird aus jeder Tabellenzeile ein Block.
  *
- *              Seitengerüst und Karte kommen aus auth.css, wie bei der
- *              Anmeldung - diese Datei regelt nur die Liste darin.
+ *              Seitenabstand, Karte, Überschriften und Meldungen kommen aus
+ *              auth.css - diese Datei regelt nur, was es nur hier gibt.
  * @see         empfang.php
  * @see         assets/css/components/auth.css
  */
 
-.empfang-zurueck {
-  display: inline-block;
-  margin-top: 24px;
-}
-
-.empfang-liste {
+/* --- Gerüst: Kopf oben, Karte darunter über die ganze Breite ---------------- */
+.empfang-inner {
   display: grid;
-  gap: 10px;
-  margin: 18px 0;
-  padding: 0;
-  list-style: none;
+  gap: 48px;
 }
 
-.empfang-eintrag {
+.empfang-kopf {
+  display: grid;
+  align-items: end;
+  gap: 40px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+}
+
+.empfang-kopf .auth-lead {
+  margin: 0;
+}
+
+.empfang-titelzeile {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
   gap: 16px;
-  padding: 14px 18px;
-  border-left: 3px solid var(--lime);
+}
+
+.empfang-anzahl {
+  margin: 0;
+  color: var(--lime);
+  font: 700 .76rem var(--body);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+/* --- Werkzeugleiste: Suche links, Filter und Neu laden rechts --------------- */
+.empfang-werkzeuge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0 18px;
+}
+
+.empfang-suche {
+  position: relative;
+  flex: 1 1 320px;
+  max-width: 460px;
+}
+
+.empfang-suche svg {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--muted);
+  stroke-linecap: round;
+  stroke-width: 2;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.empfang-suche input {
+  width: 100%;
+  padding: 13px 14px 13px 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
   background: var(--ink);
+  color: var(--paper);
+  font: .95rem var(--body);
+}
+
+.empfang-suche input::placeholder {
+  color: var(--muted);
+}
+
+.empfang-filter {
+  margin-left: auto;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+  font: 700 .8rem var(--body);
+}
+
+.empfang-neu {
+  display: grid;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+}
+
+.empfang-neu svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.empfang-filter:hover,
+.empfang-neu:hover {
+  border-color: var(--lime);
+}
+
+.empfang-neu[disabled] {
+  cursor: wait;
+  opacity: .5;
+}
+
+.empfang-suche input:focus-visible,
+.empfang-filter:focus-visible,
+.empfang-neu:focus-visible,
+.empfang-aktionen button:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 2px;
+}
+
+/* --- Tabelle ---------------------------------------------------------------- */
+.empfang-tabelle {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Ohne Zeilen bliebe nur der Tabellenkopf stehen - dann spricht der
+   Hinweis darunter für sich. */
+.empfang-tabelle:has(tbody:empty) {
+  display: none;
+}
+
+.empfang-tabelle th {
+  padding: 12px 18px;
+  background: color-mix(in srgb, var(--paper) 4%, var(--ink));
+  color: var(--muted);
+  font: 700 .7rem var(--body);
+  letter-spacing: .08em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.empfang-tabelle td {
+  padding: 16px 18px;
+  border-top: 1px solid var(--line);
+  background: var(--ink);
+  vertical-align: middle;
+}
+
+.empfang-zeile-kopf {
+  display: block;
+  font-weight: 700;
+}
+
+.empfang-zeile-zusatz {
+  display: block;
+  color: var(--muted);
+  font-size: .82rem;
+  overflow-wrap: anywhere;
+}
+
+/* Status mit Punkt davor: Lime = Frist läuft, Rot = verpasst. */
+.empfang-status .empfang-zeile-kopf::before {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: var(--lime);
+  content: "";
+  vertical-align: middle;
 }
 
 /* Frist verpasst: Diese Person zahlt gerade den Standardpreis. Fällt auf,
    damit sie am Empfang nicht übersehen wird. */
-.empfang-eintrag[data-frist-verpasst="ja"] {
-  border-left-color: var(--danger);
+.empfang-tabelle tr[data-frist-verpasst="ja"] td:first-child {
+  box-shadow: inset 3px 0 0 var(--danger);
 }
 
-.empfang-text {
-  min-width: 0;
-}
-
-.empfang-text p {
-  margin: 0;
-  line-height: 1.5;
-}
-
-.empfang-name {
-  font-weight: 700;
-}
-
-.empfang-angaben,
-.empfang-frist {
-  color: var(--muted);
-  font-size: .82rem;
-}
-
-.empfang-eintrag[data-frist-verpasst="ja"] .empfang-frist {
+.empfang-tabelle tr[data-frist-verpasst="ja"] .empfang-status .empfang-zeile-kopf {
   color: var(--danger);
 }
 
+.empfang-tabelle tr[data-frist-verpasst="ja"] .empfang-status .empfang-zeile-kopf::before {
+  background: var(--danger);
+}
+
 .empfang-aktionen {
-  display: flex;
-  flex: none;
-  align-items: center;
-  gap: 14px;
+  text-align: right;
+  white-space: nowrap;
 }
 
 .empfang-aktionen .button {
   min-height: 40px;
+  margin-right: 14px;
   padding: 0 16px;
   cursor: pointer;
+  vertical-align: middle;
 }
 
 .empfang-ablehnen {
@@ -85,15 +233,11 @@
   font-size: .78rem;
   text-decoration: underline;
   text-underline-offset: 3px;
+  vertical-align: middle;
 }
 
 .empfang-ablehnen:hover {
   color: var(--danger);
-}
-
-.empfang-aktionen button:focus-visible {
-  outline: 2px solid var(--lime);
-  outline-offset: 3px;
 }
 
 .empfang-aktionen button[disabled] {
@@ -101,10 +245,86 @@
   opacity: .5;
 }
 
-/* Schmal: Knöpfe unter den Text statt daneben. */
-@media (max-width: 560px) {
-  .empfang-eintrag {
-    align-items: flex-start;
-    flex-direction: column;
+.empfang-leer {
+  margin: 18px 0 0;
+}
+
+.empfang-zurueck {
+  display: inline-block;
+  margin-top: 24px;
+}
+
+/* --- Schmal: Kopf untereinander, jede Tabellenzeile ein Block --------------- */
+@media (max-width: 760px) {
+  .empfang-kopf {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .empfang-werkzeuge {
+    flex-wrap: wrap;
+  }
+
+  .empfang-suche {
+    max-width: none;
+    flex-basis: 100%;
+  }
+
+  .empfang-filter {
+    flex: 1;
+    margin-left: 0;
+  }
+
+  /* Der Kopf bleibt für Screenreader da, sichtbar steht die Spalte an
+     jeder Zelle selbst (data-spalte). */
+  .empfang-tabelle thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .empfang-tabelle,
+  .empfang-tabelle tbody,
+  .empfang-tabelle tr,
+  .empfang-tabelle td {
+    display: block;
+  }
+
+  .empfang-tabelle tr {
+    padding: 14px 16px;
+    background: var(--ink);
+  }
+
+  .empfang-tabelle tr + tr {
+    border-top: 1px solid var(--line);
+  }
+
+  .empfang-tabelle td {
+    padding: 5px 0;
+    border-top: 0;
+    background: none;
+  }
+
+  .empfang-tabelle td[data-spalte]::before {
+    display: block;
+    color: var(--muted);
+    content: attr(data-spalte);
+    font: 700 .64rem var(--body);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .empfang-tabelle tr[data-frist-verpasst="ja"] {
+    box-shadow: inset 3px 0 0 var(--danger);
+  }
+
+  .empfang-tabelle tr[data-frist-verpasst="ja"] td:first-child {
+    box-shadow: none;
+  }
+
+  .empfang-aktionen {
+    padding-top: 10px;
+    text-align: left;
   }
 }

@@ -143,17 +143,22 @@ final class NachweisRepository
      * Er kann jederzeit nachkommen und bekommt dann seinen Preis zurück.
      * Am dringendsten zuerst, also nach Frist sortiert.
      *
+     * Die E-Mail kommt aus users, der Tabelle der Login-Bibliothek - nur
+     * lesend. Mit ihr unterscheidet das Personal zwei Personen gleichen
+     * Namens.
+     *
      * @return array<int, array<string, mixed>>  je Zeile mitglied_id,
-     *         vorname, nachname, vorzeigen_bis, nachweis_id, art,
+     *         vorname, nachname, email, vorzeigen_bis, nachweis_id, art,
      *         gueltig_bis, geprueft_am
      */
     public function amEmpfangOffeneFinden(): array
     {
         $stmt = Database::connection()->prepare(
-            'SELECT m.id AS mitglied_id, m.vorname, m.nachname, m.vorzeigen_bis,
+            'SELECT m.id AS mitglied_id, m.vorname, m.nachname, u.email, m.vorzeigen_bis,
                     n.id AS nachweis_id, n.art, n.gueltig_bis, n.geprueft_am
                FROM nachweise n
                JOIN mitglieder m ON m.id = n.mitglied_id
+               JOIN "users" u ON u.id = m.user_id
               WHERE m.bestaetigt_am IS NULL
                 AND (n.gueltig_bis IS NULL OR n.gueltig_bis >= CURRENT_DATE)
               ORDER BY m.vorzeigen_bis, m.nachname, m.vorname'
