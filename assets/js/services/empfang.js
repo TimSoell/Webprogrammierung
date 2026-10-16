@@ -49,7 +49,7 @@ export async function offeneLaden() {
  *
  * @param {number} mitgliedId
  * @returns {Promise<{offen: Array<OffenesKonto>}>}  die Liste danach
- * @throws {ApiError}  403 beim eigenen Konto, 409 wenn es schon bestätigt ist
+ * @throws {ApiError}  403 beim eigenen oder selbst geworbenen Konto, 409 wenn es schon bestätigt ist
  */
 export async function bestaetigen(mitgliedId) {
   return sendJson('PUT', 'api/empfang.php', { mitgliedId: String(mitgliedId) });

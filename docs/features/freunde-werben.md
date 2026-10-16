@@ -73,6 +73,9 @@ Gutschein anlegen passieren in einer Transaktion
   [ADR-0026](../decisions/ADR-0026-schutz-vor-falschen-konten.md). Löscht ein
   Admin das Konto des Geworbenen, verschwinden Einladung und noch nicht
   eingelöster Gutschein mit ([Unstimmigkeiten](unstimmigkeiten.md)).
+- Wer zum **Personal** gehört, darf seine eigenen geworbenen Freunde am
+  Empfang nicht selbst bestätigen — das macht jemand anderes. Sonst gäbe es
+  sich den Gutschein mit einem erfundenen Freund selbst frei.
 - Er gehört dem Werber. **Nur er** kann ihn einlösen — ein erratener oder
   weitergegebener Code nützt niemand anderem. Für fremde und für erfundene
   Codes kommt dieselbe Antwort (404).

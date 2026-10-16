@@ -40,6 +40,10 @@ Randbedingung wie immer: Die Datenstruktur wird nur ergänzt.
 - **Ein Gutschein lässt sich erst einlösen, wenn das Konto des Geworbenen am
   Empfang bestätigt ist.** Bis dahin steht er in „Mein Konto" auf „wartet".
   Dafür reicht die Spalte `mitglieder.bestaetigt_am`, die es schon gibt.
+- **Das Personal bestätigt nie Konten, die es selbst geworben hat** — genau
+  wie das eigene Konto. Sonst gäbe es sich mit einem erfundenen Freund den
+  Gutschein selbst frei. Wer wen geworben hat, steht schon in
+  `empfehlungen.werber_id` und `empfehlungen.geworben_id`.
 
 ## Konsequenzen
 
@@ -58,6 +62,8 @@ Randbedingung wie immer: Die Datenstruktur wird nur ergänzt.
   helfen nur die Rückfrage und dass nur gemeldete Konten gehen.
 - **Ehrliche Werber warten länger** auf ihren Gutschein — bis der Freund zum
   ersten Training kommt.
+- **Hat jemand vom Personal den Freund geworben und steht allein am Tresen**,
+  muss der Freund ein anderes Mal wiederkommen.
 - **Wer gemeldet oder gelöscht hat, wird nicht gespeichert.**
 
 ## Verworfene Alternativen

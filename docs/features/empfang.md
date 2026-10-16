@@ -85,7 +85,7 @@ sein Konto (`Auth::nurFuerPersonal()`), und `api/empfang.php` antwortet mit
 
 | | |
 |---|---|
-| Wer bestätigt | nur das Personal, und nie das eigene Konto |
+| Wer bestätigt | nur das Personal — nie das eigene Konto und nie Konten, die es über „Freunde werben" selbst geworben hat (sonst gäbe es sich den Gutschein selbst frei) |
 | Was bestätigt wird | das Konto: Personalausweis gesehen, Foto passt zur Person, Name zum Konto |
 | Was der Empfang nicht prüft | Schüler-, Studierenden- und Seniorennachweise |
 | Wie oft | einmal je Konto, für immer |
@@ -145,7 +145,7 @@ etwas gemeldet hat.
 | Methode | Pfad | Zweck | Antwort |
 |---|---|---|---|
 | GET | `api/empfang.php` | alle unbestätigten Konten | `{ "offen": [...] }` · 401 · 403 |
-| PUT | `api/empfang.php` | Konto bestätigen, `{ mitgliedId }` | `{ "offen": [...] }` · 400 · 403 eigenes Konto · 409 schon bestätigt |
+| PUT | `api/empfang.php` | Konto bestätigen, `{ mitgliedId }` | `{ "offen": [...] }` · 400 · 403 eigenes oder selbst geworbenes Konto · 409 schon bestätigt |
 | POST | `api/empfang.php` | Unstimmigkeit melden, `{ mitgliedId, grund }` | `{ "offen": [...] }` · 400 ohne Grund · 403 eigenes Konto · 409 schon gemeldet |
 
 **409** heißt meist: Jemand anderes am Empfang hat gerade schneller

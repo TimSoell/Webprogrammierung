@@ -21,6 +21,11 @@
  *              Ausweisprüfung in api/nachweise.php. Siehe
  *              docs/decisions/ADR-0024-empfang-bestaetigt-konto-mit-personalausweis.md
  *
+ *              NIE SELBST: Das eigene Konto und Konten, die das Personal über
+ *              "Freunde werben" selbst geworben hat, bestätigt jemand anderes
+ *              (403). Die Bestätigung gibt nämlich den Gutschein des Werbers
+ *              frei, siehe api/gutscheine.php.
+ *
  *              UNSTIMMIGKEIT heißt: Der Personalausweis ist falsch, oder die
  *              Person passt nicht zum Konto. Das Personal schreibt kurz dazu,
  *              was nicht passt; löschen kann es nichts. Das tut ein Admin auf
@@ -35,6 +40,7 @@
  *              nimmt die Bestätigung das zurück - nach derselben Regel wie
  *              beim Hochladen in api/nachweise.php.
  * @see         assets/js/services/empfang.js
+ * @see         src/Repositories/EmpfehlungRepository.php
  * @see         src/Repositories/MitgliedRepository.php
  * @see         src/Repositories/MitgliedschaftRepository.php
  * @see         src/Repositories/NachweisRepository.php
@@ -45,6 +51,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/../src/bootstrap.php';
 
+use Repositories\EmpfehlungRepository;
 use Repositories\MitgliedRepository;
 use Repositories\MitgliedschaftRepository;
 use Repositories\NachweisRepository;
@@ -141,6 +148,13 @@ try {
     // Personal selbst jeden Namen geben.
     if ($mitgliedId === $eigeneId) {
         Api::fehler(403, 'Dein eigenes Konto muss jemand anderes am Empfang bestätigen.');
+    }
+
+    // Ebenso Konten, die das Personal selbst geworben hat: Die Bestätigung
+    // gibt den Gutschein des Werbers frei - sonst könnte es sich mit einem
+    // erfundenen Freund selbst Gratiszeit verschaffen.
+    if ($eigeneId !== null && (new EmpfehlungRepository())->hatGeworben($eigeneId, $mitgliedId)) {
+        Api::fehler(403, 'Dieses Konto hast du selbst geworben – bestätigen muss es jemand anderes am Empfang.');
     }
 
     if (!$mitglieder->bestaetigen($mitgliedId)) {

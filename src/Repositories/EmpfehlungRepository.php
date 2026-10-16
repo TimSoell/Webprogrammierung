@@ -13,6 +13,7 @@
  * @see         database/schema.sql
  * @see         api/empfehlungen.php
  * @see         api/mitglieder.php
+ * @see         api/empfang.php
  * @see         docs/features/freunde-werben.md
  */
 
@@ -65,6 +66,26 @@ final class EmpfehlungRepository
         $stmt->execute([$werberId]);
 
         return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * Hat dieses Mitglied jenes geworben? Der Empfang fragt das, bevor das
+     * Personal ein Konto bestätigt: Wer seinen eigenen geworbenen Freund
+     * bestätigt, gibt sich damit selbst den Gutschein frei.
+     *
+     * @param int $werberId    mitglieder.id des möglichen Werbers
+     * @param int $geworbenId  mitglieder.id des Kontos, um das es geht
+     * @return bool
+     */
+    public function hatGeworben(int $werberId, int $geworbenId): bool
+    {
+        $stmt = Database::connection()->prepare(
+            'SELECT 1 FROM empfehlungen
+              WHERE werber_id = ? AND geworben_id = ?'
+        );
+        $stmt->execute([$werberId, $geworbenId]);
+
+        return $stmt->fetchColumn() !== false;
     }
 
     /**
