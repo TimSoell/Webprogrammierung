@@ -90,8 +90,8 @@ require ROOT_PATH . '/partials/header.php';
             </p>
 
             <p class="auth-hint konto-name-gesperrt" id="name-bestaetigt" hidden>
-              Dein Name wurde am Empfang mit deinem Ausweis bestätigt und ist
-              jetzt fest. Das Konto gehört damit dir allein.
+              Dein Konto wurde am Empfang mit deinem Personalausweis bestätigt.
+              Der Name ist jetzt fest, das Konto gehört damit dir allein.
             </p>
 
             <form class="auth-form konto-name-form" id="name-form" hidden>
@@ -221,8 +221,8 @@ require ROOT_PATH . '/partials/header.php';
             Fotografiere deinen Ausweis — wir lesen Name und Datum aus und
             löschen das Bild sofort danach. Der Name muss zu deinem Konto
             passen, und es gilt immer nur ein Nachweis. Der Preis gilt
-            sofort; zeig den Ausweis innerhalb von 14 Tagen einmal am
-            Empfang. Danach prüfen wir neue Ausweise nur noch online.
+            sofort; zeig innerhalb von 14 Tagen einmal deinen
+            Personalausweis am Empfang, damit wir dein Konto bestätigen.
           </p>
 
           <ul class="nachweis-liste" id="nachweis-liste"></ul>

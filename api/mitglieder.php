@@ -147,7 +147,7 @@ try {
         // Die Sperre sitzt hier und nicht im Browser - der Knopf auf der
         // Kontoseite erklärt nur, warum es gerade nicht geht.
         if ($mitglieder->empfangsstandFinden($mitgliedId)['bestaetigt_am'] !== null) {
-            Api::fehler(409, 'Dein Name wurde am Empfang mit deinem Ausweis bestätigt und lässt sich nicht mehr ändern.');
+            Api::fehler(409, 'Dein Konto wurde am Empfang mit deinem Personalausweis bestätigt. Der Name lässt sich nicht mehr ändern.');
         }
         if ((new NachweisRepository())->aktuellenFinden($mitgliedId) !== null) {
             Api::fehler(409, 'Solange ein gültiger Nachweis hinterlegt ist, lässt sich der Name nicht ändern. Entferne zuerst den Nachweis und lade ihn danach neu hoch.');

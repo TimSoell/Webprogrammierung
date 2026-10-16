@@ -210,16 +210,16 @@ if (seite) {
    */
   const empfangStand = () => {
     if (empfang.bestaetigt) {
-      return { stand: 'bestaetigt', text: 'Am Empfang bestätigt' };
+      return { stand: 'bestaetigt', text: 'Konto am Empfang bestätigt' };
     }
     if (empfang.fristVerpasst) {
       return {
         stand: 'verpasst',
-        text: 'Frist für den Empfang verpasst — der ermäßigte Preis gilt erst wieder, wenn das Personal deinen Ausweis gesehen hat',
+        text: 'Frist für den Empfang verpasst — der ermäßigte Preis gilt erst wieder, wenn das Personal deinen Personalausweis gesehen hat',
       };
     }
 
-    return { stand: 'offen', text: `Zeig deinen Ausweis bis ${datumAnzeigen(empfang.vorzeigenBis)} einmal am Empfang` };
+    return { stand: 'offen', text: `Zeig bis ${datumAnzeigen(empfang.vorzeigenBis)} einmal deinen Personalausweis am Empfang` };
   };
 
   /**
@@ -434,7 +434,7 @@ if (seite) {
       // Frist verpasst: Gespeichert ist der Nachweis, für den Preis zählt er
       // aber erst nach dem Empfang - das muss die Meldung sagen.
       if (stand.fristVerpasst) {
-        meldungZeigen(nachweisMeldung, 'Nachweis gespeichert. Deine 14 Tage für den Empfang sind aber vorbei: Der ermäßigte Preis gilt erst wieder, wenn das Personal deinen Ausweis gesehen hat.', true);
+        meldungZeigen(nachweisMeldung, 'Nachweis gespeichert. Deine 14 Tage für den Empfang sind aber vorbei: Der ermäßigte Preis gilt erst wieder, wenn das Personal deinen Personalausweis gesehen hat.', true);
 
         return;
       }
@@ -442,7 +442,7 @@ if (seite) {
       // Noch nicht bestätigt: an den Empfang erinnern, mit dem Datum.
       const empfangHinweis = stand.bestaetigt
         ? ''
-        : ` Zeig deinen Ausweis bis ${datumAnzeigen(stand.vorzeigenBis)} einmal am Empfang.`;
+        : ` Zeig bis ${datumAnzeigen(stand.vorzeigenBis)} einmal deinen Personalausweis am Empfang.`;
 
       if (stand.herabstufungZurueckgenommen) {
         // Oben auf der Seite steht noch der vorgemerkte Wechsel auf den

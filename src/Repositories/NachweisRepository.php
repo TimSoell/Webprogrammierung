@@ -11,11 +11,10 @@
  *              src/Ausweispruefung.php ausgelesen und sofort verworfen.
  *
  *              Für den Preis zählt ein Nachweis erst zusammen mit dem
- *              Empfang: Die Person muss dort bestätigt sein oder ihre Frist
- *              läuft noch (Spalten bestaetigt_am und vorzeigen_bis in
- *              mitglieder). Deshalb lesen gueltigenFinden() und die beiden
- *              Abfragen für den Empfang die Tabelle mitglieder mit -
- *              geschrieben wird sie hier nie.
+ *              Empfang: Das Konto muss dort mit dem Personalausweis bestätigt
+ *              sein oder seine Frist läuft noch (Spalten bestaetigt_am und
+ *              vorzeigen_bis in mitglieder). Deshalb liest gueltigenFinden()
+ *              die Tabelle mitglieder mit - geschrieben wird sie hier nie.
  * @see         database/schema.sql
  * @see         api/nachweise.php
  * @see         docs/features/nachweise.md
@@ -132,65 +131,6 @@ final class NachweisRepository
         $stmt->execute([$mitgliedId]);
 
         return $stmt->fetchAll();
-    }
-
-    /**
-     * Liefert alle Nachweise, die am Empfang noch gezeigt werden müssen -
-     * die Liste für das Personal.
-     *
-     * Offen heißt: Die Person ist noch nicht bestätigt, und ihr Nachweis
-     * gilt nach Datum. Auch wer die Frist schon verpasst hat, steht hier:
-     * Er kann jederzeit nachkommen und bekommt dann seinen Preis zurück.
-     * Am dringendsten zuerst, also nach Frist sortiert.
-     *
-     * Die E-Mail kommt aus users, der Tabelle der Login-Bibliothek - nur
-     * lesend. Mit ihr unterscheidet das Personal zwei Personen gleichen
-     * Namens.
-     *
-     * @return array<int, array<string, mixed>>  je Zeile mitglied_id,
-     *         vorname, nachname, email, vorzeigen_bis, nachweis_id, art,
-     *         gueltig_bis, geprueft_am
-     */
-    public function amEmpfangOffeneFinden(): array
-    {
-        $stmt = Database::connection()->prepare(
-            'SELECT m.id AS mitglied_id, m.vorname, m.nachname, u.email, m.vorzeigen_bis,
-                    n.id AS nachweis_id, n.art, n.gueltig_bis, n.geprueft_am
-               FROM nachweise n
-               JOIN mitglieder m ON m.id = n.mitglied_id
-               JOIN "users" u ON u.id = m.user_id
-              WHERE m.bestaetigt_am IS NULL
-                AND (n.gueltig_bis IS NULL OR n.gueltig_bis >= CURRENT_DATE)
-              ORDER BY m.vorzeigen_bis, m.nachname, m.vorname'
-        );
-        $stmt->execute();
-
-        return $stmt->fetchAll();
-    }
-
-    /**
-     * Sucht den offenen Nachweis EINES Mitglieds - dieselbe Bedingung wie
-     * amEmpfangOffeneFinden(). Der Empfang prüft damit vor dem Bestätigen
-     * und Ablehnen, ob es überhaupt etwas zu entscheiden gibt.
-     *
-     * @param int $mitgliedId  mitglieder.id
-     * @return array<string, mixed>|null  id, art, gueltig_bis; null, wenn
-     *         die Person schon bestätigt ist oder keinen gültigen Nachweis hat
-     */
-    public function amEmpfangOffenenFinden(int $mitgliedId): ?array
-    {
-        $stmt = Database::connection()->prepare(
-            'SELECT n.id, n.art, n.gueltig_bis
-               FROM nachweise n
-               JOIN mitglieder m ON m.id = n.mitglied_id
-              WHERE n.mitglied_id = ?
-                AND m.bestaetigt_am IS NULL
-                AND (n.gueltig_bis IS NULL OR n.gueltig_bis >= CURRENT_DATE)
-              LIMIT 1'
-        );
-        $stmt->execute([$mitgliedId]);
-
-        return $stmt->fetch() ?: null;
     }
 
     /**

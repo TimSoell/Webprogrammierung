@@ -38,13 +38,14 @@
  *              Nachweis zum laufenden Vertrag, verwirft der POST diese
  *              Vormerkung und meldet das in herabstufungZurueckgenommen.
  *
- *              DIE PERSON WIRD EINMAL AM EMPFANG BESTAETIGT. Der erste Nachweis
- *              gilt sofort, aber nur VORZEIGEFRIST_TAGE lang - bis dahin muss
- *              das Personal den Ausweis gesehen haben (api/empfang.php). Die
+ *              DAS KONTO WIRD EINMAL AM EMPFANG BESTAETIGT, mit dem
+ *              Personalausweis. Den Ermäßigungsnachweis selbst prüft allein
+ *              dieser Endpunkt, der Empfang sieht ihn nicht. Der erste
+ *              Nachweis gilt sofort, aber nur VORZEIGEFRIST_TAGE lang - bis
+ *              dahin muss das Konto bestätigt sein (api/empfang.php). Die
  *              Frist setzt der erste Upload und kein späterer verlängert sie.
- *              Nach der Bestätigung prüft spätere Nachweise allein die
- *              Ausweisprüfung. Den Stand liefert jede Antwort in bestaetigt,
- *              vorzeigenBis und fristVerpasst.
+ *              Den Stand liefert jede Antwort in bestaetigt, vorzeigenBis und
+ *              fristVerpasst.
  * @see         assets/js/services/nachweise.js
  * @see         src/Ausweispruefung.php
  * @see         src/Repositories/NachweisRepository.php
@@ -95,7 +96,7 @@ const HOECHSTDAUER = ['schueler' => '+2 years', 'student' => '+1 year'];
 const PRUEFVERSUCHE = 3;
 
 /**
- * So viele Tage nach dem ersten Nachweis muss das Personal die Person am
+ * So viele Tage nach dem ersten Nachweis muss das Personal das Konto am
  * Empfang bestätigt haben, sonst gilt der ermäßigte Preis nicht mehr. Der
  * Nachtrag in database/schema.sql gibt vorhandenen Nachweisen dieselben 14 Tage.
  */

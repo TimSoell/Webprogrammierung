@@ -1,6 +1,6 @@
 # ADR-0023 — Der Name ist bis zur Bestätigung am Empfang änderbar, und das Personal bestätigt jede Person einmal
 
-**Status:** angenommen
+**Status:** angenommen, Liste am Empfang, gezeigter Ausweis und „Ablehnen" ersetzt durch [ADR-0024](ADR-0024-empfang-bestaetigt-konto-mit-personalausweis.md)
 **Datum:** 2026-10-16
 
 **Ergänzt [ADR-0020](ADR-0020-nachweise-absichern.md).** Dessen Regeln gelten

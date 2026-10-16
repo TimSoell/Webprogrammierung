@@ -23,8 +23,8 @@ Kontoseite folgt dem Entwurf des Teams vom 2026-09-30 und steht in
 
 Unter den Stammdaten steht **„Name ändern"**. Vor- und Nachname lassen sich
 dort korrigieren — aber nur, solange kein gültiger Nachweis für einen
-ermäßigten Preis hinterlegt ist, und nie mehr, sobald das Personal die
-Person am Empfang bestätigt hat. Warum, steht in
+ermäßigten Preis hinterlegt ist, und nie mehr, sobald das Personal das
+Konto am Empfang mit dem Personalausweis bestätigt hat. Warum, steht in
 [Nachweise](nachweise.md) unter „Den Namen ändern".
 
 **Das Personal** meldet sich hier genauso an. Es hat ein normales Konto mit

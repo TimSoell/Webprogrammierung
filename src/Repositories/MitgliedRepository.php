@@ -9,9 +9,10 @@
  *              Tabelle users der Login-Bibliothek. Verbunden sind beide über
  *              user_id. Mehr dazu in docs/features/mitglieder-login.md.
  *
- *              Ebenfalls hier: ob das Personal die Person am Empfang
- *              bestätigt hat und bis wann das passieren muss - siehe
- *              docs/features/empfang.md.
+ *              Ebenfalls hier: ob das Personal das Konto am Empfang mit dem
+ *              Personalausweis bestätigt hat und bis wann das passieren muss,
+ *              und die Liste aller noch unbestätigten Konten für den Empfang -
+ *              siehe docs/features/empfang.md.
  * @see         database/schema.sql
  * @see         api/mitglieder.php
  * @see         api/sitzung.php
@@ -23,6 +24,7 @@ declare(strict_types=1);
 namespace Repositories;
 
 use Database;
+use Delight\Auth\Status;
 
 final class MitgliedRepository
 {
@@ -155,25 +157,70 @@ final class MitgliedRepository
     }
 
     /**
-     * Hält fest, dass das Personal die Person am Empfang bestätigt hat.
+     * Liefert alle Konten, die am Empfang noch nicht bestätigt sind - die
+     * Liste für das Personal.
      *
-     * Einmal gesetzt, wird das nie zurückgenommen - auch nicht, wenn der
+     * Nur Konten im normalen Zustand der Login-Bibliothek. Gesperrte Konten,
+     * etwa die Demo-Konten für die Auslastung, kann niemand vorzeigen.
+     *
+     * Dazu je Konto die Art des gültigen Ermäßigungsnachweises, falls es
+     * einen gibt: Für diese Personen läuft die Frist, deshalb stehen sie
+     * oben, die dringendste zuerst. Alle anderen folgen nach Namen.
+     *
+     * Liest users (E-Mail, Status) und nachweise nur mit, geschrieben wird
+     * hier nur mitglieder.
+     *
+     * @return array<int, array<string, mixed>>  je Zeile mitglied_id,
+     *         vorname, nachname, email, erstellt_am, vorzeigen_bis und
+     *         ermaessigung ('schueler', 'student', 'senior' oder null)
+     */
+    public function unbestaetigteFinden(): array
+    {
+        $stmt = Database::connection()->prepare(
+            'SELECT m.id AS mitglied_id, m.vorname, m.nachname, u.email,
+                    m.erstellt_am, m.vorzeigen_bis, n.art AS ermaessigung
+               FROM mitglieder m
+               JOIN "users" u ON u.id = m.user_id
+               LEFT JOIN nachweise n
+                      ON n.mitglied_id = m.id
+                     AND (n.gueltig_bis IS NULL OR n.gueltig_bis >= CURRENT_DATE)
+              WHERE m.bestaetigt_am IS NULL
+                AND u.status = ?
+              ORDER BY n.id IS NULL, m.vorzeigen_bis, m.nachname, m.vorname'
+        );
+        // Ein Mitglied hat höchstens einen gültigen Nachweis (siehe
+        // NachweisRepository::anlegen()), der LEFT JOIN verdoppelt also nichts.
+        $stmt->execute([Status::NORMAL]);
+
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Hält fest, dass das Personal das Konto am Empfang mit dem
+     * Personalausweis bestätigt hat.
+     *
+     * Einmal gesetzt, wird das nie zurückgenommen - auch nicht, wenn ein
      * Nachweis später abläuft. Ab dann ist der Name fest. Die Bedingung auf
      * bestaetigt_am sorgt dafür, dass ein zweiter Klick den ersten Zeitpunkt
-     * nicht überschreibt.
+     * nicht überschreibt; die auf den Status, dass nur Konten aus der Liste
+     * bestätigt werden.
      *
      * @param int $mitgliedId  mitglieder.id
-     * @return void
+     * @return bool  false, wenn es nichts zu bestätigen gab - schon bestätigt,
+     *               gesperrt oder unbekannt
      */
-    public function bestaetigen(int $mitgliedId): void
+    public function bestaetigen(int $mitgliedId): bool
     {
         $stmt = Database::connection()->prepare(
             'UPDATE mitglieder
                 SET bestaetigt_am = LOCALTIMESTAMP(0)
               WHERE id = ?
-                AND bestaetigt_am IS NULL'
+                AND bestaetigt_am IS NULL
+                AND user_id IN (SELECT id FROM "users" WHERE status = ?)'
         );
-        $stmt->execute([$mitgliedId]);
+        $stmt->execute([$mitgliedId, Status::NORMAL]);
+
+        return $stmt->rowCount() === 1;
     }
 
     /**
