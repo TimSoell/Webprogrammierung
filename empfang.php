@@ -40,16 +40,9 @@ require ROOT_PATH . '/partials/header.php';
   <main class="auth" id="empfang-seite" data-login="<?= e(BASE_URL) ?>anmelden.php">
     <div class="wrap empfang-inner">
 
-      <div class="empfang-kopf">
-        <div>
-          <p class="eyebrow">Nur für das Personal</p>
-          <h1 class="display auth-title">Empfang.</h1>
-        </div>
-        <p class="auth-lead">
-          Hier steht, wer einen Nachweis für einen ermäßigten Preis hochgeladen
-          hat und den Ausweis noch einmal zeigen muss. Vergleiche Foto und Name
-          auf dem Ausweis mit der Person vor dir und mit dem Namen in der Liste.
-        </p>
+      <div>
+        <p class="eyebrow">Nur für das Personal</p>
+        <h1 class="display auth-title">Empfang.</h1>
       </div>
 
       <section class="auth-card empfang-karte" aria-labelledby="empfang-titel">

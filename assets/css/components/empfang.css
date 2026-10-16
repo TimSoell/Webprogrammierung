@@ -1,7 +1,7 @@
 /**
  * @file        assets/css/components/empfang.css
  * @layer       Komponente
- * @description Die Seite des Empfangs: oben Titel und Erklärung, darunter
+ * @description Die Seite des Empfangs: oben der Titel, darunter
  *              eine breite Karte mit Suche, Filter und der Tabelle der
  *              offenen Ausweise - je Zeile Person, Nachweis, Status und die
  *              Knöpfe Bestätigen und Ablehnen. Auf schmalen Bildschirmen
@@ -13,21 +13,10 @@
  * @see         assets/css/components/auth.css
  */
 
-/* --- Gerüst: Kopf oben, Karte darunter über die ganze Breite ---------------- */
+/* --- Gerüst: Titel oben, Karte darunter über die ganze Breite --------------- */
 .empfang-inner {
   display: grid;
   gap: 48px;
-}
-
-.empfang-kopf {
-  display: grid;
-  align-items: end;
-  gap: 40px;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
-}
-
-.empfang-kopf .auth-lead {
-  margin: 0;
 }
 
 .empfang-titelzeile {
@@ -254,12 +243,8 @@
   margin-top: 24px;
 }
 
-/* --- Schmal: Kopf untereinander, jede Tabellenzeile ein Block --------------- */
+/* --- Schmal: jede Tabellenzeile ein Block ------------------------------------ */
 @media (max-width: 760px) {
-  .empfang-kopf {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   .empfang-werkzeuge {
     flex-wrap: wrap;
   }
