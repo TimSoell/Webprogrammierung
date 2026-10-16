@@ -2,7 +2,7 @@
 
 **Status:** fertig
 **Verantwortlich:** Tim
-**Zuletzt geprüft:** 2026-09-30
+**Zuletzt geprüft:** 2026-10-16
 
 Umsetzung von Issue #8 „Mitglieder-Registrierung & Login“.
 
@@ -20,6 +20,17 @@ mit einem runden Profilbild-Platz (bis es Profilbilder gibt: neutrales
 Personen-Symbol) und oben rechts der Link zum Abmelden. Das Aussehen der
 Kontoseite folgt dem Entwurf des Teams vom 2026-09-30 und steht in
 `assets/css/components/konto.css`.
+
+Unter den Stammdaten steht **„Name ändern"**. Vor- und Nachname lassen sich
+dort korrigieren — aber nur, solange kein gültiger Nachweis für einen
+ermäßigten Preis hinterlegt ist, und nie mehr, sobald das Personal die
+Person am Empfang bestätigt hat. Warum, steht in
+[Nachweise](nachweise.md) unter „Den Namen ändern".
+
+**Das Personal** meldet sich hier genauso an. Es hat ein normales Konto mit
+der Rolle `EMPLOYEE` der Bibliothek und ruft den Empfang über seine Adresse
+auf — einen Link dorthin gibt es nirgends. Vergeben wird die Rolle nur im
+Supabase-Dashboard, siehe [Empfang](empfang.md).
 
 ## Beteiligte Dateien
 
@@ -56,6 +67,7 @@ schicken, sonst antwortet der Endpunkt mit 415. Das ist der Schutz vor CSRF
 | Methode | Pfad | Zweck | Antwort |
 |---|---|---|---|
 | POST | `api/mitglieder.php` | registrieren, danach angemeldet | 201 `{ "id": 7 }` · 400 · 409 E-Mail vergeben |
+| PUT | `api/mitglieder.php` | eigenen Vor- und Nachnamen ändern | `{ "vorname": "…", "nachname": "…" }` · 400 · 401 · 409 am Empfang bestätigt oder gültiger Nachweis hinterlegt |
 | GET | `api/sitzung.php` | wer ist angemeldet | Stammdaten · 401 |
 | POST | `api/sitzung.php` | anmelden | `{ "angemeldet": true }` · 401 · 429 |
 | DELETE | `api/sitzung.php` | abmelden | `{ "angemeldet": false }` |
@@ -124,8 +136,8 @@ baut man in `api/passwort-reset.php` an der markierten Stelle ein.
 
 - Echter E-Mail-Versand (SMTP), dafür braucht es Zugangsdaten und eine weitere
   Bibliothek oder einen Mailserver.
-- Stammdaten ändern, Buchungen, Zahlungen: eigene Issues, die auf
-  `mitglieder.id` aufbauen. Der erste davon ist gebaut — die Tarife und
-  Verträge stehen in [Mitgliedschaften](mitgliedschaften.md).
+- E-Mail-Adresse ändern, Buchungen, Zahlungen: eigene Issues, die auf
+  `mitglieder.id` aufbauen. Gebaut sind die Tarife und Verträge
+  ([Mitgliedschaften](mitgliedschaften.md)) und das Ändern des Namens.
 - Die Kopfzeile ist zwischen 801 und etwa 880 px Breite sehr voll. Dort bricht
   „Probetraining buchen“ auf zwei Zeilen um.

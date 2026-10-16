@@ -63,7 +63,7 @@ Im Supabase-Dashboard unter **Table Editor**. Das ersetzt phpMyAdmin.
 
 | Tabelle | Feature | Herkunft |
 |---|---|---|
-| `mitglieder` | Mitglieder-Login | unsere Stammdaten |
+| `mitglieder` | Mitglieder-Login | unsere Stammdaten, dazu die Bestätigung am Empfang (Feature [Empfang](../docs/features/empfang.md)) |
 | `users`, `users_*` (8 Tabellen) | Mitglieder-Login | Login-Bibliothek, siehe [ADR-0005](../docs/decisions/ADR-0005-login-bibliothek.md) |
 | `tarife` | Mitgliedschaften | Katalog, Inhalt aus `seed.sql`, siehe [ADR-0009](../docs/decisions/ADR-0009-mitgliedschaften-datenmodell.md) |
 | `mitgliedschaften` | Mitgliedschaften | abgeschlossene Verträge |
