@@ -50,11 +50,9 @@ require ROOT_PATH . '/partials/header.php';
           <h2 class="auth-heading" id="empfang-titel">Ausweis zeigen</h2>
           <p class="empfang-anzahl" id="empfang-anzahl" aria-live="polite"></p>
         </div>
-        <p class="auth-hint">
-          Eine Zeile je Person. Bestätigen heißt: Die Person ist die, auf die
-          das Konto läuft — ihr Name ist danach für immer fest. Ablehnen
-          entfernt den Nachweis.
-        </p>
+
+        <!-- Was Bestätigen und Ablehnen bewirken, sagt die Rückfrage beim
+             Klick (assets/js/pages/empfang.page.js). -->
 
         <!-- Suchen und Filtern geschieht im Browser über die geladene Liste:
              Der Server liefert ohnehin alle offenen Einträge. -->
