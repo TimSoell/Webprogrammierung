@@ -1,0 +1,110 @@
+/**
+ * @file        assets/css/components/empfang.css
+ * @layer       Komponente
+ * @description Die Liste auf der Seite des Empfangs: je Mitglied Name,
+ *              Nachweis und Frist, daneben Bestätigen und Ablehnen.
+ *
+ *              Seitengerüst und Karte kommen aus auth.css, wie bei der
+ *              Anmeldung - diese Datei regelt nur die Liste darin.
+ * @see         empfang.php
+ * @see         assets/css/components/auth.css
+ */
+
+.empfang-zurueck {
+  display: inline-block;
+  margin-top: 24px;
+}
+
+.empfang-liste {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.empfang-eintrag {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border-left: 3px solid var(--lime);
+  background: var(--ink);
+}
+
+/* Frist verpasst: Diese Person zahlt gerade den Standardpreis. Fällt auf,
+   damit sie am Empfang nicht übersehen wird. */
+.empfang-eintrag[data-frist-verpasst="ja"] {
+  border-left-color: var(--danger);
+}
+
+.empfang-text {
+  min-width: 0;
+}
+
+.empfang-text p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.empfang-name {
+  font-weight: 700;
+}
+
+.empfang-angaben,
+.empfang-frist {
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+.empfang-eintrag[data-frist-verpasst="ja"] .empfang-frist {
+  color: var(--danger);
+}
+
+.empfang-aktionen {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 14px;
+}
+
+.empfang-aktionen .button {
+  min-height: 40px;
+  padding: 0 16px;
+  cursor: pointer;
+}
+
+.empfang-ablehnen {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: .78rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.empfang-ablehnen:hover {
+  color: var(--danger);
+}
+
+.empfang-aktionen button:focus-visible {
+  outline: 2px solid var(--lime);
+  outline-offset: 3px;
+}
+
+.empfang-aktionen button[disabled] {
+  cursor: default;
+  opacity: .5;
+}
+
+/* Schmal: Knöpfe unter den Text statt daneben. */
+@media (max-width: 560px) {
+  .empfang-eintrag {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

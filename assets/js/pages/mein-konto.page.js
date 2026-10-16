@@ -5,6 +5,12 @@
  *              laufende Mitgliedschaft, die Nachweise und die angekündigten
  *              Besuche des angemeldeten Mitglieds in die Seite und meldet
  *              über den Button "Abmelden" ab.
+ *
+ *              Zwei Dinge hängen am Empfang: Der Name lässt sich nur ändern,
+ *              bis das Personal ihn bestätigt hat (und davor nicht, solange
+ *              ein Nachweis gilt), und die Nachweisliste zeigt, bis wann der
+ *              Ausweis gezeigt werden muss. Beides ist hier nur Anzeige -
+ *              verbindlich sind api/mitglieder.php und api/nachweise.php.
  * @see         mein-konto.php
  * @see         assets/js/services/mitglieder.js
  * @see         assets/js/services/auswahl.js
@@ -17,7 +23,7 @@
  */
 
 import { $ } from '../lib/dom.js';
-import { abmelden, angemeldetesMitgliedLaden } from '../services/mitglieder.js';
+import { abmelden, angemeldetesMitgliedLaden, nameAendern } from '../services/mitglieder.js';
 import { auswahlEntfernen, meineAuswahlLaden } from '../services/auswahl.js';
 import { standLaden } from '../services/mitgliedschaften.js';
 import {
@@ -190,6 +196,33 @@ if (seite) {
   let gueltigerNachweis = null;
 
   /**
+   * Wie weit das Mitglied mit dem Empfang ist. Kommt mit jedem Nachweisstand
+   * vom Server, siehe api/nachweise.php.
+   *
+   * @type {{bestaetigt: boolean, vorzeigenBis: string|null, fristVerpasst: boolean}}
+   */
+  let empfang = { bestaetigt: false, vorzeigenBis: null, fristVerpasst: false };
+
+  /**
+   * Was beim gültigen Nachweis zum Empfang dasteht.
+   *
+   * @returns {{stand: 'bestaetigt'|'verpasst'|'offen', text: string}}
+   */
+  const empfangStand = () => {
+    if (empfang.bestaetigt) {
+      return { stand: 'bestaetigt', text: 'Am Empfang bestätigt' };
+    }
+    if (empfang.fristVerpasst) {
+      return {
+        stand: 'verpasst',
+        text: 'Frist für den Empfang verpasst — der ermäßigte Preis gilt erst wieder, wenn das Personal deinen Ausweis gesehen hat',
+      };
+    }
+
+    return { stand: 'offen', text: `Zeig deinen Ausweis bis ${datumAnzeigen(empfang.vorzeigenBis)} einmal am Empfang` };
+  };
+
+  /**
    * Macht aus dem Ablaufdatum eines Nachweises den Text für die Anzeige.
    * Ein Nachweis ohne Datum ist unbefristet - das gibt es nur bei Senioren.
    *
@@ -216,6 +249,18 @@ if (seite) {
     text.textContent = `${NACHWEISARTEN[nachweis.art]} — ${bisAnzeigen(nachweis.gueltigBis)}`
       + (abgelaufen ? ' (abgelaufen)' : '')
       + (nachweis.quelle === 'demo' ? ' · im Demo-Modus eingetragen' : '');
+
+    // Nur beim gültigen Nachweis: Steht der Empfang noch aus, und bis wann?
+    if (!abgelaufen) {
+      const { stand, text: standText } = empfangStand();
+
+      const status = document.createElement('span');
+      status.className = 'nachweis-status';
+      status.dataset.stand = stand;
+      status.textContent = standText;
+
+      text.append(status);
+    }
 
     const knopf = document.createElement('button');
     knopf.type = 'button';
@@ -263,6 +308,11 @@ if (seite) {
     const istAbgelaufen = (nachweis) => nachweis.gueltigBis !== null && nachweis.gueltigBis < heute;
 
     gueltigerNachweis = stand.nachweise.find((nachweis) => !istAbgelaufen(nachweis)) ?? null;
+    empfang = {
+      bestaetigt: stand.bestaetigt,
+      vorzeigenBis: stand.vorzeigenBis,
+      fristVerpasst: stand.fristVerpasst,
+    };
 
     $('#nachweis-leer').hidden = stand.nachweise.length > 0;
     $('#nachweis-liste').replaceChildren(
@@ -272,6 +322,21 @@ if (seite) {
     // Ohne Schlüssel gibt es nichts auszulesen, dann wird das Datum getippt.
     $('#nachweis-bild-feld').hidden = !stand.kiVerfuegbar;
     $('#nachweis-datum-feld').hidden = stand.kiVerfuegbar;
+
+    // Ohne gültigen Nachweis ist der Name wieder frei - dann stimmt der
+    // Hinweis "Name gesperrt" oben in den Stammdaten nicht mehr.
+    if (gueltigerNachweis === null) {
+      $('#name-gesperrt').hidden = true;
+    }
+
+    // Nach der Bestätigung am Empfang ist der Name für immer fest: Statt
+    // "Name ändern" steht dann nur noch, warum.
+    if (empfang.bestaetigt) {
+      $('#name-aendern').hidden = true;
+      $('#name-form').hidden = true;
+      $('#name-gesperrt').hidden = true;
+      $('#name-bestaetigt').hidden = false;
+    }
 
     vorhandenenHinweisZeigen();
   }
@@ -366,16 +431,29 @@ if (seite) {
       nachweiseZeigen(stand);
       formular.reset();
 
-      if (stand.herabstufungZurueckgenommen) {
-        // Oben auf der Seite steht noch der vorgemerkte Wechsel auf den
-        // Standardpreis. Den gibt es nicht mehr, also neu laden.
-        mitgliedschaftZeigen(await standLaden());
-        meldungZeigen(nachweisMeldung, 'Nachweis gespeichert. Der vorgemerkte Wechsel auf den Standardpreis entfällt, dein Preis bleibt wie bisher.', true);
+      // Frist verpasst: Gespeichert ist der Nachweis, für den Preis zählt er
+      // aber erst nach dem Empfang - das muss die Meldung sagen.
+      if (stand.fristVerpasst) {
+        meldungZeigen(nachweisMeldung, 'Nachweis gespeichert. Deine 14 Tage für den Empfang sind aber vorbei: Der ermäßigte Preis gilt erst wieder, wenn das Personal deinen Ausweis gesehen hat.', true);
 
         return;
       }
 
-      meldungZeigen(nachweisMeldung, 'Nachweis gespeichert. Der Preis steht dir ab sofort offen.', true);
+      // Noch nicht bestätigt: an den Empfang erinnern, mit dem Datum.
+      const empfangHinweis = stand.bestaetigt
+        ? ''
+        : ` Zeig deinen Ausweis bis ${datumAnzeigen(stand.vorzeigenBis)} einmal am Empfang.`;
+
+      if (stand.herabstufungZurueckgenommen) {
+        // Oben auf der Seite steht noch der vorgemerkte Wechsel auf den
+        // Standardpreis. Den gibt es nicht mehr, also neu laden.
+        mitgliedschaftZeigen(await standLaden());
+        meldungZeigen(nachweisMeldung, `Nachweis gespeichert. Der vorgemerkte Wechsel auf den Standardpreis entfällt, dein Preis bleibt wie bisher.${empfangHinweis}`, true);
+
+        return;
+      }
+
+      meldungZeigen(nachweisMeldung, `Nachweis gespeichert. Der Preis steht dir ab sofort offen.${empfangHinweis}`, true);
     });
 
     // formularAbsenden() gibt den Button am Ende immer wieder frei. Wo er
@@ -453,7 +531,11 @@ if (seite) {
   }
 
   $('#besuch-jetzt').addEventListener('click', async (event) => {
-    event.currentTarget.disabled = true;
+    // Vor dem ersten await merken: Danach ist event.currentTarget null, und
+    // der Knopf bliebe gesperrt.
+    const knopf = event.currentTarget;
+
+    knopf.disabled = true;
 
     try {
       await besuchEintragen('jetzt');
@@ -462,7 +544,7 @@ if (seite) {
     } catch (fehler) {
       meldungZeigen(besuchMeldung, fehler.message);
     } finally {
-      event.currentTarget.disabled = false;
+      knopf.disabled = false;
     }
   });
 
@@ -477,6 +559,57 @@ if (seite) {
     } catch (fehler) {
       meldungZeigen(besuchMeldung, fehler.message);
     }
+  });
+
+  // --- Name ändern -----------------------------------------------------------
+
+  const nameKnopf = $('#name-aendern');
+  const nameForm = $('#name-form');
+  const nameMeldung = $('#name-meldung');
+
+  /**
+   * Zeigt entweder das Formular oder den Knopf "Name ändern".
+   *
+   * @param {boolean} offen  true = Formular sichtbar
+   * @returns {void}
+   */
+  const nameFormZeigen = (offen) => {
+    nameForm.hidden = !offen;
+    nameKnopf.hidden = offen;
+  };
+
+  nameKnopf.addEventListener('click', () => {
+    // Der Nachweis wurde gegen den Namen geprüft, deshalb bleibt der Name
+    // gesperrt, solange einer gilt. Nach der Bestätigung am Empfang ist der
+    // Knopf gar nicht mehr zu sehen. Das hier ist nur die Erklärung -
+    // verbindlich sperrt api/mitglieder.php.
+    $('#name-gesperrt').hidden = gueltigerNachweis === null;
+
+    if (gueltigerNachweis !== null) {
+      return;
+    }
+
+    nameForm.vorname.value = $('#konto-vorname').textContent;
+    nameForm.nachname.value = $('#konto-nachname').textContent;
+    meldungZeigen(nameMeldung, '');
+    nameFormZeigen(true);
+    nameForm.vorname.focus();
+  });
+
+  $('#name-abbrechen').addEventListener('click', () => nameFormZeigen(false));
+
+  nameForm.addEventListener('submit', async (ereignis) => {
+    ereignis.preventDefault();
+
+    await formularAbsenden(nameForm, nameMeldung, async () => {
+      const name = await nameAendern(nameForm.vorname.value, nameForm.nachname.value);
+
+      // textContent statt innerHTML: Namen sind Nutzereingaben.
+      $('#konto-vorname').textContent = name.vorname;
+      $('#konto-nachname').textContent = name.nachname;
+      nameFormZeigen(false);
+      meldungZeigen(meldung, 'Name geändert.', true);
+    });
   });
 
   $('#abmelden').addEventListener('click', async () => {

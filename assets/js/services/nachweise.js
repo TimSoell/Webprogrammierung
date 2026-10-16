@@ -36,6 +36,13 @@ import { verkleinern } from '../lib/bild.js';
  *                                        true nur nach einem Upload, der den
  *                                        vorgemerkten Wechsel auf den
  *                                        Standardpreis verworfen hat
+ * @property {boolean} bestaetigt         true, sobald das Personal die Person
+ *                                        am Empfang bestätigt hat - für immer
+ * @property {string|null} vorzeigenBis   letzter Tag, um den Ausweis am Empfang
+ *                                        zu zeigen; null vor dem ersten Nachweis
+ * @property {boolean} fristVerpasst      true = nicht bestätigt und die Frist
+ *                                        ist vorbei, kein Nachweis zählt für
+ *                                        den Preis
  */
 
 /**

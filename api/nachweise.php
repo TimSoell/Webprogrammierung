@@ -5,7 +5,8 @@
  * @description Nachweise für ermäßigte Preise hochladen, ansehen und entfernen.
  *
  *                GET     -> { nachweise: [...], kiVerfuegbar: bool,
- *                             herabstufungZurueckgenommen: bool }
+ *                             herabstufungZurueckgenommen: bool,
+ *                             bestaetigt: bool, vorzeigenBis, fristVerpasst: bool }
  *                POST    { art, bild, mimeTyp }            -> 201, mit KI
  *                POST    { art, datum }                    -> 201, im Demo-Modus
  *                DELETE  { id }                            -> 200, eigenen entfernen
@@ -36,12 +37,22 @@
  *              Monatsersten auf den Standardpreis vorgemerkt. Passt der neue
  *              Nachweis zum laufenden Vertrag, verwirft der POST diese
  *              Vormerkung und meldet das in herabstufungZurueckgenommen.
+ *
+ *              DIE PERSON WIRD EINMAL AM EMPFANG BESTAETIGT. Der erste Nachweis
+ *              gilt sofort, aber nur VORZEIGEFRIST_TAGE lang - bis dahin muss
+ *              das Personal den Ausweis gesehen haben (api/empfang.php). Die
+ *              Frist setzt der erste Upload und kein späterer verlängert sie.
+ *              Nach der Bestätigung prüft spätere Nachweise allein die
+ *              Ausweisprüfung. Den Stand liefert jede Antwort in bestaetigt,
+ *              vorzeigenBis und fristVerpasst.
  * @see         assets/js/services/nachweise.js
  * @see         src/Ausweispruefung.php
  * @see         src/Repositories/NachweisRepository.php
  * @see         src/Repositories/MitgliedschaftRepository.php
  * @see         docs/decisions/ADR-0011-ausweispruefung-mit-ki.md
  * @see         docs/decisions/ADR-0020-nachweise-absichern.md
+ * @see         docs/decisions/ADR-0023-name-aendern-und-ausweis-am-empfang.md
+ * @see         api/empfang.php
  */
 
 declare(strict_types=1);
@@ -82,6 +93,13 @@ const HOECHSTDAUER = ['schueler' => '+2 years', 'student' => '+1 year'];
  * Anfrage aus dem Tageskontingent der kostenlosen Stufe.
  */
 const PRUEFVERSUCHE = 3;
+
+/**
+ * So viele Tage nach dem ersten Nachweis muss das Personal die Person am
+ * Empfang bestätigt haben, sonst gilt der ermäßigte Preis nicht mehr. Der
+ * Nachtrag in database/schema.sql gibt vorhandenen Nachweisen dieselben 14 Tage.
+ */
+const VORZEIGEFRIST_TAGE = 14;
 
 /**
  * Größte erlaubte Bildgröße in Byte, vor der base64-Kodierung.
@@ -126,7 +144,9 @@ try {
     $nachweise = new NachweisRepository();
 
     /** Der Nachweisstand, wie ihn die Seite nach jeder Anfrage braucht. */
-    $standAntworten = static function (int $status, bool $herabstufungZurueckgenommen = false) use ($nachweise, $mitgliedId): void {
+    $standAntworten = static function (int $status, bool $herabstufungZurueckgenommen = false) use ($nachweise, $mitglieder, $mitgliedId): void {
+        $empfang = $mitglieder->empfangsstandFinden($mitgliedId);
+
         Api::antworten([
             'nachweise' => array_map(static fn (array $zeile): array => [
                 'id'         => (int) $zeile['id'],
@@ -136,6 +156,14 @@ try {
                 'hinweis'    => $zeile['hinweis'],
                 'geprueftAm' => $zeile['geprueft_am'],
             ], $nachweise->alleFinden($mitgliedId)),
+
+            // Der Stand am Empfang gehört zur Person, nicht zu einem
+            // Nachweis: Bestätigt wird einmal, die Frist beginnt mit dem
+            // ersten Upload. Ist sie verpasst, zählt kein Nachweis für den
+            // Preis, bis das Personal bestätigt.
+            'bestaetigt'    => $empfang['bestaetigt_am'] !== null,
+            'vorzeigenBis'  => $empfang['vorzeigen_bis'],
+            'fristVerpasst' => $empfang['frist_verpasst'],
 
             // Die Seite muss wissen, ob sie ein Bildfeld oder ein Datumsfeld
             // anzeigt. Ohne Schlüssel gibt es nichts auszulesen.
@@ -357,6 +385,11 @@ try {
 
         $nachweise->anlegen($mitgliedId, $art, $gueltigBis, $quelle, $modell, $hinweis);
 
+        // Nur beim ersten Nachweis: Ab jetzt läuft die Frist für den
+        // Empfang. Ist schon eine gesetzt oder die Person bestätigt, ändert
+        // das nichts - siehe MitgliedRepository::fristSetzen().
+        $mitglieder->fristSetzen($mitgliedId, $heute->modify('+' . VORZEIGEFRIST_TAGE . ' days')->format('Y-m-d'));
+
         // Fehlte der Nachweis, hat api/mitgliedschaften.php den Vertrag zum
         // Monatsersten auf den Standardpreis vorgemerkt. Mit dem neuen
         // Nachweis ist das hinfällig.
@@ -376,7 +409,10 @@ try {
             && $geplant !== null
             && $geplant['kennung'] === $laufend['kennung']
             && $geplant['preisgruppe'] === 'standard'
-            && in_array($art, NachweisRepository::PREISGRUPPE_ARTEN[$laufend['preisgruppe']] ?? [], true);
+            && in_array($art, NachweisRepository::PREISGRUPPE_ARTEN[$laufend['preisgruppe']] ?? [], true)
+            // Wer die Frist für den Empfang verpasst hat, bekommt den Preis
+            // auch mit dem neuen Nachweis erst nach der Bestätigung zurück.
+            && $nachweise->gueltigenFinden($mitgliedId, $laufend['preisgruppe']) !== null;
 
         if ($herabstufungHinfaellig) {
             // Der Tarif bleibt derselbe - an den gebuchten Kursen ändert sich

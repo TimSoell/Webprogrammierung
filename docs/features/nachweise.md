@@ -2,7 +2,7 @@
 
 **Status:** in Arbeit
 **Verantwortlich:** Felix
-**Zuletzt geprüft:** 2026-10-01
+**Zuletzt geprüft:** 2026-10-16
 
 ## Was kann man damit
 
@@ -26,14 +26,22 @@ weiterhin im Klartext — limefarben, damit der Satz zwischen den grauen
 Karten auffällt.
 
 Damit lässt sich die Mitgliedschaft vollständig online abschließen — bei
-anderen Studios muss man mit dem Ausweis an den Tresen. Das ist der Punkt
-des Features.
+anderen Studios muss man mit dem Ausweis an den Tresen, **bevor** man den
+Preis bekommt. Das ist der Punkt des Features.
+
+Der Ausweis wird trotzdem einmal vorgezeigt: **innerhalb von 14 Tagen am
+Empfang**, wo das Personal die Person bestätigt. Der Preis gilt aber sofort —
+siehe „Bestätigung am Empfang" und das Feature [Empfang](empfang.md).
 
 ## Die Regeln
 
 | | |
 |---|---|
 | Name auf dem Ausweis | muss zum Namen im Konto passen |
+| Name im Konto | änderbar, aber nur ohne gültigen Nachweis — nach der Bestätigung am Empfang nie mehr |
+| Ausweis selbst | einmal je Person innerhalb von 14 Tagen nach dem ersten Nachweis am Empfang zeigen, der Nachweis gilt schon vorher |
+| Frist verpasst | kein ermäßigter Preis, bis das Personal die Person bestätigt |
+| Spätere Nachweise | nach der Bestätigung nur noch online geprüft |
 | Schüler- und Studierendenausweis | gilt bis zum aufgedruckten Ablaufdatum, höchstens aber ein Jahr im Voraus (Schüler: zwei) |
 | Senior | ab 65 Jahren, gilt unbefristet |
 | Standardpreis | braucht nie einen Nachweis |
@@ -43,7 +51,8 @@ des Features.
 | Prüfversuche | drei, danach kommt alle acht Stunden einer dazu |
 
 Die Gründe stehen in
-[ADR-0020](../decisions/ADR-0020-nachweise-absichern.md).
+[ADR-0020](../decisions/ADR-0020-nachweise-absichern.md) und
+[ADR-0023](../decisions/ADR-0023-name-aendern-und-ausweis-am-empfang.md).
 
 **Der Namensabgleich.** Ohne ihn könnte ein Vater den Schülerausweis seines
 Sohnes hochladen. Das Modell liest Vor- und Nachname, verglichen wird in
@@ -52,6 +61,45 @@ Konto muss unter den Vornamen auf dem Ausweis stehen — dort stehen oft
 mehrere, im Konto meist nur der Rufname. Groß- und Kleinschreibung, Umlaute
 (`Müller` = `MUELLER`), Akzente und Bindestriche zählen nicht. Passt der
 Name nicht oder ist keiner zu lesen, antwortet der Endpunkt mit **422**.
+
+**Den Namen ändern.** Wer sich als „Max" registriert hat und „Maximilian"
+heißt, scheitert am Abgleich. Unter „Mein Konto" steht deshalb bei den
+Stammdaten „Name ändern". Das geht **nur, solange kein gültiger Nachweis
+hinterlegt ist** — sonst antwortet `PUT api/mitglieder.php` mit **409**, und
+die Kontoseite zeigt statt des Formulars den Grund. Ohne die Sperre wäre der
+Abgleich wertlos: Der Vater nennt sich kurz wie sein Sohn, lädt dessen
+Schülerausweis hoch und nennt sich wieder um. Wer seinen Namen mit Nachweis
+ändern will, entfernt den Nachweis, ändert den Namen und lädt neu hoch.
+
+**Nach der Bestätigung am Empfang ist der Name für immer fest** — auch wenn
+der Nachweis abläuft. `PUT api/mitglieder.php` antwortet dann mit **409**,
+und unter „Mein Konto" steht statt „Name ändern" nur noch, dass der Name
+bestätigt ist. Das Konto gehört damit genau dieser Person.
+
+**Bestätigung am Empfang.** Der Name im Konto bleibt bis dahin eine
+Selbstauskunft, und im Demo-Modus wird gar kein Bild gelesen. Deshalb zeigt
+jede Person ihren Ausweis **einmal** dem Personal, und zwar innerhalb von 14
+Tagen nach ihrem ersten Nachweis. Das Personal bestätigt sie auf der Seite
+[Empfang](empfang.md). **Der Nachweis gilt trotzdem sofort** — am Hochladen
+und am Buchen ändert sich nichts.
+
+Die Frist steht in `mitglieder.vorzeigen_bis`. Der erste Upload setzt sie,
+**kein späterer verlängert sie** — sonst ließe sich der Empfang mit einem
+neuen Upload alle zwei Wochen umgehen. Ist sie verpasst, zählt für den Preis
+kein Nachweis mehr (`NachweisRepository::gueltigenFinden()`), bis das
+Personal bestätigt. Ein laufender Vertrag wird dann zum Monatsersten auf den
+Standardpreis gestellt, wie bei einem Ablauf.
+
+Wer bestätigt ist, lädt spätere Ausweise einfach hoch: Die Ausweisprüfung
+gleicht sie mit dem festen Namen ab, zum Empfang muss er nicht mehr.
+
+Der gültige Nachweis zeigt in der Liste seinen Stand:
+
+| Stand | Wann |
+|---|---|
+| „Zeig deinen Ausweis bis … einmal am Empfang" (lime) | noch nicht bestätigt, Frist läuft |
+| „Frist für den Empfang verpasst — …" (rot) | noch nicht bestätigt, Frist vorbei |
+| „Am Empfang bestätigt" (grau) | bestätigt |
 
 **Ein Nachweis je Mitglied.** Senior und Schüler zugleich gibt es nicht.
 Wird ein neuer Nachweis gespeichert, löscht
@@ -154,6 +202,7 @@ Vorführen werden ausschließlich erfundene Ausweise benutzt, keine echten.
 | Formular | Feld für ein Foto | Feld für ein Datum |
 | Prüfung | Modell liest Name und Datum vom Bild | Datum wird eingetippt |
 | Namensabgleich, Prüfversuche | ja | nein — ohne Bild gibt es keinen Namen |
+| Name gesperrt, Bestätigung am Empfang | ja | ja |
 | `quelle` in der Tabelle | `'ki'` | `'demo'` |
 
 Geprüft wird über die **Gemini-API von Google** auf der kostenlosen Stufe,
@@ -209,12 +258,12 @@ dieselbe Anzeige ohne wanderndes Licht und ohne Konfetti.
 | 2 Seitenskript | `assets/js/pages/mein-konto.page.js`, `assets/js/pages/mitgliedschaft.page.js` |
 | 2 Komponente | `assets/js/components/ausweis-scan.js` (Animation während der Prüfung), `assets/js/components/modal.js` (Fenster „Nachweis fehlt") |
 | Hilfsmittel | `assets/js/lib/bild.js` (verkleinert das Foto vor dem Upload) |
-| 3 Service | `assets/js/services/nachweise.js` |
-| 4 Endpunkt | `api/nachweise.php` |
+| 3 Service | `assets/js/services/nachweise.js`, `assets/js/services/mitglieder.js` (Name ändern) |
+| 4 Endpunkt | `api/nachweise.php`, `api/mitglieder.php` (Name ändern, gesperrt bei gültigem Nachweis und nach der Bestätigung) |
 | Infrastruktur | `src/Ausweispruefung.php` (einzige Stelle mit einem KI-Aufruf) |
-| 5 Repository | `src/Repositories/NachweisRepository.php`, `src/Repositories/MitgliedschaftRepository.php` (Herabstufung zurücknehmen) |
-| 6 Tabelle | `nachweise` in `database/schema.sql` |
-| CSS | `assets/css/components/auth.css`, `assets/css/components/tarifkarte.css`, `assets/css/components/ausweis-scan.css` |
+| 5 Repository | `src/Repositories/NachweisRepository.php`, `src/Repositories/MitgliedschaftRepository.php` (Herabstufung zurücknehmen), `src/Repositories/MitgliedRepository.php` (Name ändern, Frist und Bestätigung) |
+| 6 Tabelle | `nachweise` in `database/schema.sql`; für die Gültigkeit wird `bestaetigt_am` und `vorzeigen_bis` aus `mitglieder` mitgelesen |
+| CSS | `assets/css/components/auth.css`, `assets/css/components/konto.css` (Formular „Name ändern"), `assets/css/components/tarifkarte.css`, `assets/css/components/ausweis-scan.css` |
 
 ## Datenform
 
@@ -229,12 +278,20 @@ dieselbe Anzeige ohne wanderndes Licht und ohne Konfetti.
       "geprueftAm": "2025-09-12 09:15:02" }
   ],
   "kiVerfuegbar": true,
-  "herabstufungZurueckgenommen": false
+  "herabstufungZurueckgenommen": false,
+  "bestaetigt": false,
+  "vorzeigenBis": "2026-10-15",
+  "fristVerpasst": false
 }
 ```
 
 Höchstens einer der Einträge ist gültig, die übrigen sind abgelaufen.
 `gueltigBis: null` heißt unbefristet und kommt nur bei `art: "senior"` vor.
+
+`bestaetigt`, `vorzeigenBis` und `fristVerpasst` gehören zur Person, nicht zu
+einem Nachweis: Bestätigt wird einmal, die Frist beginnt mit dem ersten
+Upload. `fristVerpasst` rechnet die Datenbank, damit Browser und Server nicht
+mit verschiedenen Uhren zählen.
 
 `herabstufungZurueckgenommen` ist nur nach einem POST `true`, und nur, wenn
 der Upload einen vorgemerkten Wechsel auf den Standardpreis verworfen hat.
@@ -247,6 +304,7 @@ Die Kontoseite lädt dann den Tarifstand neu.
 | GET | `api/nachweise.php` | eigene Nachweise, auch abgelaufene | Nachweisstand |
 | POST | `api/nachweise.php` | Bild prüfen lassen bzw. Datum eintragen, ersetzt den bisherigen Nachweis, nimmt eine vorgemerkte Herabstufung zurück | 201, Nachweisstand |
 | DELETE | `api/nachweise.php` | eigenen Nachweis entfernen, `{ id }` | 200, Nachweisstand |
+| PUT | `api/mitglieder.php` | eigenen Namen ändern, `{ vorname, nachname }` | 200 `{ vorname, nachname }` · 400 · **409** nach der Bestätigung am Empfang oder solange ein gültiger Nachweis vorliegt |
 
 Fehlerfälle des POST, alle mit deutscher Meldung für das Formular:
 
@@ -274,19 +332,22 @@ Sicherheit. Alles, was aus dem Browser kommt, ist manipulierbar.
 - **Fälschungen werden nicht erkannt.** Das Modell liest ab, was dasteht.
   Ein sauber gebautes Falsifikat kommt durch — auch eines mit geändertem
   Namen.
-- **Der Name im Konto ist eine Selbstauskunft.** Wer ein Konto auf den
-  Namen des Ausweisinhabers anlegt, kommt durch den Namensabgleich. Derselbe
-  Ausweis funktioniert auch in mehreren Konten mit gleichem Namen. Sicher
-  würde das erst mit einer Kontrolle am Empfang.
-- **Der Name im Konto lässt sich nicht ändern.** Wer sich als „Max"
-  registriert hat und „Maximilian" heißt, scheitert am Namensabgleich.
+- **Bis zur Bestätigung ist der Name im Konto eine Selbstauskunft.** Wer ein
+  Konto auf den Namen des Ausweisinhabers anlegt, kommt durch den
+  Namensabgleich und hat 14 Tage den ermäßigten Preis. Danach hilft nur
+  noch das Personal am Empfang — und das sieht die Person vor sich.
+- **Den Namen mit Nachweis zu ändern kostet einen Umweg:** Nachweis
+  entfernen, Namen ändern, neu hochladen. Das verbraucht einen Prüfversuch.
+  Nach der Bestätigung geht es gar nicht mehr.
 - **Name und Datum müssen auf derselben Seite des Ausweises stehen.**
   Hochgeladen wird ein Bild.
-- **Im Demo-Modus greift keine dieser Prüfungen.** Jede Person tippt ihr
+- **Im Demo-Modus greift keine der Prüfungen am Bild.** Jede Person tippt ihr
   Datum selbst ein. Laut Migrationsplan (Entscheidung E5 in
   [`migration-vercel-supabase.md`](../migration-vercel-supabase.md)) läuft
   die Produktion bewusst ohne Schlüssel, also im Demo-Modus — damit keine
-  echten Ausweise Fremder bei Google landen.
+  echten Ausweise Fremder bei Google landen. Die Sperre des Namens und die
+  Bestätigung am Empfang gelten auch dort — spätere Nachweise einer
+  bestätigten Person prüft dort aber niemand.
 - **Eine Herabstufung, die schon gilt, bleibt.** Kommt der neue Nachweis
   erst nach dem Monatsersten, läuft bereits der Vertrag zum Standardpreis.
   Dann muss man den ermäßigten Preis auf der Tarifseite neu wählen, und er
@@ -295,9 +356,10 @@ Sicherheit. Alles, was aus dem Browser kommt, ist manipulierbar.
   hochlädt, verliert diese Vormerkung.** Sie sieht genauso aus wie eine
   automatische Herabstufung. Der Fall ist kaum denkbar und fällt zugunsten
   des Mitglieds aus.
-- **Niemand kann eine Prüfung überstimmen.** Liest das Modell ein Datum
-  falsch, hilft nur ein neuer Upload oder ein Eingriff in der Datenbank.
-  Ein Admin-Bereich wäre ein eigenes Feature.
+- **Niemand kann ein gelesenes Datum korrigieren.** Liest das Modell ein
+  Datum falsch, hilft nur ein neuer Upload oder ein Eingriff in der
+  Datenbank. Das Personal am Empfang kann einen Nachweis nur bestätigen oder
+  ablehnen.
 - **Die Herabstufung läuft bei jedem Aufruf mit**, statt einmal nachts.
   Ohne Cronjob ist das der einzige Weg — siehe
   [ADR-0011](../decisions/ADR-0011-ausweispruefung-mit-ki.md), Konsequenzen.

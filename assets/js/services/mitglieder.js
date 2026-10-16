@@ -1,8 +1,9 @@
 /**
  * @file        assets/js/services/mitglieder.js
  * @layer       3 – Service
- * @description Registrieren, Anmelden, Abmelden und Passwort zurücksetzen.
- *              Einzige Stelle im Frontend, die dafür das Backend anspricht.
+ * @description Registrieren, Anmelden, Abmelden, Namen ändern und Passwort
+ *              zurücksetzen. Einzige Stelle im Frontend, die dafür das
+ *              Backend anspricht.
  *
  *              Alle Funktionen werfen bei Fehlern einen ApiError. Dessen
  *              message ist bereits ein fertiger Satz für das Formular,
@@ -60,6 +61,23 @@ export async function abmelden() {
  */
 export async function angemeldetesMitgliedLaden() {
   return getJson('api/sitzung.php');
+}
+
+/**
+ * Ändert Vor- und Nachname des angemeldeten Mitglieds.
+ *
+ * Geht nur, solange kein gültiger Nachweis hinterlegt ist - der wurde gegen
+ * den bisherigen Namen geprüft.
+ *
+ * @param {string} vorname
+ * @param {string} nachname
+ * @returns {Promise<{vorname: string, nachname: string}>}  der gespeicherte Name
+ * @throws {ApiError}  400 bei leerem oder zu langem Namen,
+ *                     401, wenn niemand (mehr) angemeldet ist,
+ *                     409, solange ein gültiger Nachweis hinterlegt ist
+ */
+export async function nameAendern(vorname, nachname) {
+  return sendJson('PUT', 'api/mitglieder.php', { vorname, nachname });
 }
 
 /**

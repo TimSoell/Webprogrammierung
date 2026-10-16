@@ -1,6 +1,6 @@
 # ADR-0020 — Ein Nachweis je Mitglied, und er muss auf den Kontoinhaber lauten
 
-**Status:** angenommen
+**Status:** angenommen, „Name nicht änderbar" und „keine Kontrolle am Empfang" ersetzt durch [ADR-0023](ADR-0023-name-aendern-und-ausweis-am-empfang.md)
 **Datum:** 2026-10-01
 
 **Ergänzt [ADR-0011](ADR-0011-ausweispruefung-mit-ki.md).** Dessen Kern gilt

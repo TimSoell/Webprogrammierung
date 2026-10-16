@@ -230,6 +230,26 @@
   border-bottom: 0;
 }
 
+/* --- Name ändern ------------------------------------------------------------- */
+/* Unter den Stammdaten: erst nur der Textknopf, nach dem Klick das Formular
+   oder - solange ein Nachweis gilt oder nach der Bestätigung am Empfang -
+   der Hinweis, warum es nicht geht. */
+.konto-name-aendern {
+  margin-top: 12px;
+}
+
+.konto-name-gesperrt {
+  margin: 10px 0 0;
+}
+
+.konto-name-form {
+  margin-top: 18px;
+}
+
+.konto-name-form .auth-hint {
+  margin: 6px 0 0;
+}
+
 /* --- Die zwei Spalten der großen Karte ------------------------------------------ */
 /* Beide sind <section>, und 03-layout.css gibt jedem <section> 118 px Abstand
    oben und unten - dadurch rutschten die Stammdaten in die Kartenmitte. */
@@ -374,6 +394,7 @@
 }
 
 #konto-seite .besuch-zeit,
+#konto-seite .konto-name-form input,
 #konto-seite .nachweis-form select,
 #konto-seite .nachweis-form input[type="file"],
 #konto-seite .nachweis-form input[type="date"] {

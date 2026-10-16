@@ -4,7 +4,9 @@
  * @layer       1 – Seite
  * @description Startpunkt des Mitgliederbereichs. Zeigt die Stammdaten, die
  *              gemerkte Programm-Auswahl, die laufende Mitgliedschaft und die
- *              Nachweise und bietet das Abmelden an.
+ *              Nachweise und bietet das Abmelden an. Der eigene Name lässt
+ *              sich hier ändern, bis das Personal ihn am Empfang bestätigt
+ *              hat - und davor nicht, solange ein gültiger Nachweis vorliegt.
  *
  *              Nur für angemeldete Mitglieder: Wer nicht angemeldet ist, wird
  *              von Auth::nurFuerMitglieder() zur Anmeldeseite geschickt,
@@ -16,6 +18,7 @@
  * @see         assets/js/pages/mein-konto.page.js
  * @see         docs/features/mitglieder-login.md
  * @see         docs/features/mitgliedschaften.md
+ * @see         docs/features/nachweise.md
  */
 
 declare(strict_types=1);
@@ -72,6 +75,47 @@ require ROOT_PATH . '/partials/header.php';
                 <dd id="konto-email">…</dd>
               </div>
             </dl>
+
+            <!-- Der Name lässt sich ändern, bis das Personal ihn am Empfang
+                 bestätigt hat - und davor nicht, solange ein gültiger
+                 Nachweis hinterlegt ist, der wurde gegen den Namen geprüft.
+                 Was sichtbar ist, schaltet das Seitenskript; die Sperre
+                 selbst sitzt in api/mitglieder.php. -->
+            <button class="auth-link konto-name-aendern" id="name-aendern" type="button">Name ändern</button>
+
+            <p class="auth-hint konto-name-gesperrt" id="name-gesperrt" hidden>
+              Solange ein gültiger Nachweis hinterlegt ist, lässt sich der
+              Name nicht ändern. Entferne zuerst den Nachweis unten auf dieser
+              Seite und lade ihn nach der Änderung neu hoch.
+            </p>
+
+            <p class="auth-hint konto-name-gesperrt" id="name-bestaetigt" hidden>
+              Dein Name wurde am Empfang mit deinem Ausweis bestätigt und ist
+              jetzt fest. Das Konto gehört damit dir allein.
+            </p>
+
+            <form class="auth-form konto-name-form" id="name-form" hidden>
+              <div class="auth-row">
+                <div class="auth-field">
+                  <label for="name-vorname">Vorname</label>
+                  <input id="name-vorname" name="vorname" required maxlength="100" autocomplete="given-name">
+                </div>
+                <div class="auth-field">
+                  <label for="name-nachname">Nachname</label>
+                  <input id="name-nachname" name="nachname" required maxlength="100" autocomplete="family-name">
+                </div>
+              </div>
+
+              <p class="auth-hint">
+                Trag deinen Namen so ein, wie er auf deinem Ausweis steht —
+                sonst passt dein Nachweis nicht zum Konto.
+              </p>
+
+              <p class="auth-message" id="name-meldung" role="alert"></p>
+
+              <button class="button" type="submit">Name speichern</button>
+              <button class="auth-link" id="name-abbrechen" type="button">Abbrechen</button>
+            </form>
 
             <!-- Nur sichtbar, wenn es ein Profilbild gibt. -->
             <div class="konto-profilbild-optionen" id="profilbild-optionen" hidden>
@@ -176,7 +220,9 @@ require ROOT_PATH . '/partials/header.php';
             Schüler-, Studierenden- und Seniorenpreise gelten nur mit Nachweis.
             Fotografiere deinen Ausweis — wir lesen Name und Datum aus und
             löschen das Bild sofort danach. Der Name muss zu deinem Konto
-            passen, und es gilt immer nur ein Nachweis.
+            passen, und es gilt immer nur ein Nachweis. Der Preis gilt
+            sofort; zeig den Ausweis innerhalb von 14 Tagen einmal am
+            Empfang. Danach prüfen wir neue Ausweise nur noch online.
           </p>
 
           <ul class="nachweis-liste" id="nachweis-liste"></ul>

@@ -28,6 +28,8 @@
 --              Hosting auf Vercel: sitzungen (PHP-Sitzungen in der Datenbank).
 --              Feature Bewertungen: bewertungen.
 --              Feature Profilbilder: profilbilder.
+--              Feature Empfang: bestaetigt_am und vorzeigen_bis in mitglieder,
+--              nachgetragen im Abschnitt NACHTRÄGE am Ende.
 --              Die auskommentierte Tabelle in der Mitte zeigt die Konventionen.
 --
 --              Die Datei darf mehrfach eingespielt werden: CREATE ... IF NOT
@@ -218,6 +220,18 @@ CREATE TABLE IF NOT EXISTS mitglieder (
     vorname     varchar(100) NOT NULL,
     nachname    varchar(100) NOT NULL,
     erstellt_am timestamp(0) NOT NULL DEFAULT LOCALTIMESTAMP(0),
+
+    -- Wann das Personal am Empfang den Ausweis gesehen und bestätigt hat,
+    -- dass die Person die ist, auf die das Konto läuft. Wird einmal gesetzt
+    -- und nie zurückgenommen: Ab dann ist der Name fest, und spätere
+    -- Nachweise prüft allein die Ausweisprüfung. NULL = noch nicht bestätigt.
+    bestaetigt_am timestamp(0) NULL,
+
+    -- Bis wann das spätestens passieren muss: 14 Tage nach dem ERSTEN
+    -- Nachweis, gesetzt von api/nachweise.php. Beginnt nie neu, sonst ließe
+    -- sich der Empfang mit einem neuen Upload alle zwei Wochen umgehen.
+    -- NULL = noch nie einen Nachweis hochgeladen.
+    vorzeigen_bis date       NULL,
 
     CONSTRAINT uniq_user_id UNIQUE (user_id),
 
@@ -989,6 +1003,31 @@ CREATE TABLE IF NOT EXISTS profilbilder (
         FOREIGN KEY (mitglied_id) REFERENCES mitglieder (id)
         ON DELETE CASCADE
 );
+
+
+-- -----------------------------------------------------------------------------
+-- NACHTRÄGE - neue Spalten in Tabellen, die es schon gibt
+-- -----------------------------------------------------------------------------
+-- CREATE TABLE IF NOT EXISTS lässt eine vorhandene Tabelle in Ruhe, auch wenn
+-- oben inzwischen eine Spalte dazugekommen ist. Diese Zeilen holen das nach.
+-- In einer frischen Datenbank tun sie nichts.
+-- -----------------------------------------------------------------------------
+
+-- Feature Empfang: Bestätigung der Person, siehe
+-- docs/decisions/ADR-0023-name-aendern-und-ausweis-am-empfang.md
+ALTER TABLE mitglieder ADD COLUMN IF NOT EXISTS bestaetigt_am timestamp(0) NULL;
+ALTER TABLE mitglieder ADD COLUMN IF NOT EXISTS vorzeigen_bis date NULL;
+
+-- Wer beim Einspielen schon einen Nachweis hat, bekommt seine 14 Tage ab
+-- heute - sonst verlöre er den ermäßigten Preis von einem Tag auf den
+-- anderen. Trifft nur Mitglieder ohne Frist; seit dem Feature setzt
+-- api/nachweise.php sie beim ersten Upload, ein zweites Einspielen ändert
+-- also nichts.
+UPDATE mitglieder
+   SET vorzeigen_bis = CURRENT_DATE + 14
+ WHERE vorzeigen_bis IS NULL
+   AND bestaetigt_am IS NULL
+   AND EXISTS (SELECT 1 FROM nachweise n WHERE n.mitglied_id = mitglieder.id);
 
 
 -- -----------------------------------------------------------------------------

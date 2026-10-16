@@ -23,6 +23,13 @@
  *              Verwendung:
  *                  Auth::instanz()->isLoggedIn()     in Kopfzeile und Endpunkten
  *                  Auth::nurFuerMitglieder();        oben in geschützten Seiten
+ *                  Auth::nurFuerPersonal();          oben in Seiten des Empfangs
+ *                  Auth::istPersonal()               im Endpunkt des Empfangs
+ *
+ *              PERSONAL ist ein normales Konto mit der Rolle EMPLOYEE der
+ *              Bibliothek (Spalte users.roles_mask). Vergeben wird sie nur im
+ *              Supabase-Dashboard, nie über die Website - siehe
+ *              docs/features/empfang.md
  * @see         src/bootstrap.php
  * @see         docs/features/mitglieder-login.md
  */
@@ -30,6 +37,7 @@
 declare(strict_types=1);
 
 use Delight\Auth\Auth as LoginBibliothek;
+use Delight\Auth\Role;
 
 final class Auth
 {
@@ -76,6 +84,39 @@ final class Auth
     {
         if (!self::instanz()->isLoggedIn()) {
             header('Location: ' . BASE_URL . 'anmelden.php');
+            exit;
+        }
+    }
+
+    /**
+     * Gehört das angemeldete Konto zum Personal?
+     *
+     * Die Bibliothek liest die Rolle aus der Session und gleicht sie alle
+     * fünf Minuten mit der Datenbank ab. Eine frisch vergebene Rolle wirkt
+     * also spätestens nach fünf Minuten oder sofort nach neuem Anmelden.
+     *
+     * @return bool  false auch, wenn niemand angemeldet ist
+     */
+    public static function istPersonal(): bool
+    {
+        return self::instanz()->isLoggedIn() && self::instanz()->hasRole(Role::EMPLOYEE);
+    }
+
+    /**
+     * Lässt nur das Personal auf die Seite. Wer nicht angemeldet ist, kommt
+     * zur Anmeldung, ein Mitglied ohne die Rolle zurück in sein Konto.
+     *
+     * Gehört in jede Seite des Empfangs - direkt nach bootstrap.php, vor
+     * jeder Ausgabe. Die Endpunkte prüfen zusätzlich selbst.
+     *
+     * @return void  Kehrt nur zurück, wenn das Personal angemeldet ist
+     */
+    public static function nurFuerPersonal(): void
+    {
+        self::nurFuerMitglieder();
+
+        if (!self::istPersonal()) {
+            header('Location: ' . BASE_URL . 'mein-konto.php');
             exit;
         }
     }

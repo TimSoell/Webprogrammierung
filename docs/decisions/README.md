@@ -44,5 +44,6 @@ Kein ADR für: Farbwerte, Textänderungen, das Anlegen einer einzelnen Datei.
 | [0017](ADR-0017-postgresql-auf-supabase.md) | PostgreSQL bei Supabase, Sitzungen in der Datenbank | angenommen |
 | [0018](ADR-0018-indexierung-bei-google.md) | Die Seite darf bei Google erscheinen | angenommen |
 | [0019](ADR-0019-profilbilder-in-der-datenbank.md) | Profilbilder liegen in der Datenbank und haben eine eigene Adresse | angenommen |
-| [0020](ADR-0020-nachweise-absichern.md) | Ein Nachweis je Mitglied, und er muss auf den Kontoinhaber lauten | angenommen |
+| [0020](ADR-0020-nachweise-absichern.md) | Ein Nachweis je Mitglied, und er muss auf den Kontoinhaber lauten | angenommen, Name nicht änderbar und fehlende Kontrolle am Empfang ersetzt durch 0023 |
 | [0021](ADR-0021-gutschein-als-gratiszeitraum.md) | Ein Gutschein ist ein Gratiszeitraum am Mitglied, kein Vertrag | angenommen |
+| [0023](ADR-0023-name-aendern-und-ausweis-am-empfang.md) | Der Name ist bis zur Bestätigung am Empfang änderbar, und das Personal bestätigt jede Person einmal | angenommen |

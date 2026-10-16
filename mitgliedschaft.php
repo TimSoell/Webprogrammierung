@@ -94,7 +94,10 @@ require ROOT_PATH . '/partials/header.php';
 
         <p class="tarife-hinweis">
           Der ermäßigte Preis gilt gegen Vorlage eines gültigen Schüler- oder
-          Studierendenausweises, der Seniorenpreis ab 65 Jahren.
+          Studierendenausweises, der Seniorenpreis ab 65 Jahren. Den Nachweis
+          lädst du unter „Mein Konto“ hoch, der Preis gilt dann sofort. Zeig
+          den Ausweis innerhalb von 14 Tagen einmal am Empfang — danach
+          prüfen wir neue Ausweise nur noch online.
         </p>
 
 <?php if (Auth::instanz()->isLoggedIn()): ?>
