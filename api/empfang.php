@@ -22,6 +22,10 @@
  *              es nicht. Siehe
  *              docs/decisions/ADR-0024-empfang-bestaetigt-konto-mit-personalausweis.md
  *
+ *              WER MUSS: jedes Mitglied mit Tarif, binnen 14 Tagen nach der
+ *              ersten Tarifwahl (api/mitgliedschaften.php). Konten ohne Tarif
+ *              stehen auch in der Liste, müssen aber nicht.
+ *
  *              War wegen verpasster Frist schon der Standardpreis vorgemerkt,
  *              nimmt die Bestätigung das zurück - nach derselben Regel wie
  *              beim Hochladen in api/nachweise.php.
@@ -73,16 +77,16 @@ try {
                 'email'         => $zeile['email'],
                 'registriertAm' => substr((string) $zeile['erstellt_am'], 0, 10),
 
-                // Nur gesetzt, wenn ein gültiger Ermäßigungsnachweis vorliegt -
-                // dann läuft die Frist, und es eilt.
+                // Art des gültigen Ermäßigungsnachweises oder null. Nur für
+                // die Anzeige: Verpasst so jemand die Frist, ruht der Preis.
                 'ermaessigung'  => $zeile['ermaessigung'],
+
+                // Gesetzt mit der ersten Tarifwahl, null = noch kein Tarif.
                 'vorzeigenBis'  => $zeile['vorzeigen_bis'],
 
                 // Beide Daten als 'JJJJ-MM-TT': Der Zeichenvergleich ist
                 // hier dasselbe wie der Datumsvergleich.
-                'fristVerpasst' => $zeile['ermaessigung'] !== null
-                    && $zeile['vorzeigen_bis'] !== null
-                    && $zeile['vorzeigen_bis'] < $heute,
+                'fristVerpasst' => $zeile['vorzeigen_bis'] !== null && $zeile['vorzeigen_bis'] < $heute,
             ], $zeilen)),
         ]);
     };

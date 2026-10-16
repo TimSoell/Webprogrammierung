@@ -173,8 +173,8 @@
   overflow-wrap: anywhere;
 }
 
-/* Status mit Punkt davor: Lime = Frist läuft, Rot = verpasst, Grau = ohne
-   Ermäßigung, da eilt nichts. */
+/* Status mit Punkt davor: Lime = Frist läuft, Rot = verpasst, Grau = ohne Tarif, da
+   eilt nichts. */
 .empfang-status .empfang-zeile-kopf::before {
   display: inline-block;
   width: 8px;

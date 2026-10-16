@@ -6,9 +6,10 @@
 
 ## Was kann man damit
 
-Am Empfang wird jedes Konto **einmal mit dem Personalausweis bestätigt**.
-Das Personal sieht auf einer eigenen Seite alle Konten, die das noch nicht
-sind. Steht die Person vor ihm, vergleicht es das Foto im Personalausweis mit
+**Jedes Mitglied, das einen Tarif wählt, bestätigt sein Konto einmal am
+Empfang mit dem Personalausweis** — innerhalb von 14 Tagen nach der ersten
+Tarifwahl, am besten beim ersten Training. Das Personal sieht auf einer
+eigenen Seite alle Konten, die das noch nicht sind. Steht die Person vor ihm, vergleicht es das Foto im Personalausweis mit
 ihr und den Namen mit dem Konto und klickt **„Bestätigen"**. Passt etwas
 nicht, bestätigt es einfach nicht.
 
@@ -17,7 +18,7 @@ die prüft die Ausweisprüfung online, siehe [Nachweise](nachweise.md).
 
 Die Liste ist eine Tabelle mit den Spalten Person (Name und E-Mail),
 Registriert, Status und dem Knopf. Darüber stehen eine **Suche nach Name
-oder E-Mail**, ein Filter (alle, mit Ermäßigung, Frist verpasst) und ein
+oder E-Mail**, ein Filter (alle, mit Tarif, Frist verpasst) und ein
 Knopf zum Neuladen — falls am zweiten Tresen gerade jemand bestätigt hat.
 Suche und Filter arbeiten im Browser auf der geladenen Liste; Groß- und
 Kleinschreibung und Akzente zählen nicht („muller" findet „Müller"). Auf
@@ -84,16 +85,22 @@ sein Konto (`Auth::nurFuerPersonal()`), und `api/empfang.php` antwortet mit
 | Was der Empfang nicht prüft | Schüler-, Studierenden- und Seniorennachweise |
 | Wie oft | einmal je Konto, für immer |
 | Wer in der Liste steht | alle unbestätigten Konten, ohne gesperrte (Demo-Konten) und ohne das eigene |
-| Frist | nur mit Ermäßigung: 14 Tage ab dem **ersten** Nachweis, beginnt nie neu |
-| Bis zur Bestätigung | ermäßigter Preis gilt, solange die Frist läuft |
-| Frist verpasst | kein ermäßigter Preis, bis das Konto bestätigt ist; ein laufender Vertrag wird zum Monatsersten herabgestuft |
+| Wer muss | jedes Mitglied mit Tarif, in jeder Preisgruppe, auch mit Gutschein |
+| Frist | 14 Tage ab der **ersten Tarifwahl**, beginnt nie neu; ohne Tarif keine Frist |
+| Bis zur Bestätigung | alles gilt, auch ein ermäßigter Preis |
+| Frist verpasst, mit Ermäßigung | kein ermäßigter Preis, bis das Konto bestätigt ist; ein laufender Vertrag wird zum Monatsersten herabgestuft |
+| Frist verpasst, ohne Ermäßigung | keine Sperre, nur rot markiert in „Mein Konto" und am Empfang |
 | Bestätigen nach verpasster Frist | Preis gilt wieder, eine noch nicht wirksame Herabstufung wird zurückgenommen |
 | Personalausweis passt nicht | nicht bestätigen — einen Knopf „Ablehnen" gibt es nicht |
 | Name | bis zur Bestätigung änderbar (nicht, solange ein Nachweis gilt), danach für immer fest |
 
-Oben stehen die Konten mit Ermäßigungsnachweis, die dringendste Frist zuerst;
-verpasste sind rot markiert. Danach alle anderen nach Namen, mit grauem
-Status „Ohne Ermäßigung".
+Oben stehen die Konten mit Tarif, die dringendste Frist zuerst; verpasste
+sind rot markiert, mit Ermäßigung steht dabei, dass der günstige Preis ruht.
+Danach die Konten ohne Tarif nach Namen, mit grauem Status „Ohne Tarif".
+
+Mitglieder sehen ihre Frist in „Mein Konto" bei den Stammdaten (lime, bei
+verpasster Frist rot) und nach der ersten Tarifwahl in der Meldung auf der
+Tarifseite.
 
 ## Beteiligte Dateien
 
@@ -120,8 +127,9 @@ Ein Eintrag der Liste:
   "ermaessigung": "student", "vorzeigenBis": "2026-10-30", "fristVerpasst": false }
 ```
 
-`ermaessigung` ist `null`, wenn kein gültiger Ermäßigungsnachweis vorliegt.
-Dann gibt es keine Frist, und `fristVerpasst` ist immer `false`.
+`vorzeigenBis` ist `null`, solange kein Tarif gewählt ist — dann gibt es keine
+Frist, und `fristVerpasst` ist `false`. `ermaessigung` ist `null` ohne
+gültigen Ermäßigungsnachweis; es steht nur zur Anzeige da.
 
 ## Endpunkte
 
@@ -138,7 +146,9 @@ geklickt. Die Seite zeigt die Meldung, die Liste lädt man neu.
 Aus PostgreSQL bei Supabase, Tabellen `mitglieder`, `nachweise` und `users`.
 Neue Tabellen gibt es nicht. Die zwei Spalten kommen über den Abschnitt
 „NACHTRÄGE" am Ende von `database/schema.sql` in vorhandene Datenbanken;
-wer dort schon einen Nachweis hat, bekommt seine 14 Tage ab dem Einspielen.
+wer dort schon einen Tarif hat, bekommt seine 14 Tage ab dem Einspielen.
+Fristen, die nach der alten Regel ohne Tarif entstanden sind, setzt der
+Nachtrag zurück.
 
 ## Was fehlt noch
 
@@ -152,5 +162,8 @@ wer dort schon einen Nachweis hat, bekommt seine 14 Tage ab dem Einspielen.
   bleibt nach der Bestätigung aber fest.
 - **Einen falschen Ermäßigungsnachweis kann der Empfang nicht entfernen.** Er
   bestätigt das Konto dann nicht, nach 14 Tagen ruht der Preis von selbst.
+- **Ohne Ermäßigung hat eine verpasste Frist keine Folge** — bewusst die
+  lockere Variante. Strenger wäre, Kursbuchungen bis zur Bestätigung zu
+  sperren.
 - **Die Tarifseite sagt bei verpasster Frist „Nachweis fehlt".** Den genauen
   Grund nennt nur „Mein Konto".

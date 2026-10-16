@@ -5,7 +5,7 @@
  *              noch nicht mit dem Personalausweis bestätigt sind, und
  *              schickt das Bestätigen an den Server.
  *
- *              Suche (Name oder E-Mail) und Filter (mit Ermäßigung / Frist
+ *              Suche (Name oder E-Mail) und Filter (mit Tarif / Frist
  *              verpasst) arbeiten nur im Browser auf der geladenen Liste -
  *              der Server liefert ohnehin alle unbestätigten Konten. "Neu
  *              laden" holt die Liste noch einmal, falls am zweiten Tresen
@@ -71,14 +71,14 @@ if (seite) {
     .replace(/[̀-ͯ]/g, '');
 
   /**
-   * Wie dringend ein Konto ist: Mit Ermäßigung läuft eine Frist, die auch
-   * schon verpasst sein kann. Ohne Ermäßigung eilt nichts.
+   * Wie dringend ein Konto ist: Mit Tarif läuft eine Frist, die auch schon
+   * verpasst sein kann. Ohne Tarif eilt nichts.
    *
    * @param {import('../services/empfang.js').OffenesKonto} eintrag
    * @returns {'laeuft'|'verpasst'|'ohne'}
    */
   const standVon = (eintrag) => {
-    if (eintrag.ermaessigung === null) {
+    if (eintrag.vorzeigenBis === null) {
       return 'ohne';
     }
 
@@ -94,7 +94,7 @@ if (seite) {
     const begriff = vergleichbar(suche.value.trim());
 
     return offen.filter((eintrag) => {
-      if (filter.value === 'ermaessigung' && eintrag.ermaessigung === null) {
+      if (filter.value === 'tarif' && eintrag.vorzeigenBis === null) {
         return false;
       }
       if (filter.value === 'verpasst' && !eintrag.fristVerpasst) {
@@ -144,12 +144,19 @@ if (seite) {
    */
   const statusZelle = (eintrag) => {
     const stand = standVon(eintrag);
-    const art = NACHWEISARTEN[eintrag.ermaessigung];
+
+    // Mit Ermäßigung steht dabei, welcher Nachweis - und bei verpasster
+    // Frist, dass der günstige Preis gerade ruht.
+    const art = eintrag.ermaessigung === null ? '' : ` · ${NACHWEISARTEN[eintrag.ermaessigung]}`;
 
     const zelle = {
-      ohne: () => zelleBauen('Ohne Ermäßigung', 'keine Frist', 'Status'),
-      laeuft: () => zelleBauen('Frist läuft', `${art} · zeigen bis ${datumAnzeigen(eintrag.vorzeigenBis)}`, 'Status'),
-      verpasst: () => zelleBauen('Frist verpasst', `${art} · seit ${datumAnzeigen(eintrag.vorzeigenBis)} · Preis ruht`, 'Status'),
+      ohne: () => zelleBauen('Ohne Tarif', 'muss nicht, kann aber', 'Status'),
+      laeuft: () => zelleBauen('Frist läuft', `bis ${datumAnzeigen(eintrag.vorzeigenBis)}${art}`, 'Status'),
+      verpasst: () => zelleBauen(
+        'Frist verpasst',
+        `seit ${datumAnzeigen(eintrag.vorzeigenBis)}${eintrag.ermaessigung === null ? '' : ' · ermäßigter Preis ruht'}`,
+        'Status',
+      ),
     }[stand]();
 
     zelle.classList.add('empfang-status');

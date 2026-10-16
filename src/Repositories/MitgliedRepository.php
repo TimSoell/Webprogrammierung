@@ -133,12 +133,12 @@ final class MitgliedRepository
     }
 
     /**
-     * Setzt die Frist, bis zu der ein Mitglied den Ausweis am Empfang zeigen
-     * muss - aber nur beim ersten Nachweis.
+     * Setzt die Frist, bis zu der ein Mitglied seinen Personalausweis am
+     * Empfang zeigen muss - aufgerufen bei der ersten Tarifwahl.
      *
-     * Ist schon eine Frist gesetzt, bleibt sie stehen: Ein neuer Upload darf
-     * sie nicht verlängern, sonst ließe sich der Empfang umgehen. Wer schon
-     * bestätigt ist, braucht keine.
+     * Ist schon eine Frist gesetzt, bleibt sie stehen und wird nie
+     * verlängert, sonst ließe sich der Empfang umgehen. Wer schon bestätigt
+     * ist, braucht keine.
      *
      * @param int    $mitgliedId  mitglieder.id
      * @param string $bis         letzter Tag, 'JJJJ-MM-TT'
@@ -163,9 +163,11 @@ final class MitgliedRepository
      * Nur Konten im normalen Zustand der Login-Bibliothek. Gesperrte Konten,
      * etwa die Demo-Konten für die Auslastung, kann niemand vorzeigen.
      *
-     * Dazu je Konto die Art des gültigen Ermäßigungsnachweises, falls es
-     * einen gibt: Für diese Personen läuft die Frist, deshalb stehen sie
-     * oben, die dringendste zuerst. Alle anderen folgen nach Namen.
+     * Wer einen Tarif hat, hat eine Frist (vorzeigen_bis) und steht oben, die
+     * dringendste zuerst. Konten ohne Tarif folgen nach Namen - sie müssen
+     * nicht, können aber bestätigt werden. Dazu je Konto die Art des gültigen
+     * Ermäßigungsnachweises, falls es einen gibt: Verpasst so jemand die
+     * Frist, ruht sein ermäßigter Preis.
      *
      * Liest users (E-Mail, Status) und nachweise nur mit, geschrieben wird
      * hier nur mitglieder.
@@ -186,10 +188,11 @@ final class MitgliedRepository
                      AND (n.gueltig_bis IS NULL OR n.gueltig_bis >= CURRENT_DATE)
               WHERE m.bestaetigt_am IS NULL
                 AND u.status = ?
-              ORDER BY n.id IS NULL, m.vorzeigen_bis, m.nachname, m.vorname'
+              ORDER BY m.vorzeigen_bis IS NULL, m.vorzeigen_bis, m.nachname, m.vorname'
         );
         // Ein Mitglied hat höchstens einen gültigen Nachweis (siehe
         // NachweisRepository::anlegen()), der LEFT JOIN verdoppelt also nichts.
+        // Sortiert wird erst "mit Frist vor ohne", dann nach der Frist.
         $stmt->execute([Status::NORMAL]);
 
         return $stmt->fetchAll();

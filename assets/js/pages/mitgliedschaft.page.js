@@ -454,7 +454,7 @@ if (seite) {
       zeichnen();
 
       const erfolg = {
-        erstwahl: `Willkommen im ${was.ziel.name}. Dein Tarif gilt ab heute.`,
+        erstwahl: `Willkommen im ${was.ziel.name}. Dein Tarif gilt ab heute. Bring zum ersten Training deinen Personalausweis mit, falls dein Konto noch nicht am Empfang bestätigt ist.`,
         wechsel: `Wechsel vorgemerkt: Ab ${was.gueltigAb ? datumAnzeigen(was.gueltigAb) : 'dem Monatsersten'} gilt ${was.ziel.name}.`,
         ruecknahme: `Zurückgenommen. Dein ${was.ziel.name} läuft unverändert weiter.`,
       };

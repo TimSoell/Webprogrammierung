@@ -40,11 +40,11 @@
  *
  *              DAS KONTO WIRD EINMAL AM EMPFANG BESTAETIGT, mit dem
  *              Personalausweis. Den Ermäßigungsnachweis selbst prüft allein
- *              dieser Endpunkt, der Empfang sieht ihn nicht. Der erste
- *              Nachweis gilt sofort, aber nur VORZEIGEFRIST_TAGE lang - bis
- *              dahin muss das Konto bestätigt sein (api/empfang.php). Die
- *              Frist setzt der erste Upload und kein späterer verlängert sie.
- *              Den Stand liefert jede Antwort in bestaetigt, vorzeigenBis und
+ *              dieser Endpunkt, der Empfang sieht ihn nicht. Ein Nachweis gilt
+ *              sofort. Die Frist für den Empfang beginnt aber mit der ersten
+ *              Tarifwahl (api/mitgliedschaften.php); ist sie verpasst, ruht
+ *              der ermäßigte Preis, bis das Konto bestätigt ist. Den Stand
+ *              liefert jede Antwort in bestaetigt, vorzeigenBis und
  *              fristVerpasst.
  * @see         assets/js/services/nachweise.js
  * @see         src/Ausweispruefung.php
@@ -94,13 +94,6 @@ const HOECHSTDAUER = ['schueler' => '+2 years', 'student' => '+1 year'];
  * Anfrage aus dem Tageskontingent der kostenlosen Stufe.
  */
 const PRUEFVERSUCHE = 3;
-
-/**
- * So viele Tage nach dem ersten Nachweis muss das Personal das Konto am
- * Empfang bestätigt haben, sonst gilt der ermäßigte Preis nicht mehr. Der
- * Nachtrag in database/schema.sql gibt vorhandenen Nachweisen dieselben 14 Tage.
- */
-const VORZEIGEFRIST_TAGE = 14;
 
 /**
  * Größte erlaubte Bildgröße in Byte, vor der base64-Kodierung.
@@ -385,11 +378,6 @@ try {
             : AUSWEISNAMEN[$art] . ' geprüft: ' . $geprueft . ', Name stimmt mit dem Konto überein.';
 
         $nachweise->anlegen($mitgliedId, $art, $gueltigBis, $quelle, $modell, $hinweis);
-
-        // Nur beim ersten Nachweis: Ab jetzt läuft die Frist für den
-        // Empfang. Ist schon eine gesetzt oder die Person bestätigt, ändert
-        // das nichts - siehe MitgliedRepository::fristSetzen().
-        $mitglieder->fristSetzen($mitgliedId, $heute->modify('+' . VORZEIGEFRIST_TAGE . ' days')->format('Y-m-d'));
 
         // Fehlte der Nachweis, hat api/mitgliedschaften.php den Vertrag zum
         // Monatsersten auf den Standardpreis vorgemerkt. Mit dem neuen

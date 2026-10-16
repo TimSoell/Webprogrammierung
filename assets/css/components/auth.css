@@ -382,17 +382,12 @@
   line-height: 1.5;
 }
 
-/* Zweite Zeile im Eintrag: der Stand am Empfang. Steht er noch aus, fällt
-   die Zeile in Lime auf - wie der Hinweis auf den fehlenden Nachweis auf der
-   Tarifseite. Ist die Frist verpasst, in Rot, wie ein abgelaufener Nachweis. */
+/* Zweite Zeile im Eintrag, nur wenn die Frist für den Empfang verpasst ist:
+   Dann ruht der ermäßigte Preis. In Rot, wie ein abgelaufener Nachweis. */
 .nachweis-status {
   display: block;
   color: var(--muted);
   font-size: .78rem;
-}
-
-.nachweis-status[data-stand="offen"] {
-  color: var(--lime);
 }
 
 .nachweis-status[data-stand="verpasst"] {

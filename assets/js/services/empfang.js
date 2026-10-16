@@ -22,9 +22,11 @@ import { getJson, sendJson } from './api.js';
  * @property {string} registriertAm       'JJJJ-MM-TT'
  * @property {'schueler'|'student'|'senior'|null} ermaessigung
  *                                        Art des gültigen Ermäßigungsnachweises,
- *                                        null ohne - dann gibt es keine Frist
- * @property {string|null} vorzeigenBis   letzter Tag der Frist, 'JJJJ-MM-TT'
- * @property {boolean} fristVerpasst      true = der ermäßigte Preis ruht
+ *                                        null ohne
+ * @property {string|null} vorzeigenBis   letzter Tag der Frist, 'JJJJ-MM-TT';
+ *                                        null = noch kein Tarif, keine Frist
+ * @property {boolean} fristVerpasst      true = Frist vorbei; mit Ermäßigung
+ *                                        ruht dann der günstige Preis
  */
 
 /**

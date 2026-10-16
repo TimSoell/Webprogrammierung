@@ -46,8 +46,10 @@ final class NachweisRepository
      * Sucht den gültigen Nachweis, der zu einer Preisgruppe berechtigt.
      *
      * Gültig heißt: unbefristet (gueltig_bis IS NULL, nur bei Senioren) oder
-     * das Ablaufdatum liegt heute oder später - UND die Person wurde am
-     * Empfang bestätigt oder ihre Frist dafür läuft noch. Wer die Frist
+     * das Ablaufdatum liegt heute oder später - UND das Konto wurde am
+     * Empfang bestätigt oder seine Frist dafür ist noch nicht vorbei. Ohne
+     * Frist (vorzeigen_bis NULL) hat das Mitglied noch keinen Tarif gewählt;
+     * die Frist beginnt erst damit, der Nachweis zählt also. Wer die Frist
      * verpasst, verliert den Preis, bis das Personal ihn bestätigt.
      *
      * @param int    $mitgliedId   mitglieder.id, NICHT users.id
@@ -72,7 +74,7 @@ final class NachweisRepository
               WHERE n.mitglied_id = ?
                 AND n.art IN (' . $platzhalter . ')
                 AND (n.gueltig_bis IS NULL OR n.gueltig_bis >= CURRENT_DATE)
-                AND (m.bestaetigt_am IS NOT NULL OR m.vorzeigen_bis >= CURRENT_DATE)
+                AND (m.bestaetigt_am IS NOT NULL OR m.vorzeigen_bis IS NULL OR m.vorzeigen_bis >= CURRENT_DATE)
               ORDER BY n.gueltig_bis IS NULL DESC, n.gueltig_bis DESC
               LIMIT 1'
         );

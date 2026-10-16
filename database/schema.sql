@@ -227,10 +227,9 @@ CREATE TABLE IF NOT EXISTS mitglieder (
     -- Nachweise prüft allein die Ausweisprüfung. NULL = noch nicht bestätigt.
     bestaetigt_am timestamp(0) NULL,
 
-    -- Bis wann das spätestens passieren muss: 14 Tage nach dem ERSTEN
-    -- Nachweis, gesetzt von api/nachweise.php. Beginnt nie neu, sonst ließe
-    -- sich der Empfang mit einem neuen Upload alle zwei Wochen umgehen.
-    -- NULL = noch nie einen Nachweis hochgeladen.
+    -- Bis wann das spätestens passieren muss: 14 Tage nach der ERSTEN
+    -- Tarifwahl, gesetzt von api/mitgliedschaften.php. Beginnt nie neu.
+    -- NULL = noch keinen Tarif gewählt, also auch keine Frist.
     vorzeigen_bis date       NULL,
 
     CONSTRAINT uniq_user_id UNIQUE (user_id),
@@ -1018,16 +1017,27 @@ CREATE TABLE IF NOT EXISTS profilbilder (
 ALTER TABLE mitglieder ADD COLUMN IF NOT EXISTS bestaetigt_am timestamp(0) NULL;
 ALTER TABLE mitglieder ADD COLUMN IF NOT EXISTS vorzeigen_bis date NULL;
 
--- Wer beim Einspielen schon einen Nachweis hat, bekommt seine 14 Tage ab
--- heute - sonst verlöre er den ermäßigten Preis von einem Tag auf den
--- anderen. Trifft nur Mitglieder ohne Frist; seit dem Feature setzt
--- api/nachweise.php sie beim ersten Upload, ein zweites Einspielen ändert
--- also nichts.
+-- Wer beim Einspielen schon einen Tarif hat, bekommt seine 14 Tage ab heute -
+-- die Frist beginnt sonst mit der ersten Tarifwahl, und die liegt bei ihm
+-- schon zurück. Trifft nur Mitglieder ohne Frist; seitdem setzt
+-- api/mitgliedschaften.php sie bei der Erstwahl, ein zweites Einspielen
+-- ändert also nichts. Siehe
+-- docs/decisions/ADR-0024-empfang-bestaetigt-konto-mit-personalausweis.md
 UPDATE mitglieder
    SET vorzeigen_bis = CURRENT_DATE + 14
  WHERE vorzeigen_bis IS NULL
    AND bestaetigt_am IS NULL
-   AND EXISTS (SELECT 1 FROM nachweise n WHERE n.mitglied_id = mitglieder.id);
+   AND EXISTS (SELECT 1 FROM mitgliedschaften ms WHERE ms.mitglied_id = mitglieder.id);
+
+-- Eine kurze Zeit lang begann die Frist schon mit dem ersten Nachweis. Wer so
+-- eine Frist hat, aber noch keinen Tarif, bekommt sie zurück auf NULL - sie
+-- beginnt dann richtig mit seiner Tarifwahl. Mitglieder mit Tarif bleiben
+-- unberührt; ein zweites Einspielen ändert nichts.
+UPDATE mitglieder
+   SET vorzeigen_bis = NULL
+ WHERE vorzeigen_bis IS NOT NULL
+   AND bestaetigt_am IS NULL
+   AND NOT EXISTS (SELECT 1 FROM mitgliedschaften ms WHERE ms.mitglied_id = mitglieder.id);
 
 
 -- -----------------------------------------------------------------------------

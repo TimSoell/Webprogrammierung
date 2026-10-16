@@ -5,8 +5,10 @@
  * @description Startpunkt des Mitgliederbereichs. Zeigt die Stammdaten, die
  *              gemerkte Programm-Auswahl, die laufende Mitgliedschaft und die
  *              Nachweise und bietet das Abmelden an. Der eigene Name lässt
- *              sich hier ändern, bis das Personal ihn am Empfang bestätigt
- *              hat - und davor nicht, solange ein gültiger Nachweis vorliegt.
+ *              sich hier ändern, bis das Personal das Konto am Empfang
+ *              bestätigt hat - und davor nicht, solange ein gültiger Nachweis
+ *              vorliegt. Mit Tarif steht bei den Stammdaten, bis wann der
+ *              Personalausweis gezeigt werden muss.
  *
  *              Nur für angemeldete Mitglieder: Wer nicht angemeldet ist, wird
  *              von Auth::nurFuerMitglieder() zur Anmeldeseite geschickt,
@@ -93,6 +95,11 @@ require ROOT_PATH . '/partials/header.php';
               Dein Konto wurde am Empfang mit deinem Personalausweis bestätigt.
               Der Name ist jetzt fest, das Konto gehört damit dir allein.
             </p>
+
+            <!-- Mit dem ersten Tarif muss das Konto einmal am Empfang bestätigt
+                 werden. Text, Sichtbarkeit und Farbe (data-stand) setzt das
+                 Seitenskript aus api/nachweise.php. -->
+            <p class="auth-hint konto-empfang-hinweis" id="konto-empfang-hinweis" hidden></p>
 
             <form class="auth-form konto-name-form" id="name-form" hidden>
               <div class="auth-row">
@@ -221,8 +228,8 @@ require ROOT_PATH . '/partials/header.php';
             Fotografiere deinen Ausweis — wir lesen Name und Datum aus und
             löschen das Bild sofort danach. Der Name muss zu deinem Konto
             passen, und es gilt immer nur ein Nachweis. Der Preis gilt
-            sofort; zeig innerhalb von 14 Tagen einmal deinen
-            Personalausweis am Empfang, damit wir dein Konto bestätigen.
+            sofort. Ist dein Konto 14 Tage nach der Tarifwahl noch nicht am
+            Empfang bestätigt, ruht er, bis das nachgeholt ist.
           </p>
 
           <ul class="nachweis-liste" id="nachweis-liste"></ul>

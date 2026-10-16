@@ -70,7 +70,7 @@ require ROOT_PATH . '/partials/header.php';
           <label class="konto-visually-hidden" for="empfang-filter">Filtern</label>
           <select class="empfang-filter" id="empfang-filter">
             <option value="alle">Alle</option>
-            <option value="ermaessigung">Mit Ermäßigung</option>
+            <option value="tarif">Mit Tarif</option>
             <option value="verpasst">Frist verpasst</option>
           </select>
 

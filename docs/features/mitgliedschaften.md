@@ -182,6 +182,11 @@ entscheidet der Server**, nicht der Browser:
 | laufender Tarif gewählt, Vormerkung vorhanden | Vormerkung zurückgenommen | 200 |
 | laufender Tarif gewählt, keine Vormerkung | nichts zu tun | 409 |
 
+**Die Erstwahl startet die Frist für den Empfang.** Ab dann hat das Mitglied
+14 Tage, um sein Konto einmal mit dem Personalausweis bestätigen zu lassen —
+in jeder Preisgruppe, auch wenn der Tarif dank Gutschein gratis beginnt.
+Siehe [Empfang](empfang.md).
+
 ## Woher kommen die Daten aktuell
 
 Aus PostgreSQL bei Supabase, siehe
