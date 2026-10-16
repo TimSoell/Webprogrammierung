@@ -2,10 +2,11 @@
  * @file        assets/js/services/empfang.js
  * @layer       3 – Service
  * @description Die Liste der Konten lesen, die am Empfang noch nicht mit
- *              dem Personalausweis bestätigt sind, und ein Konto bestätigen.
+ *              dem Personalausweis bestätigt sind, ein Konto bestätigen und
+ *              eine Unstimmigkeit melden.
  *              Einzige Stelle im Frontend, die api/empfang.php anspricht.
  *
- *              Beide Funktionen antworten mit der Liste, wie sie danach ist.
+ *              Alle Funktionen antworten mit der Liste, wie sie danach ist.
  *              Ohne die Rolle des Personals antwortet der Server mit 403.
  * @see         assets/js/services/api.js
  * @see         api/empfang.php
@@ -27,6 +28,9 @@ import { getJson, sendJson } from './api.js';
  *                                        null = noch kein Tarif, keine Frist
  * @property {boolean} fristVerpasst      true = Frist vorbei; mit Ermäßigung
  *                                        ruht dann der günstige Preis
+ * @property {{am: string, grund: string}|null} unstimmigkeit
+ *                                        vom Personal gemeldet, am = 'JJJJ-MM-TT';
+ *                                        null = nichts gemeldet
  */
 
 /**
@@ -49,4 +53,18 @@ export async function offeneLaden() {
  */
 export async function bestaetigen(mitgliedId) {
   return sendJson('PUT', 'api/empfang.php', { mitgliedId: String(mitgliedId) });
+}
+
+/**
+ * Meldet eine Unstimmigkeit: Der Personalausweis ist falsch, oder die
+ * Person passt nicht zum Konto. Ein Admin entscheidet danach, ob das Konto
+ * gelöscht wird.
+ *
+ * @param {number} mitgliedId
+ * @param {string} grund  was nicht passt, höchstens 200 Zeichen
+ * @returns {Promise<{offen: Array<OffenesKonto>}>}  die Liste danach
+ * @throws {ApiError}  400 ohne Grund, 403 beim eigenen Konto, 409 schon gemeldet
+ */
+export async function unstimmigkeitMelden(mitgliedId, grund) {
+  return sendJson('POST', 'api/empfang.php', { mitgliedId: String(mitgliedId), grund });
 }

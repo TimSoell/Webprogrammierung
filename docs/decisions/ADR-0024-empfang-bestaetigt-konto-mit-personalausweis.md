@@ -1,6 +1,6 @@
 # ADR-0024 — Jedes Mitglied mit Tarif bestätigt sein Konto einmal mit dem Personalausweis am Empfang
 
-**Status:** angenommen
+**Status:** angenommen, „nur Bestätigen" ersetzt durch [ADR-0026](ADR-0026-schutz-vor-falschen-konten.md)
 **Datum:** 2026-10-16
 
 **Ersetzt einen Teil von [ADR-0023](ADR-0023-name-aendern-und-ausweis-am-empfang.md):**

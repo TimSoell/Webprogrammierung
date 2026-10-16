@@ -3,7 +3,8 @@
  * @layer       2 – Seitenskript
  * @description Zeigt dem Personal die Tabelle der Konten, die am Empfang
  *              noch nicht mit dem Personalausweis bestätigt sind, und
- *              schickt das Bestätigen an den Server.
+ *              schickt das Bestätigen an den Server - oder eine
+ *              Unstimmigkeit, wenn Ausweis oder Person nicht passen.
  *
  *              Suche (Name oder E-Mail) und Filter (mit Tarif / Frist
  *              verpasst) arbeiten nur im Browser auf der geladenen Liste -
@@ -12,13 +13,14 @@
  *              jemand bestätigt hat.
  *
  *              Bestätigen fragt vorher nach, denn es sperrt den Namen für
- *              immer. Wer das darf, prüft allein api/empfang.php.
+ *              immer. Unstimmigkeit fragt nach dem Grund. Wer das darf,
+ *              prüft allein api/empfang.php.
  * @see         empfang.php
  * @see         assets/js/services/empfang.js
  */
 
 import { $ } from '../lib/dom.js';
-import { bestaetigen, offeneLaden } from '../services/empfang.js';
+import { bestaetigen, offeneLaden, unstimmigkeitMelden } from '../services/empfang.js';
 import { meldungZeigen } from '../components/auth-formular.js';
 
 const seite = $('#empfang-seite');
@@ -72,12 +74,16 @@ if (seite) {
 
   /**
    * Wie dringend ein Konto ist: Mit Tarif läuft eine Frist, die auch schon
-   * verpasst sein kann. Ohne Tarif eilt nichts.
+   * verpasst sein kann. Ohne Tarif eilt nichts. Eine gemeldete
+   * Unstimmigkeit geht allem vor.
    *
    * @param {import('../services/empfang.js').OffenesKonto} eintrag
-   * @returns {'laeuft'|'verpasst'|'ohne'}
+   * @returns {'unstimmig'|'laeuft'|'verpasst'|'ohne'}
    */
   const standVon = (eintrag) => {
+    if (eintrag.unstimmigkeit !== null) {
+      return 'unstimmig';
+    }
     if (eintrag.vorzeigenBis === null) {
       return 'ohne';
     }
@@ -150,6 +156,11 @@ if (seite) {
     const art = eintrag.ermaessigung === null ? '' : ` · ${NACHWEISARTEN[eintrag.ermaessigung]}`;
 
     const zelle = {
+      unstimmig: () => zelleBauen(
+        'Unstimmigkeit',
+        `gemeldet am ${datumAnzeigen(eintrag.unstimmigkeit.am)} · ${eintrag.unstimmigkeit.grund}`,
+        'Status',
+      ),
       ohne: () => zelleBauen('Ohne Tarif', 'muss nicht, kann aber', 'Status'),
       laeuft: () => zelleBauen('Frist läuft', `bis ${datumAnzeigen(eintrag.vorzeigenBis)}${art}`, 'Status'),
       verpasst: () => zelleBauen(
@@ -204,6 +215,40 @@ if (seite) {
     });
 
     aktionen.append(knopf);
+
+    // Ein zweites Mal melden geht nicht - der Grund der ersten Meldung
+    // steht schon im Status.
+    if (eintrag.unstimmigkeit === null) {
+      const melden = document.createElement('button');
+      melden.type = 'button';
+      melden.className = 'button button--ghost';
+      melden.textContent = 'Unstimmigkeit';
+      melden.setAttribute('aria-label', `Unstimmigkeit bei ${name} melden`);
+
+      melden.addEventListener('click', async () => {
+        const antwort = window.prompt(`Was passt bei ${name} nicht? Zum Beispiel „Foto passt nicht zur Person“. Ein Admin entscheidet danach, ob das Konto gelöscht wird.`);
+
+        // Abbrechen: nichts tun.
+        if (antwort === null) {
+          return;
+        }
+
+        melden.disabled = true;
+        meldungZeigen(meldung, '');
+
+        try {
+          offen = (await unstimmigkeitMelden(eintrag.mitgliedId, antwort.trim())).offen;
+          tabelleZeigen();
+          meldungZeigen(meldung, `Die Unstimmigkeit bei ${name} ist gemeldet.`, true);
+        } catch (fehler) {
+          meldungZeigen(meldung, fehler.message);
+          melden.disabled = false;
+        }
+      });
+
+      aktionen.append(melden);
+    }
+
     zeile.append(
       zelleBauen(name, eintrag.email, 'Person'),
       zelleBauen(datumAnzeigen(eintrag.registriertAm), '', 'Registriert'),

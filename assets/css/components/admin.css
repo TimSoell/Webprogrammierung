@@ -3,7 +3,8 @@
  * @layer       Komponente
  * @description Die Seite für Admins: das Feld für die E-Mail-Adresse mit dem
  *              Knopf "Zum Personal machen" daneben, auf schmalen
- *              Bildschirmen untereinander.
+ *              Bildschirmen untereinander. Und der rote Knopf "Konto
+ *              löschen" bei den Unstimmigkeiten.
  *
  *              Karte, Formular und Meldungen kommen aus auth.css, Gerüst und
  *              Tabelle aus empfang.css - diese Datei regelt nur, was es nur
@@ -32,6 +33,19 @@
 .admin-formular .admin-eingabe .button {
   margin-top: 0;
   white-space: nowrap;
+}
+
+/* Löschen ist endgültig - der Knopf sieht deshalb anders aus als
+   "Markierung aufheben" daneben. */
+.admin-loeschen {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.admin-loeschen:hover {
+  border-color: var(--danger);
+  background: var(--danger);
+  color: var(--paper);
 }
 
 @media (max-width: 760px) {

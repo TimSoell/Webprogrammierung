@@ -36,7 +36,9 @@
  *
  *              ADMIN ist die Rolle ADMIN der Bibliothek in derselben Spalte.
  *              Sie wird nur im Supabase-Dashboard vergeben, nie über die
- *              Website.
+ *              Website. Ein Admin löscht auch Konten, die das Personal als
+ *              Unstimmigkeit gemeldet hat (kontoLoeschen()) - siehe
+ *              docs/features/unstimmigkeiten.md
  * @see         src/bootstrap.php
  * @see         docs/features/mitglieder-login.md
  */
@@ -199,6 +201,23 @@ final class Auth
         }
 
         return true;
+    }
+
+    /**
+     * Löscht ein Konto endgültig. Alles Fachliche hängt mit ON DELETE
+     * CASCADE an users und verschwindet mit.
+     *
+     * Nur für MitgliedRepository::unstimmigesKontoLoeschen(), das vorher
+     * aufräumt und alles in eine Transaktion packt. Wer das darf, prüft
+     * api/unstimmigkeiten.php.
+     *
+     * @param int $userId  users.id
+     * @return void
+     * @throws \Delight\Auth\UnknownIdException  wenn es das Konto nicht gibt
+     */
+    public static function kontoLoeschen(int $userId): void
+    {
+        self::instanz()->admin()->deleteUserById($userId);
     }
 
     /**

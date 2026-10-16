@@ -93,6 +93,6 @@ sie nur über die Bibliothek in `src/Auth.php`, gelesen für die Liste in
 
 - **Gespeichert wird nicht, wer wann jemanden zum Personal gemacht hat.**
 - **Admin lässt sich nur im Dashboard vergeben.** Mit Absicht.
-- **Als nächster Schritt geplant:** Das Personal markiert am Empfang ein
-  Konto als „Unstimmigkeit", wenn Ausweis und Person nicht passen, und ein
-  Admin kann solche Konten löschen.
+
+Auf derselben Seite steht die zweite Karte für Admins:
+[Unstimmigkeiten und Konto löschen](unstimmigkeiten.md).

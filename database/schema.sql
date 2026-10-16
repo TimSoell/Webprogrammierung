@@ -232,6 +232,14 @@ CREATE TABLE IF NOT EXISTS mitglieder (
     -- NULL = noch keinen Tarif gewählt, also auch keine Frist.
     vorzeigen_bis date       NULL,
 
+    -- Wann das Personal am Empfang eine Unstimmigkeit gemeldet hat - falscher
+    -- Ausweis, oder die Person passt nicht zum Konto - und was nicht passt.
+    -- Beide NULL = nichts gemeldet. Ein Admin löscht so ein Konto oder hebt
+    -- die Meldung auf; eine Bestätigung am Empfang hebt sie auch auf. Siehe
+    -- docs/features/unstimmigkeiten.md
+    unstimmigkeit_am    timestamp(0) NULL,
+    unstimmigkeit_grund varchar(200) NULL,
+
     CONSTRAINT uniq_user_id UNIQUE (user_id),
 
     -- Wird ein Konto gelöscht, verschwinden seine Stammdaten mit.
@@ -1038,6 +1046,11 @@ UPDATE mitglieder
  WHERE vorzeigen_bis IS NOT NULL
    AND bestaetigt_am IS NULL
    AND NOT EXISTS (SELECT 1 FROM mitgliedschaften ms WHERE ms.mitglied_id = mitglieder.id);
+
+-- Feature Unstimmigkeiten: Meldung vom Empfang, siehe
+-- docs/decisions/ADR-0026-schutz-vor-falschen-konten.md
+ALTER TABLE mitglieder ADD COLUMN IF NOT EXISTS unstimmigkeit_am timestamp(0) NULL;
+ALTER TABLE mitglieder ADD COLUMN IF NOT EXISTS unstimmigkeit_grund varchar(200) NULL;
 
 
 -- -----------------------------------------------------------------------------

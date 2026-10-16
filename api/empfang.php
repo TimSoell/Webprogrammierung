@@ -4,10 +4,11 @@
  * @layer       4 – API-Endpunkt
  * @description Die Liste für das Personal am Empfang - welche Konten sind
  *              noch nicht mit dem Personalausweis bestätigt? - und das
- *              Bestätigen selbst.
+ *              Bestätigen selbst, oder das Melden einer Unstimmigkeit.
  *
  *                GET  -> { offen: [...] }
- *                PUT  { mitgliedId } -> 200 { offen: [...] }, Konto bestätigt
+ *                PUT  { mitgliedId }        -> 200 { offen: [...] }, Konto bestätigt
+ *                POST { mitgliedId, grund } -> 200 { offen: [...] }, Unstimmigkeit gemeldet
  *
  *              NUR FUER DAS PERSONAL (Rolle EMPLOYEE), sonst 401 bzw. 403.
  *              empfang.php sperrt die Seite ebenfalls, verbindlich ist aber
@@ -17,10 +18,14 @@
  *              gesehen, das Foto passt zur Person und der Name zum Konto. Ab
  *              dann ist der Name für immer fest. Schüler-, Studierenden- und
  *              Seniorennachweise beurteilt der Empfang nicht - die prüft die
- *              Ausweisprüfung in api/nachweise.php. Passt der Personalausweis
- *              nicht, bestätigt das Personal einfach nicht; ein Ablehnen gibt
- *              es nicht. Siehe
+ *              Ausweisprüfung in api/nachweise.php. Siehe
  *              docs/decisions/ADR-0024-empfang-bestaetigt-konto-mit-personalausweis.md
+ *
+ *              UNSTIMMIGKEIT heißt: Der Personalausweis ist falsch, oder die
+ *              Person passt nicht zum Konto. Das Personal schreibt kurz dazu,
+ *              was nicht passt; löschen kann es nichts. Das tut ein Admin auf
+ *              admin.php, siehe
+ *              docs/decisions/ADR-0026-schutz-vor-falschen-konten.md
  *
  *              WER MUSS: jedes Mitglied mit Tarif, binnen 14 Tagen nach der
  *              ersten Tarifwahl (api/mitgliedschaften.php). Konten ohne Tarif
@@ -87,6 +92,12 @@ try {
                 // Beide Daten als 'JJJJ-MM-TT': Der Zeichenvergleich ist
                 // hier dasselbe wie der Datumsvergleich.
                 'fristVerpasst' => $zeile['vorzeigen_bis'] !== null && $zeile['vorzeigen_bis'] < $heute,
+
+                // Gemeldet vom Personal, null = nichts gemeldet.
+                'unstimmigkeit' => $zeile['unstimmigkeit_am'] === null ? null : [
+                    'am'    => substr((string) $zeile['unstimmigkeit_am'], 0, 10),
+                    'grund' => $zeile['unstimmigkeit_grund'],
+                ],
             ], $zeilen)),
         ]);
     };
@@ -95,15 +106,36 @@ try {
         $listeAntworten();
     }
 
-    if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
+    if ($_SERVER['REQUEST_METHOD'] !== 'PUT' && $_SERVER['REQUEST_METHOD'] !== 'POST') {
         Api::fehler(405, 'Methode nicht erlaubt.');
     }
 
-    $mitgliedId = (int) Api::text(Api::eingabe(), 'mitgliedId');
+    $eingabe    = Api::eingabe();
+    $mitgliedId = (int) Api::text($eingabe, 'mitgliedId');
 
     if ($mitgliedId <= 0) {
         Api::fehler(400, 'Es wurde kein Mitglied angegeben.');
     }
+
+    // --- Unstimmigkeit melden ---------------------------------------------
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $grund = trim(Api::text($eingabe, 'grund'));
+
+        if ($mitgliedId === $eigeneId) {
+            Api::fehler(403, 'Dein eigenes Konto kannst du nicht melden.');
+        }
+        // 200 Zeichen passen in die Spalte mitglieder.unstimmigkeit_grund.
+        if ($grund === '' || mb_strlen($grund) > 200) {
+            Api::fehler(400, 'Schreib kurz dazu, was nicht passt – höchstens 200 Zeichen.');
+        }
+        if (!$mitglieder->unstimmigkeitMelden($mitgliedId, $grund)) {
+            Api::fehler(409, 'Dieses Konto ist schon gemeldet oder steht nicht mehr in der Liste.');
+        }
+
+        $listeAntworten();
+    }
+
+    // --- Bestätigen ---------------------------------------------------------
 
     // Das eigene Konto bestätigt jemand anderes - sonst könnte sich das
     // Personal selbst jeden Namen geben.
