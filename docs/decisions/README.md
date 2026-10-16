@@ -37,7 +37,7 @@ Kein ADR für: Farbwerte, Textänderungen, das Anlegen einer einzelnen Datei.
 | [0010](ADR-0010-tarifwechsel-zum-monatsersten.md) | Tarifwechsel gelten zum Monatsersten und brauchen eine Bestätigung | angenommen |
 | [0011](ADR-0011-ausweispruefung-mit-ki.md) | Ausweise werden per KI geprüft, das Bild wird nie gespeichert | angenommen, Hinweissatz vom Modell ersetzt durch 0020 |
 | [0012](ADR-0012-gemini-statt-claude.md) | Die Ausweisprüfung läuft über Gemini auf der kostenlosen Stufe | angenommen |
-| [0013](ADR-0013-auslastung-und-besuche.md) | Auslastung als Summe aus fester Kurve und gezählten Besuchen | angenommen |
+| [0013](ADR-0013-auslastung-und-besuche.md) | Auslastung als Summe aus fester Kurve und gezählten Besuchen | ersetzt durch 0022 |
 | [0014](ADR-0014-terminkalender-wochenplan.md) | Termine als Wochenplan, Buchungen mit Datum | angenommen |
 | [0015](ADR-0015-kurskalender-monate-und-tarif.md) | Kurskalender monatsweise, Kurse nur mit passendem Tarif | angenommen |
 | [0016](ADR-0016-hosting-auf-vercel.md) | Hosting auf Vercel mit der Laufzeit vercel-php | angenommen, noindex ersetzt durch 0018 |
@@ -46,4 +46,5 @@ Kein ADR für: Farbwerte, Textänderungen, das Anlegen einer einzelnen Datei.
 | [0019](ADR-0019-profilbilder-in-der-datenbank.md) | Profilbilder liegen in der Datenbank und haben eine eigene Adresse | angenommen |
 | [0020](ADR-0020-nachweise-absichern.md) | Ein Nachweis je Mitglied, und er muss auf den Kontoinhaber lauten | angenommen, Name nicht änderbar und fehlende Kontrolle am Empfang ersetzt durch 0023 |
 | [0021](ADR-0021-gutschein-als-gratiszeitraum.md) | Ein Gutschein ist ein Gratiszeitraum am Mitglied, kein Vertrag | angenommen |
+| [0022](ADR-0022-auslastung-als-fuellung.md) | Besuche füllen die typische Auslastung | angenommen |
 | [0023](ADR-0023-name-aendern-und-ausweis-am-empfang.md) | Der Name ist bis zur Bestätigung am Empfang änderbar, und das Personal bestätigt jede Person einmal | angenommen |

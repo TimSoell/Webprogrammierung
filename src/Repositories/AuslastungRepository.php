@@ -5,15 +5,9 @@
  * @description Liest die typische Auslastungskurve (Tabelle auslastung_basis)
  *              und verwaltet die angekündigten Besuche (Tabelle besuche).
  *
- *              Die angezeigte Auslastung ist immer eine SUMME aus zwei
- *              Quellen:
- *
- *                Basiswert  - die erfundene Kurve aus auslastung_basis
- *                Besuche    - echte Zeilen aus besuche
- *
- *              Nur der zweite Teil verändert sich, wenn jemand eincheckt.
- *              Genau das macht die Vorführung sichtbar: die Kurve steht,
- *              der Aufschlag wächst.
+ *              Die typische Kurve bleibt als grauer Vergleich sichtbar.
+ *              Besuche (geplant und jetzt) füllen sie im Diagramm grün aus.
+ *              Die API nimmt den größeren Wert als gesamte Auslastung.
  *
  *              Alle Methoden, die auf besuche schreiben oder löschen,
  *              bekommen die mitglied_id als ERSTEN Parameter und filtern in
@@ -109,22 +103,23 @@ final class AuslastungRepository
      * Zahlen 0 bis 23; das wäre für 24 Werte mehr Aufwand als Nutzen.
      *
      * @param DateTimeImmutable $tag  Irgendein Zeitpunkt des gesuchten Tages
-     * @return array<int, int>  Stunde (0-23) => Anzahl Besuche
+     * @return array<int, array{gebucht: int, checkins: int}> Stunde (0-23),
+     *         alle Besuche und darin enthaltene tatsächliche Check-ins
      */
     public function besucheProStundeZaehlen(DateTimeImmutable $tag): array
     {
         $stmt = Database::connection()->prepare(
-            'SELECT beginn, ende
+            'SELECT beginn, ende, art
                FROM besuche
               WHERE ende   >  ?
                 AND beginn <  ?'
         );
         $stmt->execute([
             $tag->format('Y-m-d 00:00:00'),
-            $tag->format('Y-m-d 23:59:59'),
+            $tag->modify('tomorrow')->format('Y-m-d 00:00:00'),
         ]);
 
-        $proStunde = array_fill(0, 24, 0);
+        $proStunde = array_fill(0, 24, ['gebucht' => 0, 'checkins' => 0]);
         $datum     = $tag->format('Y-m-d');
 
         foreach ($stmt->fetchAll() as $zeile) {
@@ -138,7 +133,10 @@ final class AuslastungRepository
                 // Überlappung zweier Zeiträume: der eine beginnt vor dem Ende
                 // des anderen und endet nach dessen Beginn.
                 if ($beginn < $bis && $ende > $von) {
-                    $proStunde[$stunde]++;
+                    $proStunde[$stunde]['gebucht']++;
+                    if ($zeile['art'] === 'jetzt') {
+                        $proStunde[$stunde]['checkins']++;
+                    }
                 }
             }
         }

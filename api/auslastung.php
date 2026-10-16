@@ -89,18 +89,19 @@ try {
 
         for ($stunde = 0; $stunde < 24; $stunde++) {
             $basiswert = $basis[$stunde] ?? 0;
-            $gebucht   = $proStunde[$stunde] ?? 0;
+            $gebucht   = $proStunde[$stunde]['gebucht'];
 
             $verlauf[] = [
-                'stunde'  => $stunde,
-                'basis'   => $basiswert,
-                'gebucht' => $gebucht,
-                'gesamt'  => $basiswert + $gebucht,
+                'stunde'   => $stunde,
+                'basis'    => $basiswert,
+                'gebucht'  => $gebucht,
+                'checkins' => $proStunde[$stunde]['checkins'],
+                'gesamt'   => max($basiswert, $gebucht),
             ];
         }
 
         $aktuelleStunde = (int) $jetzt->format('G');
-        $jetztPersonen  = ($basis[$aktuelleStunde] ?? 0) + $auslastung->besucheZaehlen($jetzt);
+        $jetztPersonen  = max($basis[$aktuelleStunde] ?? 0, $auslastung->besucheZaehlen($jetzt));
 
         $antwort = [
             'kapazitaet' => AuslastungRepository::KAPAZITAET,

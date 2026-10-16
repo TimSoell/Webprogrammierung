@@ -73,6 +73,7 @@
 /* --- Das Diagramm --------------------------------------------------------- */
 
 .auslastung-diagramm {
+  position: relative;
   /* Platzhalterhoehe, solange das SVG noch nicht da ist. Ohne sie springt
      der Rest der Seite nach unten, sobald die Antwort eintrifft. */
   min-height: 240px;
@@ -84,7 +85,61 @@
   height: auto;
 }
 
-/* Der untere Teil jedes Balkens: die typische Auslastung aus der Datenbank. */
+.auslastung-spalte {
+  cursor: pointer;
+  outline: none;
+}
+
+.auslastung-treffer {
+  fill: transparent;
+}
+
+.auslastung-spalte:hover .auslastung-treffer,
+.auslastung-spalte:focus-visible .auslastung-treffer {
+  fill: rgba(240, 239, 233, .06);
+  stroke: var(--lime);
+  stroke-width: .5;
+}
+
+.auslastung-hovercard {
+  position: absolute;
+  z-index: 2;
+  top: var(--hover-y);
+  left: clamp(0px, calc(var(--hover-x) - 115px), max(0px, calc(100% - 230px)));
+  width: 230px;
+  max-width: 100%;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+  font-size: .85rem;
+  pointer-events: none;
+}
+
+.auslastung-hovercard strong {
+  color: var(--lime);
+}
+
+.auslastung-hovercard dl {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 20px;
+  margin: 12px 0 0;
+}
+
+.auslastung-hovercard dt {
+  color: var(--muted);
+}
+
+.auslastung-hovercard dd {
+  margin: 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hintergrund jedes Balkens: die typische Auslastung aus der Datenbank. */
 .auslastung-balken {
   fill: #3a423d;
 }
@@ -93,8 +148,7 @@
   fill: #58635b;
 }
 
-/* Der obere Teil: angekuendigte Besuche. Bewusst die Markenfarbe - das ist
-   der Teil, der bei der Vorfuehrung waechst. */
+/* Die Füllung von unten: angekündigte Besuche und Check-ins. */
 .auslastung-balken-gebucht {
   fill: var(--lime);
 }
