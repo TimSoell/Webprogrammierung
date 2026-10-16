@@ -4,8 +4,8 @@
  * @description Die Seite des Empfangs: oben der Titel, darunter
  *              eine breite Karte mit Suche, Filter und der Tabelle der
  *              unbestätigten Konten - je Zeile Person, Registriert, Status
- *              und der Knopf Bestätigen. Auf schmalen Bildschirmen wird aus
- *              jeder Tabellenzeile ein Block.
+ *              und die Knöpfe Bestätigen und Unstimmigkeit. Auf schmalen
+ *              Bildschirmen wird aus jeder Tabellenzeile ein Block.
  *
  *              Seitenabstand, Karte, Überschriften und Meldungen kommen aus
  *              auth.css - diese Datei regelt nur, was es nur hier gibt.
@@ -208,9 +208,27 @@
   background: var(--danger);
 }
 
+/* Unstimmigkeit gemeldet: genauso auffällig, damit niemand das Konto aus
+   Versehen bestätigt, ohne die Meldung zu lesen. */
+.empfang-tabelle tr[data-stand="unstimmig"] td:first-child {
+  box-shadow: inset 3px 0 0 var(--danger);
+}
+
+.empfang-tabelle tr[data-stand="unstimmig"] .empfang-status .empfang-zeile-kopf {
+  color: var(--danger);
+}
+
+.empfang-tabelle tr[data-stand="unstimmig"] .empfang-status .empfang-zeile-kopf::before {
+  background: var(--danger);
+}
+
 .empfang-aktionen {
   text-align: right;
   white-space: nowrap;
+}
+
+.empfang-aktionen .button + .button {
+  margin-left: 8px;
 }
 
 .empfang-aktionen .button {
@@ -298,16 +316,25 @@
     text-transform: uppercase;
   }
 
-  .empfang-tabelle tr[data-stand="verpasst"] {
+  .empfang-tabelle tr[data-stand="verpasst"],
+  .empfang-tabelle tr[data-stand="unstimmig"] {
     box-shadow: inset 3px 0 0 var(--danger);
   }
 
-  .empfang-tabelle tr[data-stand="verpasst"] td:first-child {
+  .empfang-tabelle tr[data-stand="verpasst"] td:first-child,
+  .empfang-tabelle tr[data-stand="unstimmig"] td:first-child {
     box-shadow: none;
   }
 
-  .empfang-aktionen {
+  /* Zwei Knöpfe nebeneinander passen nicht immer - dann untereinander. */
+  .empfang-tabelle td.empfang-aktionen {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
     padding-top: 10px;
-    text-align: left;
+  }
+
+  .empfang-aktionen .button + .button {
+    margin-left: 0;
   }
 }

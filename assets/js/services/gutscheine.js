@@ -17,6 +17,9 @@ import { getJson, postJson } from './api.js';
  * @typedef  {object} Gutschein
  * @property {string}      code        z. B. 'SK-7F3K9QXM'
  * @property {boolean}     eingeloest
+ * @property {boolean}     freigegeben true, sobald das Konto des Geworbenen am
+ *                                     Empfang bestätigt ist - erst dann einlösbar
+ * @property {string}      freund      Name, unter dem der Freund eingeladen wurde
  * @property {string|null} gratisVon   erster Gratistag, 'JJJJ-MM-TT'; null = nicht eingelöst
  * @property {string|null} gratisBis   letzter Gratistag, einschließlich
  */
@@ -33,11 +36,12 @@ export async function gutscheineLaden() {
 
 /**
  * Löst einen eigenen Gutschein ein: Der Basisplan ist danach drei Monate
- * gratis. Geht nur, wenn der Basisplan läuft oder vorgemerkt ist.
+ * gratis. Geht nur, wenn der Gutschein freigegeben ist und der Basisplan
+ * läuft oder vorgemerkt ist.
  *
  * @param {string} code  wie unter "Mein Konto" angezeigt; Groß- und Kleinschreibung egal
  * @returns {Promise<{gratisVon: string, gratisBis: string}>}  beide 'JJJJ-MM-TT', einschließlich
- * @throws {ApiError}  404 gibt es nicht · 409 schon eingelöst oder kein Basisplan
+ * @throws {ApiError}  404 gibt es nicht · 409 schon eingelöst, noch nicht freigegeben oder kein Basisplan
  */
 export async function gutscheinEinloesen(code) {
   return postJson('api/gutscheine.php', { code });

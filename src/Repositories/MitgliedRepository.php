@@ -14,13 +14,16 @@
  *              und die Liste aller noch unbestätigten Konten für den Empfang -
  *              siehe docs/features/empfang.md.
  *
- *              Und die Liste aller Konten mit der Rolle Personal für
- *              admin.php - siehe docs/features/personal-verwalten.md.
+ *              Und für admin.php: die Liste aller Konten mit der Rolle
+ *              Personal (docs/features/personal-verwalten.md) und die
+ *              Unstimmigkeiten, die das Personal am Empfang meldet, bis hin
+ *              zum Löschen solcher Konten (docs/features/unstimmigkeiten.md).
  * @see         database/schema.sql
  * @see         api/mitglieder.php
  * @see         api/sitzung.php
  * @see         api/empfang.php
  * @see         api/personal.php
+ * @see         api/unstimmigkeiten.php
  */
 
 declare(strict_types=1);
@@ -30,6 +33,7 @@ namespace Repositories;
 use Database;
 use Delight\Auth\Role;
 use Delight\Auth\Status;
+use Throwable;
 
 final class MitgliedRepository
 {
@@ -172,20 +176,23 @@ final class MitgliedRepository
      * dringendste zuerst. Konten ohne Tarif folgen nach Namen - sie müssen
      * nicht, können aber bestätigt werden. Dazu je Konto die Art des gültigen
      * Ermäßigungsnachweises, falls es einen gibt: Verpasst so jemand die
-     * Frist, ruht sein ermäßigter Preis.
+     * Frist, ruht sein ermäßigter Preis. Und ob das Personal schon eine
+     * Unstimmigkeit gemeldet hat.
      *
      * Liest users (E-Mail, Status) und nachweise nur mit, geschrieben wird
      * hier nur mitglieder.
      *
      * @return array<int, array<string, mixed>>  je Zeile mitglied_id,
-     *         vorname, nachname, email, erstellt_am, vorzeigen_bis und
-     *         ermaessigung ('schueler', 'student', 'senior' oder null)
+     *         vorname, nachname, email, erstellt_am, vorzeigen_bis,
+     *         ermaessigung ('schueler', 'student', 'senior' oder null),
+     *         unstimmigkeit_am und unstimmigkeit_grund (beide null ohne Meldung)
      */
     public function unbestaetigteFinden(): array
     {
         $stmt = Database::connection()->prepare(
             'SELECT m.id AS mitglied_id, m.vorname, m.nachname, u.email,
-                    m.erstellt_am, m.vorzeigen_bis, n.art AS ermaessigung
+                    m.erstellt_am, m.vorzeigen_bis, n.art AS ermaessigung,
+                    m.unstimmigkeit_am, m.unstimmigkeit_grund
                FROM mitglieder m
                JOIN "users" u ON u.id = m.user_id
                LEFT JOIN nachweise n
@@ -213,6 +220,9 @@ final class MitgliedRepository
      * nicht überschreibt; die auf den Status, dass nur Konten aus der Liste
      * bestätigt werden.
      *
+     * War eine Unstimmigkeit gemeldet, ist sie damit erledigt: Die Person
+     * kam wieder, und diesmal passte alles.
+     *
      * @param int $mitgliedId  mitglieder.id
      * @return bool  false, wenn es nichts zu bestätigen gab - schon bestätigt,
      *               gesperrt oder unbekannt
@@ -221,7 +231,9 @@ final class MitgliedRepository
     {
         $stmt = Database::connection()->prepare(
             'UPDATE mitglieder
-                SET bestaetigt_am = LOCALTIMESTAMP(0)
+                SET bestaetigt_am       = LOCALTIMESTAMP(0),
+                    unstimmigkeit_am    = NULL,
+                    unstimmigkeit_grund = NULL
               WHERE id = ?
                 AND bestaetigt_am IS NULL
                 AND user_id IN (SELECT id FROM "users" WHERE status = ?)'
@@ -229,6 +241,143 @@ final class MitgliedRepository
         $stmt->execute([$mitgliedId, Status::NORMAL]);
 
         return $stmt->rowCount() === 1;
+    }
+
+    /**
+     * Hält fest, dass am Empfang etwas nicht gepasst hat - falscher
+     * Personalausweis, oder die Person passt nicht zum Konto.
+     *
+     * Dieselben Bedingungen wie bei bestaetigen(): nur Konten aus der Liste
+     * des Empfangs. Dazu: nur einmal, eine zweite Meldung überschreibt die
+     * erste nicht.
+     *
+     * @param int    $mitgliedId  mitglieder.id
+     * @param string $grund       was nicht passt, höchstens 200 Zeichen
+     * @return bool  false, wenn schon gemeldet, schon bestätigt, gesperrt
+     *               oder unbekannt
+     */
+    public function unstimmigkeitMelden(int $mitgliedId, string $grund): bool
+    {
+        $stmt = Database::connection()->prepare(
+            'UPDATE mitglieder
+                SET unstimmigkeit_am    = LOCALTIMESTAMP(0),
+                    unstimmigkeit_grund = ?
+              WHERE id = ?
+                AND bestaetigt_am IS NULL
+                AND unstimmigkeit_am IS NULL
+                AND user_id IN (SELECT id FROM "users" WHERE status = ?)'
+        );
+        $stmt->execute([$grund, $mitgliedId, Status::NORMAL]);
+
+        return $stmt->rowCount() === 1;
+    }
+
+    /**
+     * Alle Konten mit einer gemeldeten Unstimmigkeit, die älteste Meldung
+     * zuerst - für die Admins auf admin.php.
+     *
+     * @return array<int, array<string, mixed>>  je Zeile mitglied_id,
+     *         vorname, nachname, email, erstellt_am, unstimmigkeit_am,
+     *         unstimmigkeit_grund
+     */
+    public function unstimmigeFinden(): array
+    {
+        $stmt = Database::connection()->prepare(
+            'SELECT m.id AS mitglied_id, m.vorname, m.nachname, u.email,
+                    m.erstellt_am, m.unstimmigkeit_am, m.unstimmigkeit_grund
+               FROM mitglieder m
+               JOIN "users" u ON u.id = m.user_id
+              WHERE m.unstimmigkeit_am IS NOT NULL
+              ORDER BY m.unstimmigkeit_am, m.id'
+        );
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Nimmt eine gemeldete Unstimmigkeit zurück, wenn sich alles aufgeklärt
+     * hat. Danach steht das Konto am Empfang wieder ganz normal in der Liste.
+     *
+     * @param int $mitgliedId  mitglieder.id
+     * @return bool  false, wenn nichts (mehr) gemeldet war
+     */
+    public function unstimmigkeitAufheben(int $mitgliedId): bool
+    {
+        $stmt = Database::connection()->prepare(
+            'UPDATE mitglieder
+                SET unstimmigkeit_am    = NULL,
+                    unstimmigkeit_grund = NULL
+              WHERE id = ?
+                AND unstimmigkeit_am IS NOT NULL'
+        );
+        $stmt->execute([$mitgliedId]);
+
+        return $stmt->rowCount() === 1;
+    }
+
+    /**
+     * Löscht ein gemeldetes Konto mit allem, was dazugehört. Nicht rückgängig
+     * zu machen.
+     *
+     * Das meiste erledigt die Datenbank: Alle Tabellen hängen mit ON DELETE
+     * CASCADE an mitglieder, und mitglieder hängt so an users. Gelöscht wird
+     * das Konto selbst von der Login-Bibliothek ($kontoLoeschen, aus
+     * src/Auth.php) - users schreibt nur sie. Hier bleibt nur die Einladung
+     * des Werbers: Ihr Verweis würde bloß geleert (ON DELETE SET NULL). Sie
+     * verschwindet samt noch nicht eingelöstem Gutschein; ein schon
+     * eingelöster Gratiszeitraum bleibt.
+     *
+     * Alles in einer Transaktion. Die Bibliothek benutzt dieselbe
+     * Verbindung, ihr Löschen gehört also mit hinein.
+     *
+     * @param int                 $mitgliedId     mitglieder.id
+     * @param callable(int): void $kontoLoeschen  löscht das Konto zu einer users.id
+     * @return bool  false, wenn das Konto nicht (mehr) gemeldet ist - dann
+     *               bleibt alles, wie es war
+     */
+    public function unstimmigesKontoLoeschen(int $mitgliedId, callable $kontoLoeschen): bool
+    {
+        $pdo = Database::connection();
+        $pdo->beginTransaction();
+
+        try {
+            // FOR UPDATE: Bis zum Ende kann niemand die Meldung aufheben
+            // oder das Konto am Empfang bestätigen.
+            $stmt = $pdo->prepare(
+                'SELECT user_id FROM mitglieder
+                  WHERE id = ? AND unstimmigkeit_am IS NOT NULL
+                    FOR UPDATE'
+            );
+            $stmt->execute([$mitgliedId]);
+            $userId = $stmt->fetchColumn();
+
+            if ($userId === false) {
+                $pdo->rollBack();
+
+                return false;
+            }
+
+            $stmt = $pdo->prepare(
+                'DELETE FROM empfehlungen e
+                  WHERE e.geworben_id = ?
+                    AND NOT EXISTS (
+                        SELECT 1 FROM gutscheine g
+                         WHERE g.empfehlung_id = e.id AND g.eingeloest_am IS NOT NULL
+                    )'
+            );
+            $stmt->execute([$mitgliedId]);
+
+            $kontoLoeschen((int) $userId);
+
+            $pdo->commit();
+
+            return true;
+        } catch (Throwable $fehler) {
+            $pdo->rollBack();
+
+            throw $fehler;
+        }
     }
 
     /**

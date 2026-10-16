@@ -7,12 +7,18 @@
  *                GET              -> { gutscheine: [...] }
  *                POST  { code }   -> { gratisVon, gratisBis }
  *                                 -> 404 gibt es nicht (oder gehört jemand anderem)
- *                                 -> 409 schon eingelöst oder kein Basisplan
+ *                                 -> 409 schon eingelöst, noch nicht
+ *                                        freigegeben oder kein Basisplan
  *
  *              Beides nur angemeldet, sonst 401.
  *
  *              Einen Gutschein gibt es für eine geworbene Registrierung,
- *              siehe api/mitglieder.php. Er macht den BASISPLAN drei Monate
+ *              siehe api/mitglieder.php. EINLOESEN geht aber erst, wenn das
+ *              Personal das Konto des Geworbenen am Empfang bestätigt hat -
+ *              sonst ließe sich mit erfundenen Konten Gratiszeit sammeln.
+ *              Siehe docs/decisions/ADR-0026-schutz-vor-falschen-konten.md
+ *
+ *              Er macht den BASISPLAN drei Monate
  *              gratis und lässt sich deshalb nur einlösen, wenn der Basisplan
  *              läuft oder zum nächsten Monatsersten vorgemerkt ist. Der
  *              Vertrag selbst bleibt unverändert - eingetragen wird nur der
@@ -75,6 +81,10 @@ try {
 
         if ($gutschein['eingeloest']) {
             Api::fehler(409, 'Diesen Gutschein hast du schon eingelöst.');
+        }
+
+        if (!$gutschein['freigegeben']) {
+            Api::fehler(409, "Diesen Gutschein kannst du einlösen, sobald {$gutschein['freund']} am Empfang mit dem Personalausweis bestätigt ist.");
         }
 
         // Ab wann der Basisplan läuft: heute, wenn er der laufende Tarif ist

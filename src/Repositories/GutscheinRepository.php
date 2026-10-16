@@ -15,6 +15,11 @@
  *              Angelegt werden Gutscheine nicht hier, sondern zusammen mit
  *              der erfüllten Einladung in
  *              EmpfehlungRepository::registrierungVerbuchen().
+ *
+ *              FREIGEGEBEN ist ein Gutschein erst, wenn das Personal das
+ *              Konto des Geworbenen am Empfang bestätigt hat
+ *              (mitglieder.bestaetigt_am). Sonst ließe sich mit erfundenen
+ *              Konten Gratiszeit sammeln.
  * @see         database/schema.sql
  * @see         api/gutscheine.php
  * @see         docs/features/freunde-werben.md
@@ -59,46 +64,64 @@ final class GutscheinRepository
     /**
      * Alle Gutscheine eines Mitglieds, der neueste zuerst.
      *
+     * Dazu je Gutschein, ob er freigegeben ist, und der Name, unter dem der
+     * Werber den Freund eingeladen hat - für den Hinweis, auf wen er wartet.
+     *
      * @param int $mitgliedId  mitglieder.id, NICHT users.id
-     * @return list<array{code: string, eingeloest: bool, gratisVon: string|null, gratisBis: string|null}>
+     * @return list<array{code: string, eingeloest: bool, freigegeben: bool, freund: string, gratisVon: string|null, gratisBis: string|null}>
      */
     public function fuerMitgliedFinden(int $mitgliedId): array
     {
         $stmt = Database::connection()->prepare(
-            'SELECT code, eingeloest_am, gratis_von, gratis_bis
-               FROM gutscheine
-              WHERE mitglied_id = ?
-              ORDER BY erstellt_am DESC, id DESC'
+            'SELECT g.code, g.eingeloest_am, g.gratis_von, g.gratis_bis,
+                    e.freund_name, m.bestaetigt_am
+               FROM gutscheine g
+               JOIN empfehlungen e ON e.id = g.empfehlung_id
+               LEFT JOIN mitglieder m ON m.id = e.geworben_id
+              WHERE g.mitglied_id = ?
+              ORDER BY g.erstellt_am DESC, g.id DESC'
         );
         $stmt->execute([$mitgliedId]);
 
         return array_map(static fn (array $zeile): array => [
-            'code'       => $zeile['code'],
-            'eingeloest' => $zeile['eingeloest_am'] !== null,
-            'gratisVon'  => $zeile['gratis_von'],
-            'gratisBis'  => $zeile['gratis_bis'],
+            'code'        => $zeile['code'],
+            'eingeloest'  => $zeile['eingeloest_am'] !== null,
+            'freigegeben' => $zeile['bestaetigt_am'] !== null,
+            'freund'      => $zeile['freund_name'],
+            'gratisVon'   => $zeile['gratis_von'],
+            'gratisBis'   => $zeile['gratis_bis'],
         ], $stmt->fetchAll());
     }
 
     /**
      * Sucht einen Gutschein, aber nur, wenn er diesem Mitglied gehört.
      *
+     * Freigegeben ist er, sobald das Konto des Geworbenen am Empfang
+     * bestätigt ist. LEFT JOIN, weil geworben_id nach dem Löschen dieses
+     * Kontos leer ist - dann bleibt der Gutschein gesperrt.
+     *
      * @param string $code        wie eingetippt, bereits in Großbuchstaben
      * @param int    $mitgliedId  mitglieder.id
-     * @return array{id: int, eingeloest: bool}|null  null, wenn es ihn nicht gibt oder er jemand anderem gehört
+     * @return array{id: int, eingeloest: bool, freigegeben: bool, freund: string}|null
+     *         null, wenn es ihn nicht gibt oder er jemand anderem gehört
      */
     public function findenFuerMitglied(string $code, int $mitgliedId): ?array
     {
         $stmt = Database::connection()->prepare(
-            'SELECT id, eingeloest_am FROM gutscheine
-              WHERE code = ? AND mitglied_id = ?'
+            'SELECT g.id, g.eingeloest_am, e.freund_name, m.bestaetigt_am
+               FROM gutscheine g
+               JOIN empfehlungen e ON e.id = g.empfehlung_id
+               LEFT JOIN mitglieder m ON m.id = e.geworben_id
+              WHERE g.code = ? AND g.mitglied_id = ?'
         );
         $stmt->execute([$code, $mitgliedId]);
         $zeile = $stmt->fetch();
 
         return $zeile === false ? null : [
-            'id'         => (int) $zeile['id'],
-            'eingeloest' => $zeile['eingeloest_am'] !== null,
+            'id'          => (int) $zeile['id'],
+            'eingeloest'  => $zeile['eingeloest_am'] !== null,
+            'freigegeben' => $zeile['bestaetigt_am'] !== null,
+            'freund'      => $zeile['freund_name'],
         ];
     }
 

@@ -32,6 +32,7 @@ kommt: „Wo muss ich anfassen, wenn ich am Kursplan etwas ändern will?"
 | [Cookie-Banner](cookie-banner.md) | in Arbeit | Giani |
 | [Freunde werben](freunde-werben.md) | fertig | Jonny |
 | [Personal verwalten](personal-verwalten.md) | in Arbeit | Felix |
+| [Unstimmigkeiten und Konto löschen](unstimmigkeiten.md) | in Arbeit | Felix |
 
 Der Aufbau eines Features ist am Beispiel-Feature beschrieben — siehe
 [`../ARCHITECTURE.md`](../ARCHITECTURE.md).

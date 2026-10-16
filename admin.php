@@ -2,10 +2,15 @@
 /**
  * @file        admin.php
  * @layer       1 – Seite
- * @description Die Seite für Admins. Bisher eine Karte "Personal verwalten":
- *              oben ein Feld für die E-Mail-Adresse und der Knopf "Zum
- *              Personal machen", darunter eine Tabelle mit allen, die gerade
- *              Personal sind, je Zeile ein Knopf "Rolle entziehen".
+ * @description Die Seite für Admins, mit zwei Karten:
+ *
+ *              "Personal verwalten": oben ein Feld für die E-Mail-Adresse und
+ *              der Knopf "Zum Personal machen", darunter eine Tabelle mit
+ *              allen, die gerade Personal sind, je Zeile "Rolle entziehen".
+ *
+ *              "Unstimmigkeiten": die Konten, bei denen das Personal am
+ *              Empfang gemeldet hat, dass Ausweis oder Person nicht passen -
+ *              je Zeile "Markierung aufheben" und "Konto löschen".
  *
  *              NUR FUER ADMINS: Auth::nurFuerAdmins() schickt alle anderen
  *              weg, auch das Personal, bevor etwas ausgegeben wird. Admin
@@ -15,13 +20,14 @@
  *              Admin ruft die Adresse direkt auf (/admin.php). Geheim ist sie
  *              deshalb nicht: Geschützt wird die Seite über die Rolle.
  *
- *              Die Liste steht nicht im HTML, sondern kommt über
- *              assets/js/pages/admin.page.js aus api/personal.php. Die
- *              Tabelle sieht aus wie am Empfang und nutzt dessen Klassen aus
- *              assets/css/components/empfang.css.
+ *              Die Listen stehen nicht im HTML, sondern kommen über
+ *              assets/js/pages/admin.page.js aus api/personal.php und
+ *              api/unstimmigkeiten.php. Die Tabellen sehen aus wie am Empfang
+ *              und nutzen dessen Klassen aus assets/css/components/empfang.css.
  * @see         assets/js/pages/admin.page.js
  * @see         assets/css/components/admin.css
  * @see         docs/features/personal-verwalten.md
+ * @see         docs/features/unstimmigkeiten.md
  */
 
 declare(strict_types=1);
@@ -76,6 +82,31 @@ require ROOT_PATH . '/partials/header.php';
         </table>
 
         <p class="auth-hint empfang-leer" id="admin-leer" hidden>Noch niemand gehört zum Personal.</p>
+      </section>
+
+      <section class="auth-card" aria-labelledby="unstimmig-titel">
+        <div class="empfang-titelzeile">
+          <h2 class="auth-heading" id="unstimmig-titel">Unstimmigkeiten</h2>
+          <p class="empfang-anzahl" id="unstimmig-anzahl" aria-live="polite"></p>
+        </div>
+
+        <p class="auth-hint">Hier stehen Konten, bei denen das Personal am Empfang gemeldet hat, dass der Ausweis oder die Person nicht zum Konto passt. Löschen entfernt das Konto mit allen Daten und lässt sich nicht rückgängig machen.</p>
+
+        <table class="empfang-tabelle">
+          <thead>
+            <tr>
+              <th scope="col">Person</th>
+              <th scope="col">Gemeldet</th>
+              <th scope="col"><span class="konto-visually-hidden">Aktionen</span></th>
+            </tr>
+          </thead>
+          <!-- Füllt assets/js/pages/admin.page.js aus api/unstimmigkeiten.php. -->
+          <tbody id="unstimmig-liste"></tbody>
+        </table>
+
+        <p class="auth-hint empfang-leer" id="unstimmig-leer" hidden>Keine Unstimmigkeiten gemeldet.</p>
+
+        <p class="auth-message" id="unstimmig-meldung" role="alert"></p>
 
         <a class="auth-link empfang-zurueck" href="<?= e(BASE_URL) ?>mein-konto.php">Zurück zu Mein Konto</a>
       </section>

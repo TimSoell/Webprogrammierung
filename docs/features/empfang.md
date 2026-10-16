@@ -11,7 +11,9 @@ Empfang mit dem Personalausweis** — innerhalb von 14 Tagen nach der ersten
 Tarifwahl, am besten beim ersten Training. Das Personal sieht auf einer
 eigenen Seite alle Konten, die das noch nicht sind. Steht die Person vor ihm, vergleicht es das Foto im Personalausweis mit
 ihr und den Namen mit dem Konto und klickt **„Bestätigen"**. Passt etwas
-nicht, bestätigt es einfach nicht.
+nicht, klickt es **„Unstimmigkeit"** und schreibt kurz dazu, was — ein Admin
+entscheidet dann, ob das Konto gelöscht wird, siehe
+[Unstimmigkeiten](unstimmigkeiten.md).
 
 **Schüler-, Studierenden- und Seniorennachweise prüft der Empfang nicht** —
 die prüft die Ausweisprüfung online, siehe [Nachweise](nachweise.md).
@@ -83,7 +85,7 @@ sein Konto (`Auth::nurFuerPersonal()`), und `api/empfang.php` antwortet mit
 
 | | |
 |---|---|
-| Wer bestätigt | nur das Personal, und nie das eigene Konto |
+| Wer bestätigt | nur das Personal — nie das eigene Konto und nie Konten, die es über „Freunde werben" selbst geworben hat (sonst gäbe es sich den Gutschein selbst frei) |
 | Was bestätigt wird | das Konto: Personalausweis gesehen, Foto passt zur Person, Name zum Konto |
 | Was der Empfang nicht prüft | Schüler-, Studierenden- und Seniorennachweise |
 | Wie oft | einmal je Konto, für immer |
@@ -94,7 +96,8 @@ sein Konto (`Auth::nurFuerPersonal()`), und `api/empfang.php` antwortet mit
 | Frist verpasst, mit Ermäßigung | kein ermäßigter Preis, bis das Konto bestätigt ist; ein laufender Vertrag wird zum Monatsersten herabgestuft |
 | Frist verpasst, ohne Ermäßigung | keine Sperre, nur rot markiert in „Mein Konto" und am Empfang |
 | Bestätigen nach verpasster Frist | Preis gilt wieder, eine noch nicht wirksame Herabstufung wird zurückgenommen |
-| Personalausweis passt nicht | nicht bestätigen — einen Knopf „Ablehnen" gibt es nicht |
+| Gutschein aus „Freunde werben" | der Werber kann ihn erst einlösen, wenn das Konto des Geworbenen bestätigt ist ([Freunde werben](freunde-werben.md)) |
+| Personalausweis passt nicht | „Unstimmigkeit" melden, mit kurzem Grund; das Konto bleibt rot markiert in der Liste. Löschen kann nur ein Admin ([Unstimmigkeiten](unstimmigkeiten.md)) |
 | Name | bis zur Bestätigung änderbar (nicht, solange ein Nachweis gilt), danach für immer fest |
 
 Oben stehen die Konten mit Tarif, die dringendste Frist zuerst; verpasste
@@ -115,7 +118,7 @@ Tarifseite.
 | 4 Endpunkt | `api/empfang.php` |
 | Infrastruktur | `src/Auth.php` (`istPersonal()`, `nurFuerPersonal()`) |
 | 5 Repository | `src/Repositories/MitgliedRepository.php` (Liste, bestätigen, Frist), `src/Repositories/NachweisRepository.php` (Gültigkeit für den Preis) |
-| 6 Tabelle | Spalten `bestaetigt_am` und `vorzeigen_bis` in `mitglieder`, Rolle in `users.roles_mask` |
+| 6 Tabelle | Spalten `bestaetigt_am`, `vorzeigen_bis`, `unstimmigkeit_am` und `unstimmigkeit_grund` in `mitglieder`, Rolle in `users.roles_mask` |
 | CSS | `assets/css/components/empfang.css` |
 
 Was sich am Nachweis selbst ändert, steht in [Nachweise](nachweise.md).
@@ -127,19 +130,23 @@ Ein Eintrag der Liste:
 ```json
 { "mitgliedId": 12, "vorname": "Maximilian", "nachname": "Testmann",
   "email": "max@beispiel.de", "registriertAm": "2026-10-02",
-  "ermaessigung": "student", "vorzeigenBis": "2026-10-30", "fristVerpasst": false }
+  "ermaessigung": "student", "vorzeigenBis": "2026-10-30", "fristVerpasst": false,
+  "unstimmigkeit": null }
 ```
 
 `vorzeigenBis` ist `null`, solange kein Tarif gewählt ist — dann gibt es keine
 Frist, und `fristVerpasst` ist `false`. `ermaessigung` ist `null` ohne
-gültigen Ermäßigungsnachweis; es steht nur zur Anzeige da.
+gültigen Ermäßigungsnachweis; es steht nur zur Anzeige da. `unstimmigkeit`
+ist `null` oder `{ "am": "2026-10-16", "grund": "…" }`, wenn das Personal
+etwas gemeldet hat.
 
 ## Endpunkte
 
 | Methode | Pfad | Zweck | Antwort |
 |---|---|---|---|
 | GET | `api/empfang.php` | alle unbestätigten Konten | `{ "offen": [...] }` · 401 · 403 |
-| PUT | `api/empfang.php` | Konto bestätigen, `{ mitgliedId }` | `{ "offen": [...] }` · 400 · 403 eigenes Konto · 409 schon bestätigt |
+| PUT | `api/empfang.php` | Konto bestätigen, `{ mitgliedId }` | `{ "offen": [...] }` · 400 · 403 eigenes oder selbst geworbenes Konto · 409 schon bestätigt |
+| POST | `api/empfang.php` | Unstimmigkeit melden, `{ mitgliedId, grund }` | `{ "offen": [...] }` · 400 ohne Grund · 403 eigenes Konto · 409 schon gemeldet |
 
 **409** heißt meist: Jemand anderes am Empfang hat gerade schneller
 geklickt. Die Seite zeigt die Meldung, die Liste lädt man neu.
