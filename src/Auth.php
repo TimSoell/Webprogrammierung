@@ -25,11 +25,18 @@
  *                  Auth::nurFuerMitglieder();        oben in geschützten Seiten
  *                  Auth::nurFuerPersonal();          oben in Seiten des Empfangs
  *                  Auth::istPersonal()               im Endpunkt des Empfangs
+ *                  Auth::nurFuerAdmins();            oben in admin.php
+ *                  Auth::istAdmin()                  im Endpunkt api/personal.php
  *
  *              PERSONAL ist ein normales Konto mit der Rolle EMPLOYEE der
- *              Bibliothek (Spalte users.roles_mask). Vergeben wird sie nur im
- *              Supabase-Dashboard, nie über die Website - siehe
- *              docs/features/empfang.md
+ *              Bibliothek (Spalte users.roles_mask). Vergeben und entziehen
+ *              kann sie ein Admin auf admin.php (personalErnennen(),
+ *              personalEntziehen()) oder jemand im Supabase-Dashboard - siehe
+ *              docs/features/personal-verwalten.md
+ *
+ *              ADMIN ist die Rolle ADMIN der Bibliothek in derselben Spalte.
+ *              Sie wird nur im Supabase-Dashboard vergeben, nie über die
+ *              Website.
  * @see         src/bootstrap.php
  * @see         docs/features/mitglieder-login.md
  */
@@ -37,6 +44,7 @@
 declare(strict_types=1);
 
 use Delight\Auth\Auth as LoginBibliothek;
+use Delight\Auth\InvalidEmailException;
 use Delight\Auth\Role;
 
 final class Auth
@@ -119,6 +127,78 @@ final class Auth
             header('Location: ' . BASE_URL . 'mein-konto.php');
             exit;
         }
+    }
+
+    /**
+     * Ist das angemeldete Konto ein Admin?
+     *
+     * Ein Admin verwaltet das Personal auf admin.php. Selbst Personal ist er
+     * dadurch nicht - das sind zwei getrennte Rollen. Wie bei istPersonal()
+     * wirkt eine neu vergebene Rolle spätestens nach fünf Minuten.
+     *
+     * @return bool  false auch, wenn niemand angemeldet ist
+     */
+    public static function istAdmin(): bool
+    {
+        return self::instanz()->isLoggedIn() && self::instanz()->hasRole(Role::ADMIN);
+    }
+
+    /**
+     * Lässt nur Admins auf die Seite. Wer nicht angemeldet ist, kommt zur
+     * Anmeldung, alle anderen - auch das Personal - zurück in ihr Konto.
+     *
+     * Gehört in jede Seite für Admins - direkt nach bootstrap.php, vor jeder
+     * Ausgabe. Die Endpunkte prüfen zusätzlich selbst.
+     *
+     * @return void  Kehrt nur zurück, wenn ein Admin angemeldet ist
+     */
+    public static function nurFuerAdmins(): void
+    {
+        self::nurFuerMitglieder();
+
+        if (!self::istAdmin()) {
+            header('Location: ' . BASE_URL . 'mein-konto.php');
+            exit;
+        }
+    }
+
+    /**
+     * Gibt einem Konto die Rolle Personal.
+     *
+     * Prüft nicht, wer fragt - das tut api/personal.php vorher.
+     *
+     * @param string $email  normalisiert (emailNormalisieren())
+     * @return bool          false, wenn es mit dieser E-Mail kein Konto gibt
+     */
+    public static function personalErnennen(string $email): bool
+    {
+        try {
+            self::instanz()->admin()->addRoleForUserByEmail($email, Role::EMPLOYEE);
+        } catch (InvalidEmailException) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Nimmt einem Konto die Rolle Personal wieder weg. Alle anderen Rollen,
+     * etwa Admin, bleiben.
+     *
+     * Prüft nicht, wer fragt - das tut api/personal.php vorher.
+     *
+     * @param string $email  normalisiert (emailNormalisieren())
+     * @return bool          false, wenn es mit dieser E-Mail kein Konto gibt
+     */
+    public static function personalEntziehen(string $email): bool
+    {
+        try {
+            self::instanz()->admin()->removeRoleForUserByEmail($email, Role::EMPLOYEE);
+        } catch (InvalidEmailException) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

@@ -36,13 +36,16 @@ Konto bestätigt ist.
 
 1. Die Person **registriert sich ganz normal** auf der Website, wie jedes
    Mitglied. Ein eigenes Login gibt es nicht.
-2. Jemand mit Zugang zum **Supabase-Dashboard** gibt diesem Konto die Rolle
-   `EMPLOYEE` der Login-Bibliothek (SQL unten). Zugang zum Dashboard hat nur
-   das Team, nicht die Mitglieder.
+2. Ein **Admin** trägt ihre E-Mail-Adresse auf `admin.php` ein und klickt
+   „Zum Personal machen". Dort entzieht er die Rolle auch wieder. Wie das
+   geht und wer Admin ist: [Personal verwalten](personal-verwalten.md).
 
-Auf der Website gibt es dafür **keinen Knopf und kein Formular**. Ein
-Mitglied kann sich die Rolle also nicht selbst geben, und niemand kann sie
-über die Seite vergeben.
+Ein Mitglied kann sich die Rolle nicht selbst geben — das kann nur ein
+Admin, und Admin wird man nur im Supabase-Dashboard
+([ADR-0025](../decisions/ADR-0025-admin-verwaltet-personal.md)).
+
+Ohne Admin geht es weiter von Hand im SQL-Editor des Dashboards, mit der
+Rolle `EMPLOYEE` der Login-Bibliothek:
 
 ```sql
 -- Rolle vergeben (2048 = Role::EMPLOYEE der Bibliothek)
@@ -54,8 +57,8 @@ UPDATE users SET roles_mask = roles_mask & ~2048 WHERE email = 'name@beispiel.de
 
 Die Bibliothek gleicht die Rolle alle fünf Minuten mit der Datenbank ab. Sie
 wirkt also nach dem nächsten Anmelden sofort, sonst spätestens nach fünf
-Minuten. Das ist die einzige Stelle, an der `users` von Hand geschrieben
-wird — im Code passiert das weiterhin nur über `src/Auth.php`.
+Minuten. Im Code wird `users` weiterhin nur über `src/Auth.php`
+geschrieben.
 
 ## So kommt das Personal auf die Seite
 
@@ -155,8 +158,6 @@ Nachtrag zurück.
 - **Gespeichert wird nur, wann bestätigt wurde, nicht von wem.**
 - **Eine Bestätigung lässt sich nicht zurücknehmen** — nur von Hand im
   Dashboard (`bestaetigt_am` auf `NULL`). Mit Absicht kein Knopf dafür.
-- **Rollen vergibt man noch im Dashboard.** Eine Rolle „Admin", die
-  Personal auf der Website ernennen kann, ist der nächste Schritt.
 - **Im Demo-Modus prüft niemand den Studentenstatus.** Ohne Schlüssel läuft
   keine Ausweisprüfung, und der Empfang sieht die Nachweise nicht. Der Name
   bleibt nach der Bestätigung aber fest.

@@ -13,10 +13,14 @@
  *              Personalausweis bestätigt hat und bis wann das passieren muss,
  *              und die Liste aller noch unbestätigten Konten für den Empfang -
  *              siehe docs/features/empfang.md.
+ *
+ *              Und die Liste aller Konten mit der Rolle Personal für
+ *              admin.php - siehe docs/features/personal-verwalten.md.
  * @see         database/schema.sql
  * @see         api/mitglieder.php
  * @see         api/sitzung.php
  * @see         api/empfang.php
+ * @see         api/personal.php
  */
 
 declare(strict_types=1);
@@ -24,6 +28,7 @@ declare(strict_types=1);
 namespace Repositories;
 
 use Database;
+use Delight\Auth\Role;
 use Delight\Auth\Status;
 
 final class MitgliedRepository
@@ -224,6 +229,30 @@ final class MitgliedRepository
         $stmt->execute([$mitgliedId, Status::NORMAL]);
 
         return $stmt->rowCount() === 1;
+    }
+
+    /**
+     * Alle Konten mit der Rolle Personal, nach Namen - für die Verwaltung auf
+     * admin.php.
+     *
+     * Liest users nur mit. Vergeben und entzogen wird die Rolle über die
+     * Login-Bibliothek in src/Auth.php. Gesperrte Konten stehen mit in der
+     * Liste, damit man auch ihnen die Rolle entziehen kann.
+     *
+     * @return array<int, array{vorname: string, nachname: string, email: string}>
+     */
+    public function personalFinden(): array
+    {
+        $stmt = Database::connection()->prepare(
+            'SELECT m.vorname, m.nachname, u.email
+               FROM mitglieder m
+               JOIN "users" u ON u.id = m.user_id
+              WHERE (u.roles_mask & ?) <> 0
+              ORDER BY m.nachname, m.vorname'
+        );
+        $stmt->execute([Role::EMPLOYEE]);
+
+        return $stmt->fetchAll();
     }
 
     /**
