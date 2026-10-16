@@ -47,4 +47,5 @@ Kein ADR für: Farbwerte, Textänderungen, das Anlegen einer einzelnen Datei.
 | [0020](ADR-0020-nachweise-absichern.md) | Ein Nachweis je Mitglied, und er muss auf den Kontoinhaber lauten | angenommen, Name nicht änderbar und fehlende Kontrolle am Empfang ersetzt durch 0023 |
 | [0021](ADR-0021-gutschein-als-gratiszeitraum.md) | Ein Gutschein ist ein Gratiszeitraum am Mitglied, kein Vertrag | angenommen |
 | [0022](ADR-0022-auslastung-als-fuellung.md) | Besuche füllen die typische Auslastung | angenommen |
-| [0023](ADR-0023-name-aendern-und-ausweis-am-empfang.md) | Der Name ist bis zur Bestätigung am Empfang änderbar, und das Personal bestätigt jede Person einmal | angenommen |
+| [0023](ADR-0023-name-aendern-und-ausweis-am-empfang.md) | Der Name ist bis zur Bestätigung am Empfang änderbar, und das Personal bestätigt jede Person einmal | angenommen, wer zum Empfang muss, Fristbeginn, Ausweis, Liste und Ablehnen ersetzt durch 0024 |
+| [0024](ADR-0024-empfang-bestaetigt-konto-mit-personalausweis.md) | Jedes Mitglied mit Tarif bestätigt sein Konto einmal mit dem Personalausweis am Empfang | angenommen |

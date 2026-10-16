@@ -29,9 +29,11 @@ Damit lässt sich die Mitgliedschaft vollständig online abschließen — bei
 anderen Studios muss man mit dem Ausweis an den Tresen, **bevor** man den
 Preis bekommt. Das ist der Punkt des Features.
 
-Der Ausweis wird trotzdem einmal vorgezeigt: **innerhalb von 14 Tagen am
-Empfang**, wo das Personal die Person bestätigt. Der Preis gilt aber sofort —
-siehe „Bestätigung am Empfang" und das Feature [Empfang](empfang.md).
+Den Ermäßigungsnachweis prüft allein die Ausweisprüfung online. Am Empfang
+wird nur das **Konto einmal mit dem Personalausweis bestätigt** — von jedem
+Mitglied, innerhalb von 14 Tagen nach der ersten Tarifwahl. Der Preis gilt
+aber sofort — siehe „Bestätigung am Empfang" und das Feature
+[Empfang](empfang.md).
 
 ## Die Regeln
 
@@ -39,8 +41,9 @@ siehe „Bestätigung am Empfang" und das Feature [Empfang](empfang.md).
 |---|---|
 | Name auf dem Ausweis | muss zum Namen im Konto passen |
 | Name im Konto | änderbar, aber nur ohne gültigen Nachweis — nach der Bestätigung am Empfang nie mehr |
-| Ausweis selbst | einmal je Person innerhalb von 14 Tagen nach dem ersten Nachweis am Empfang zeigen, der Nachweis gilt schon vorher |
-| Frist verpasst | kein ermäßigter Preis, bis das Personal die Person bestätigt |
+| Am Empfang | einmal je Konto den **Personalausweis** zeigen, innerhalb von 14 Tagen nach der ersten Tarifwahl; der Nachweis gilt schon vorher, und den Ermäßigungsnachweis sieht der Empfang nicht |
+| Frist verpasst | kein ermäßigter Preis, bis das Personal das Konto bestätigt |
+| Noch kein Tarif | keine Frist, der Nachweis zählt — so lässt sich direkt der ermäßigte Tarif buchen |
 | Spätere Nachweise | nach der Bestätigung nur noch online geprüft |
 | Schüler- und Studierendenausweis | gilt bis zum aufgedruckten Ablaufdatum, höchstens aber ein Jahr im Voraus (Schüler: zwei) |
 | Senior | ab 65 Jahren, gilt unbefristet |
@@ -51,8 +54,9 @@ siehe „Bestätigung am Empfang" und das Feature [Empfang](empfang.md).
 | Prüfversuche | drei, danach kommt alle acht Stunden einer dazu |
 
 Die Gründe stehen in
-[ADR-0020](../decisions/ADR-0020-nachweise-absichern.md) und
-[ADR-0023](../decisions/ADR-0023-name-aendern-und-ausweis-am-empfang.md).
+[ADR-0020](../decisions/ADR-0020-nachweise-absichern.md),
+[ADR-0023](../decisions/ADR-0023-name-aendern-und-ausweis-am-empfang.md) und
+[ADR-0024](../decisions/ADR-0024-empfang-bestaetigt-konto-mit-personalausweis.md).
 
 **Der Namensabgleich.** Ohne ihn könnte ein Vater den Schülerausweis seines
 Sohnes hochladen. Das Modell liest Vor- und Nachname, verglichen wird in
@@ -77,29 +81,27 @@ und unter „Mein Konto" steht statt „Name ändern" nur noch, dass der Name
 bestätigt ist. Das Konto gehört damit genau dieser Person.
 
 **Bestätigung am Empfang.** Der Name im Konto bleibt bis dahin eine
-Selbstauskunft, und im Demo-Modus wird gar kein Bild gelesen. Deshalb zeigt
-jede Person ihren Ausweis **einmal** dem Personal, und zwar innerhalb von 14
-Tagen nach ihrem ersten Nachweis. Das Personal bestätigt sie auf der Seite
-[Empfang](empfang.md). **Der Nachweis gilt trotzdem sofort** — am Hochladen
-und am Buchen ändert sich nichts.
+Selbstauskunft. Deshalb zeigt jedes Mitglied **einmal** dem Personal seinen
+**Personalausweis**, innerhalb von 14 Tagen nach der ersten Tarifwahl. Das
+Personal vergleicht Foto und Name und bestätigt das Konto auf
+der Seite [Empfang](empfang.md). Den Schüler- oder Studierendenausweis
+beurteilt es nicht — das hat die Ausweisprüfung schon getan. **Der Nachweis
+gilt trotzdem sofort** — am Hochladen und am Buchen ändert sich nichts.
 
-Die Frist steht in `mitglieder.vorzeigen_bis`. Der erste Upload setzt sie,
-**kein späterer verlängert sie** — sonst ließe sich der Empfang mit einem
-neuen Upload alle zwei Wochen umgehen. Ist sie verpasst, zählt für den Preis
-kein Nachweis mehr (`NachweisRepository::gueltigenFinden()`), bis das
-Personal bestätigt. Ein laufender Vertrag wird dann zum Monatsersten auf den
-Standardpreis gestellt, wie bei einem Ablauf.
+Die Frist steht in `mitglieder.vorzeigen_bis`. Die erste Tarifwahl setzt sie
+(`api/mitgliedschaften.php`), **nichts verlängert sie**. Ein Upload setzt
+keine Frist. Ist sie verpasst, zählt für den Preis kein Nachweis mehr
+(`NachweisRepository::gueltigenFinden()`), bis das Personal bestätigt. Ein
+laufender Vertrag wird dann zum Monatsersten auf den Standardpreis gestellt,
+wie bei einem Ablauf. Solange noch kein Tarif gewählt ist, gibt es keine
+Frist, und der Nachweis zählt.
 
 Wer bestätigt ist, lädt spätere Ausweise einfach hoch: Die Ausweisprüfung
 gleicht sie mit dem festen Namen ab, zum Empfang muss er nicht mehr.
 
-Der gültige Nachweis zeigt in der Liste seinen Stand:
-
-| Stand | Wann |
-|---|---|
-| „Zeig deinen Ausweis bis … einmal am Empfang" (lime) | noch nicht bestätigt, Frist läuft |
-| „Frist für den Empfang verpasst — …" (rot) | noch nicht bestätigt, Frist vorbei |
-| „Am Empfang bestätigt" (grau) | bestätigt |
+Die Frist selbst steht in „Mein Konto" bei den Stammdaten. Beim gültigen
+Nachweis steht nur dann etwas, wenn sie verpasst ist: „Der ermäßigte Preis
+ruht, bis dein Konto am Empfang bestätigt ist." (rot).
 
 **Ein Nachweis je Mitglied.** Senior und Schüler zugleich gibt es nicht.
 Wird ein neuer Nachweis gespeichert, löscht
@@ -289,8 +291,9 @@ Höchstens einer der Einträge ist gültig, die übrigen sind abgelaufen.
 `gueltigBis: null` heißt unbefristet und kommt nur bei `art: "senior"` vor.
 
 `bestaetigt`, `vorzeigenBis` und `fristVerpasst` gehören zur Person, nicht zu
-einem Nachweis: Bestätigt wird einmal, die Frist beginnt mit dem ersten
-Upload. `fristVerpasst` rechnet die Datenbank, damit Browser und Server nicht
+einem Nachweis: Bestätigt wird einmal, die Frist beginnt mit der ersten
+Tarifwahl (`vorzeigenBis` ist bis dahin `null`). `fristVerpasst` rechnet die
+Datenbank, damit Browser und Server nicht
 mit verschiedenen Uhren zählen.
 
 `herabstufungZurueckgenommen` ist nur nach einem POST `true`, und nur, wenn
@@ -334,7 +337,7 @@ Sicherheit. Alles, was aus dem Browser kommt, ist manipulierbar.
   Namen.
 - **Bis zur Bestätigung ist der Name im Konto eine Selbstauskunft.** Wer ein
   Konto auf den Namen des Ausweisinhabers anlegt, kommt durch den
-  Namensabgleich und hat 14 Tage den ermäßigten Preis. Danach hilft nur
+  Namensabgleich und hat ab der Tarifwahl 14 Tage den ermäßigten Preis. Danach hilft nur
   noch das Personal am Empfang — und das sieht die Person vor sich.
 - **Den Namen mit Nachweis zu ändern kostet einen Umweg:** Nachweis
   entfernen, Namen ändern, neu hochladen. Das verbraucht einen Prüfversuch.
@@ -346,8 +349,8 @@ Sicherheit. Alles, was aus dem Browser kommt, ist manipulierbar.
   [`migration-vercel-supabase.md`](../migration-vercel-supabase.md)) läuft
   die Produktion bewusst ohne Schlüssel, also im Demo-Modus — damit keine
   echten Ausweise Fremder bei Google landen. Die Sperre des Namens und die
-  Bestätigung am Empfang gelten auch dort — spätere Nachweise einer
-  bestätigten Person prüft dort aber niemand.
+  Bestätigung des Kontos am Empfang gelten auch dort — den Studentenstatus
+  prüft dort aber niemand, denn der Empfang sieht nur den Personalausweis.
 - **Eine Herabstufung, die schon gilt, bleibt.** Kommt der neue Nachweis
   erst nach dem Monatsersten, läuft bereits der Vertrag zum Standardpreis.
   Dann muss man den ermäßigten Preis auf der Tarifseite neu wählen, und er
@@ -358,8 +361,8 @@ Sicherheit. Alles, was aus dem Browser kommt, ist manipulierbar.
   des Mitglieds aus.
 - **Niemand kann ein gelesenes Datum korrigieren.** Liest das Modell ein
   Datum falsch, hilft nur ein neuer Upload oder ein Eingriff in der
-  Datenbank. Das Personal am Empfang kann einen Nachweis nur bestätigen oder
-  ablehnen.
+  Datenbank. Der Empfang sieht Ermäßigungsnachweise gar nicht, er bestätigt
+  nur das Konto.
 - **Die Herabstufung läuft bei jedem Aufruf mit**, statt einmal nachts.
   Ohne Cronjob ist das der einzige Weg — siehe
   [ADR-0011](../decisions/ADR-0011-ausweispruefung-mit-ki.md), Konsequenzen.

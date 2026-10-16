@@ -1,11 +1,11 @@
 /**
  * @file        assets/css/components/empfang.css
  * @layer       Komponente
- * @description Die Seite des Empfangs: oben Titel und Erklärung, darunter
+ * @description Die Seite des Empfangs: oben der Titel, darunter
  *              eine breite Karte mit Suche, Filter und der Tabelle der
- *              offenen Ausweise - je Zeile Person, Nachweis, Status und die
- *              Knöpfe Bestätigen und Ablehnen. Auf schmalen Bildschirmen
- *              wird aus jeder Tabellenzeile ein Block.
+ *              unbestätigten Konten - je Zeile Person, Registriert, Status
+ *              und der Knopf Bestätigen. Auf schmalen Bildschirmen wird aus
+ *              jeder Tabellenzeile ein Block.
  *
  *              Seitenabstand, Karte, Überschriften und Meldungen kommen aus
  *              auth.css - diese Datei regelt nur, was es nur hier gibt.
@@ -13,21 +13,10 @@
  * @see         assets/css/components/auth.css
  */
 
-/* --- Gerüst: Kopf oben, Karte darunter über die ganze Breite ---------------- */
+/* --- Gerüst: Titel oben, Karte darunter über die ganze Breite --------------- */
 .empfang-inner {
   display: grid;
   gap: 48px;
-}
-
-.empfang-kopf {
-  display: grid;
-  align-items: end;
-  gap: 40px;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
-}
-
-.empfang-kopf .auth-lead {
-  margin: 0;
 }
 
 .empfang-titelzeile {
@@ -184,7 +173,8 @@
   overflow-wrap: anywhere;
 }
 
-/* Status mit Punkt davor: Lime = Frist läuft, Rot = verpasst. */
+/* Status mit Punkt davor: Lime = Frist läuft, Rot = verpasst, Grau = ohne Tarif, da
+   eilt nichts. */
 .empfang-status .empfang-zeile-kopf::before {
   display: inline-block;
   width: 8px;
@@ -196,17 +186,25 @@
   vertical-align: middle;
 }
 
+.empfang-tabelle tr[data-stand="ohne"] .empfang-status .empfang-zeile-kopf {
+  color: var(--muted);
+}
+
+.empfang-tabelle tr[data-stand="ohne"] .empfang-status .empfang-zeile-kopf::before {
+  background: var(--muted);
+}
+
 /* Frist verpasst: Diese Person zahlt gerade den Standardpreis. Fällt auf,
    damit sie am Empfang nicht übersehen wird. */
-.empfang-tabelle tr[data-frist-verpasst="ja"] td:first-child {
+.empfang-tabelle tr[data-stand="verpasst"] td:first-child {
   box-shadow: inset 3px 0 0 var(--danger);
 }
 
-.empfang-tabelle tr[data-frist-verpasst="ja"] .empfang-status .empfang-zeile-kopf {
+.empfang-tabelle tr[data-stand="verpasst"] .empfang-status .empfang-zeile-kopf {
   color: var(--danger);
 }
 
-.empfang-tabelle tr[data-frist-verpasst="ja"] .empfang-status .empfang-zeile-kopf::before {
+.empfang-tabelle tr[data-stand="verpasst"] .empfang-status .empfang-zeile-kopf::before {
   background: var(--danger);
 }
 
@@ -217,27 +215,9 @@
 
 .empfang-aktionen .button {
   min-height: 40px;
-  margin-right: 14px;
   padding: 0 16px;
   cursor: pointer;
   vertical-align: middle;
-}
-
-.empfang-ablehnen {
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--muted);
-  cursor: pointer;
-  font: inherit;
-  font-size: .78rem;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  vertical-align: middle;
-}
-
-.empfang-ablehnen:hover {
-  color: var(--danger);
 }
 
 .empfang-aktionen button[disabled] {
@@ -254,12 +234,8 @@
   margin-top: 24px;
 }
 
-/* --- Schmal: Kopf untereinander, jede Tabellenzeile ein Block --------------- */
+/* --- Schmal: jede Tabellenzeile ein Block ------------------------------------ */
 @media (max-width: 760px) {
-  .empfang-kopf {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   .empfang-werkzeuge {
     flex-wrap: wrap;
   }
@@ -315,11 +291,11 @@
     text-transform: uppercase;
   }
 
-  .empfang-tabelle tr[data-frist-verpasst="ja"] {
+  .empfang-tabelle tr[data-stand="verpasst"] {
     box-shadow: inset 3px 0 0 var(--danger);
   }
 
-  .empfang-tabelle tr[data-frist-verpasst="ja"] td:first-child {
+  .empfang-tabelle tr[data-stand="verpasst"] td:first-child {
     box-shadow: none;
   }
 

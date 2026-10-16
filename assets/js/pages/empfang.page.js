@@ -1,24 +1,24 @@
 /**
  * @file        assets/js/pages/empfang.page.js
  * @layer       2 – Seitenskript
- * @description Zeigt dem Personal die Tabelle der Ausweise, die am Empfang
- *              noch gezeigt werden müssen, und schickt Bestätigen und
- *              Ablehnen an den Server.
+ * @description Zeigt dem Personal die Tabelle der Konten, die am Empfang
+ *              noch nicht mit dem Personalausweis bestätigt sind, und
+ *              schickt das Bestätigen an den Server.
  *
- *              Suche (Name oder E-Mail) und Filter (Frist läuft / verpasst)
- *              arbeiten nur im Browser auf der geladenen Liste - der Server
- *              liefert ohnehin alle offenen Einträge. "Neu laden" holt die
- *              Liste noch einmal, falls am zweiten Tresen jemand bestätigt hat.
+ *              Suche (Name oder E-Mail) und Filter (mit Tarif / Frist
+ *              verpasst) arbeiten nur im Browser auf der geladenen Liste -
+ *              der Server liefert ohnehin alle unbestätigten Konten. "Neu
+ *              laden" holt die Liste noch einmal, falls am zweiten Tresen
+ *              jemand bestätigt hat.
  *
- *              Bestätigen und Ablehnen fragen vorher nach: Bestätigen sperrt
- *              den Namen für immer, Ablehnen entfernt den Nachweis. Wer was
- *              darf, prüft allein api/empfang.php.
+ *              Bestätigen fragt vorher nach, denn es sperrt den Namen für
+ *              immer. Wer das darf, prüft allein api/empfang.php.
  * @see         empfang.php
  * @see         assets/js/services/empfang.js
  */
 
 import { $ } from '../lib/dom.js';
-import { ablehnen, bestaetigen, offeneLaden } from '../services/empfang.js';
+import { bestaetigen, offeneLaden } from '../services/empfang.js';
 import { meldungZeigen } from '../components/auth-formular.js';
 
 const seite = $('#empfang-seite');
@@ -32,7 +32,7 @@ if (seite) {
   const filter = $('#empfang-filter');
   const neuKnopf = $('#empfang-neu');
 
-  /** Beschriftung der Nachweisarten - dieselben wie unter "Mein Konto". */
+  /** Beschriftung der Ermäßigungsnachweise - dieselben wie unter "Mein Konto". */
   const NACHWEISARTEN = {
     schueler: 'Schülerausweis',
     student: 'Studierendenausweis',
@@ -40,10 +40,10 @@ if (seite) {
   };
 
   /**
-   * Alle offenen Einträge, wie der Server sie zuletzt geliefert hat. Suche
-   * und Filter zeigen davon nur einen Teil.
+   * Alle unbestätigten Konten, wie der Server sie zuletzt geliefert hat.
+   * Suche und Filter zeigen davon nur einen Teil.
    *
-   * @type {Array<import('../services/empfang.js').OffenerNachweis>}
+   * @type {Array<import('../services/empfang.js').OffenesKonto>}
    */
   let offen = [];
 
@@ -71,15 +71,30 @@ if (seite) {
     .replace(/[̀-ͯ]/g, '');
 
   /**
+   * Wie dringend ein Konto ist: Mit Tarif läuft eine Frist, die auch schon
+   * verpasst sein kann. Ohne Tarif eilt nichts.
+   *
+   * @param {import('../services/empfang.js').OffenesKonto} eintrag
+   * @returns {'laeuft'|'verpasst'|'ohne'}
+   */
+  const standVon = (eintrag) => {
+    if (eintrag.vorzeigenBis === null) {
+      return 'ohne';
+    }
+
+    return eintrag.fristVerpasst ? 'verpasst' : 'laeuft';
+  };
+
+  /**
    * Die Einträge, die zu Suche und Filter passen.
    *
-   * @returns {Array<import('../services/empfang.js').OffenerNachweis>}
+   * @returns {Array<import('../services/empfang.js').OffenesKonto>}
    */
   const sichtbare = () => {
     const begriff = vergleichbar(suche.value.trim());
 
     return offen.filter((eintrag) => {
-      if (filter.value === 'offen' && eintrag.fristVerpasst) {
+      if (filter.value === 'tarif' && eintrag.vorzeigenBis === null) {
         return false;
       }
       if (filter.value === 'verpasst' && !eintrag.fristVerpasst) {
@@ -98,7 +113,7 @@ if (seite) {
    * Mitglieder.
    *
    * @param {string} kopf
-   * @param {string} zusatz
+   * @param {string} zusatz        '' = keine zweite Zeile
    * @param {string} beschriftung  Spaltenname, auf schmalen Bildschirmen sichtbar
    * @returns {HTMLTableCellElement}
    */
@@ -109,96 +124,92 @@ if (seite) {
     const oben = document.createElement('span');
     oben.className = 'empfang-zeile-kopf';
     oben.textContent = kopf;
+    zelle.append(oben);
 
-    const unten = document.createElement('span');
-    unten.className = 'empfang-zeile-zusatz';
-    unten.textContent = zusatz;
-
-    zelle.append(oben, unten);
+    if (zusatz !== '') {
+      const unten = document.createElement('span');
+      unten.className = 'empfang-zeile-zusatz';
+      unten.textContent = zusatz;
+      zelle.append(unten);
+    }
 
     return zelle;
   };
 
   /**
-   * Führt Bestätigen oder Ablehnen aus und zeichnet danach die Tabelle neu.
+   * Die Zelle "Status": ob und wie eine Frist läuft.
    *
-   * @param {HTMLTableRowElement} zeile               deren Knöpfe gesperrt werden
-   * @param {() => Promise<{offen: Array}>} aktion    Aufruf des Service
-   * @param {string} erfolg                           Meldung danach
-   * @returns {Promise<void>}
+   * @param {import('../services/empfang.js').OffenesKonto} eintrag
+   * @returns {HTMLTableCellElement}
    */
-  const entscheiden = async (zeile, aktion, erfolg) => {
-    const knoepfe = zeile.querySelectorAll('button');
+  const statusZelle = (eintrag) => {
+    const stand = standVon(eintrag);
 
-    knoepfe.forEach((knopf) => { knopf.disabled = true; });
-    meldungZeigen(meldung, '');
+    // Mit Ermäßigung steht dabei, welcher Nachweis - und bei verpasster
+    // Frist, dass der günstige Preis gerade ruht.
+    const art = eintrag.ermaessigung === null ? '' : ` · ${NACHWEISARTEN[eintrag.ermaessigung]}`;
 
-    try {
-      offen = (await aktion()).offen;
-      tabelleZeigen();
-      meldungZeigen(meldung, erfolg, true);
-    } catch (fehler) {
-      meldungZeigen(meldung, fehler.message);
-      knoepfe.forEach((knopf) => { knopf.disabled = false; });
-    }
+    const zelle = {
+      ohne: () => zelleBauen('Ohne Tarif', 'muss nicht, kann aber', 'Status'),
+      laeuft: () => zelleBauen('Frist läuft', `bis ${datumAnzeigen(eintrag.vorzeigenBis)}${art}`, 'Status'),
+      verpasst: () => zelleBauen(
+        'Frist verpasst',
+        `seit ${datumAnzeigen(eintrag.vorzeigenBis)}${eintrag.ermaessigung === null ? '' : ' · ermäßigter Preis ruht'}`,
+        'Status',
+      ),
+    }[stand]();
+
+    zelle.classList.add('empfang-status');
+
+    return zelle;
   };
 
   /**
    * Baut eine Zeile der Tabelle.
    *
-   * @param {import('../services/empfang.js').OffenerNachweis} eintrag
+   * @param {import('../services/empfang.js').OffenesKonto} eintrag
    * @returns {HTMLTableRowElement}
    */
   const zeileBauen = (eintrag) => {
     const name = `${eintrag.vorname} ${eintrag.nachname}`;
 
     const zeile = document.createElement('tr');
-    zeile.dataset.fristVerpasst = eintrag.fristVerpasst ? 'ja' : 'nein';
-
-    const person = zelleBauen(name, eintrag.email, 'Person');
-    const nachweis = zelleBauen(
-      NACHWEISARTEN[eintrag.art],
-      eintrag.gueltigBis === null ? 'unbefristet' : `gültig bis ${datumAnzeigen(eintrag.gueltigBis)}`,
-      'Nachweis',
-    );
-    const status = eintrag.fristVerpasst
-      ? zelleBauen('Frist verpasst', `seit ${datumAnzeigen(eintrag.vorzeigenBis)} · Preis ruht`, 'Status')
-      : zelleBauen('Frist läuft', `zeigen bis ${datumAnzeigen(eintrag.vorzeigenBis)}`, 'Status');
-    status.classList.add('empfang-status');
+    zeile.dataset.stand = standVon(eintrag);
 
     const aktionen = document.createElement('td');
     aktionen.className = 'empfang-aktionen';
 
-    const ja = document.createElement('button');
-    ja.type = 'button';
-    ja.className = 'button';
-    ja.textContent = 'Bestätigen';
-    ja.setAttribute('aria-label', `${name} bestätigen`);
+    const knopf = document.createElement('button');
+    knopf.type = 'button';
+    knopf.className = 'button';
+    knopf.textContent = 'Bestätigen';
+    knopf.setAttribute('aria-label', `Konto von ${name} bestätigen`);
 
-    ja.addEventListener('click', () => {
-      if (!window.confirm(`Ausweis von ${name} gesehen, Foto und Name passen? Der Name ist danach für immer fest.`)) {
+    knopf.addEventListener('click', async () => {
+      if (!window.confirm(`Personalausweis von ${name} gesehen? Das Foto passt zur Person, der Name zum Konto? Der Name ist danach für immer fest.`)) {
         return;
       }
 
-      entscheiden(zeile, () => bestaetigen(eintrag.mitgliedId), `${name} ist bestätigt.`);
-    });
+      knopf.disabled = true;
+      meldungZeigen(meldung, '');
 
-    const nein = document.createElement('button');
-    nein.type = 'button';
-    nein.className = 'empfang-ablehnen';
-    nein.textContent = 'Ablehnen';
-    nein.setAttribute('aria-label', `Nachweis von ${name} ablehnen`);
-
-    nein.addEventListener('click', () => {
-      if (!window.confirm(`Nachweis von ${name} ablehnen? Er wird entfernt, und ein ermäßigter Tarif gilt ab dem nächsten Monatsersten zum Standardpreis.`)) {
-        return;
+      try {
+        offen = (await bestaetigen(eintrag.mitgliedId)).offen;
+        tabelleZeigen();
+        meldungZeigen(meldung, `Das Konto von ${name} ist bestätigt.`, true);
+      } catch (fehler) {
+        meldungZeigen(meldung, fehler.message);
+        knopf.disabled = false;
       }
-
-      entscheiden(zeile, () => ablehnen(eintrag.mitgliedId), `Nachweis von ${name} abgelehnt und entfernt.`);
     });
 
-    aktionen.append(ja, nein);
-    zeile.append(person, nachweis, status, aktionen);
+    aktionen.append(knopf);
+    zeile.append(
+      zelleBauen(name, eintrag.email, 'Person'),
+      zelleBauen(datumAnzeigen(eintrag.registriertAm), '', 'Registriert'),
+      statusZelle(eintrag),
+      aktionen,
+    );
 
     return zeile;
   };
@@ -214,12 +225,12 @@ if (seite) {
     liste.replaceChildren(...treffer.map(zeileBauen));
 
     anzahl.textContent = treffer.length === offen.length
-      ? `${offen.length} offen`
+      ? `${offen.length} unbestätigt`
       : `${treffer.length} von ${offen.length}`;
 
     leer.hidden = treffer.length > 0;
     leer.textContent = offen.length === 0
-      ? 'Gerade muss niemand seinen Ausweis zeigen.'
+      ? 'Alle Konten sind bestätigt.'
       : 'Niemand passt zu Suche und Filter.';
   }
 

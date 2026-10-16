@@ -242,6 +242,20 @@
   margin: 10px 0 0;
 }
 
+/* Hinweis auf den Empfang: Lime, solange die Frist läuft, Rot, wenn sie
+   verpasst ist - dieselben Farben wie in der Liste am Empfang. */
+.konto-empfang-hinweis {
+  margin: 12px 0 0;
+}
+
+.konto-empfang-hinweis[data-stand="offen"] {
+  color: var(--lime);
+}
+
+.konto-empfang-hinweis[data-stand="verpasst"] {
+  color: var(--danger);
+}
+
 .konto-name-form {
   margin-top: 18px;
 }

@@ -95,9 +95,10 @@ require ROOT_PATH . '/partials/header.php';
         <p class="tarife-hinweis">
           Der ermäßigte Preis gilt gegen Vorlage eines gültigen Schüler- oder
           Studierendenausweises, der Seniorenpreis ab 65 Jahren. Den Nachweis
-          lädst du unter „Mein Konto“ hoch, der Preis gilt dann sofort. Zeig
-          den Ausweis innerhalb von 14 Tagen einmal am Empfang — danach
-          prüfen wir neue Ausweise nur noch online.
+          lädst du unter „Mein Konto“ hoch und wir prüfen ihn online, der
+          Preis gilt dann sofort. Für alle gilt: Zeig innerhalb von 14 Tagen
+          nach der Tarifwahl einmal deinen Personalausweis am Empfang, am
+          besten beim ersten Training, damit wir dein Konto bestätigen.
         </p>
 
 <?php if (Auth::instanz()->isLoggedIn()): ?>

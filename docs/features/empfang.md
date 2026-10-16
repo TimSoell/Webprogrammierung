@@ -6,27 +6,31 @@
 
 ## Was kann man damit
 
-Das Personal am Empfang sieht auf einer eigenen Seite, wer einen Nachweis
-für einen ermäßigten Preis hochgeladen hat und den Ausweis noch einmal
-zeigen muss. Steht die Person vor ihm, vergleicht es Foto und Name auf dem
-Ausweis mit ihr und mit dem Namen in der Liste und klickt **„Bestätigen"**
-oder **„Ablehnen"**.
+**Jedes Mitglied, das einen Tarif wählt, bestätigt sein Konto einmal am
+Empfang mit dem Personalausweis** — innerhalb von 14 Tagen nach der ersten
+Tarifwahl, am besten beim ersten Training. Das Personal sieht auf einer
+eigenen Seite alle Konten, die das noch nicht sind. Steht die Person vor ihm, vergleicht es das Foto im Personalausweis mit
+ihr und den Namen mit dem Konto und klickt **„Bestätigen"**. Passt etwas
+nicht, bestätigt es einfach nicht.
+
+**Schüler-, Studierenden- und Seniorennachweise prüft der Empfang nicht** —
+die prüft die Ausweisprüfung online, siehe [Nachweise](nachweise.md).
 
 Die Liste ist eine Tabelle mit den Spalten Person (Name und E-Mail),
-Nachweis, Status und den beiden Knöpfen. Darüber stehen eine **Suche nach
-Name oder E-Mail**, ein Filter (alle, Frist läuft, Frist verpasst) und ein
+Registriert, Status und dem Knopf. Darüber stehen eine **Suche nach Name
+oder E-Mail**, ein Filter (alle, mit Tarif, Frist verpasst) und ein
 Knopf zum Neuladen — falls am zweiten Tresen gerade jemand bestätigt hat.
-Suche und Filter arbeiten im Browser auf der geladenen Liste;
-Groß- und Kleinschreibung und Akzente zählen nicht („muller" findet
-„Müller"). Auf dem Handy wird aus jeder Zeile ein Block.
+Suche und Filter arbeiten im Browser auf der geladenen Liste; Groß- und
+Kleinschreibung und Akzente zählen nicht („muller" findet „Müller"). Auf
+dem Handy wird aus jeder Zeile ein Block.
 
-Bestätigt wird jede Person **einmal**. Danach ist ihr Name für immer fest,
-und spätere Nachweise — etwa der Ausweis fürs nächste Semester — prüft
-allein die Ausweisprüfung. Warum: [ADR-0023](../decisions/ADR-0023-name-aendern-und-ausweis-am-empfang.md).
+Danach ist der Name für immer fest. Warum:
+[ADR-0023](../decisions/ADR-0023-name-aendern-und-ausweis-am-empfang.md) und
+[ADR-0024](../decisions/ADR-0024-empfang-bestaetigt-konto-mit-personalausweis.md).
 
 Mitglieder sehen von alldem nur ihren Stand unter „Mein Konto": bis wann sie
-den Ausweis zeigen müssen, ob die Frist verpasst ist, oder dass ihr Name
-bestätigt ist.
+den Personalausweis zeigen müssen, ob die Frist verpasst ist, oder dass ihr
+Konto bestätigt ist.
 
 ## So entsteht ein Konto für das Personal
 
@@ -76,20 +80,27 @@ sein Konto (`Auth::nurFuerPersonal()`), und `api/empfang.php` antwortet mit
 
 | | |
 |---|---|
-| Wer bestätigt | nur das Personal, und nie sich selbst |
-| Was bestätigt wird | die Person: Ausweis gesehen, Foto und Name passen zu ihr und zum Konto |
-| Wie oft | einmal je Person, für immer |
-| Frist | 14 Tage ab dem **ersten** Nachweis, beginnt nie neu |
-| Bis zur Bestätigung | Preis gilt, solange die Frist läuft |
-| Frist verpasst | kein ermäßigter Preis, bis das Personal bestätigt; ein laufender Vertrag wird zum Monatsersten herabgestuft |
+| Wer bestätigt | nur das Personal, und nie das eigene Konto |
+| Was bestätigt wird | das Konto: Personalausweis gesehen, Foto passt zur Person, Name zum Konto |
+| Was der Empfang nicht prüft | Schüler-, Studierenden- und Seniorennachweise |
+| Wie oft | einmal je Konto, für immer |
+| Wer in der Liste steht | alle unbestätigten Konten, ohne gesperrte (Demo-Konten) und ohne das eigene |
+| Wer muss | jedes Mitglied mit Tarif, in jeder Preisgruppe, auch mit Gutschein |
+| Frist | 14 Tage ab der **ersten Tarifwahl**, beginnt nie neu; ohne Tarif keine Frist |
+| Bis zur Bestätigung | alles gilt, auch ein ermäßigter Preis |
+| Frist verpasst, mit Ermäßigung | kein ermäßigter Preis, bis das Konto bestätigt ist; ein laufender Vertrag wird zum Monatsersten herabgestuft |
+| Frist verpasst, ohne Ermäßigung | keine Sperre, nur rot markiert in „Mein Konto" und am Empfang |
 | Bestätigen nach verpasster Frist | Preis gilt wieder, eine noch nicht wirksame Herabstufung wird zurückgenommen |
-| Ablehnen | entfernt den Nachweis, die Frist läuft weiter |
+| Personalausweis passt nicht | nicht bestätigen — einen Knopf „Ablehnen" gibt es nicht |
 | Name | bis zur Bestätigung änderbar (nicht, solange ein Nachweis gilt), danach für immer fest |
-| Spätere Nachweise | prüft allein die Ausweisprüfung, kein Gang zum Empfang |
 
-In der Liste stehen alle, die noch nicht bestätigt sind und einen Nachweis
-haben, der nach Datum gilt — auch die mit verpasster Frist. Die stehen oben
-und sind rot markiert. Sortiert wird nach Frist, dann nach Namen.
+Oben stehen die Konten mit Tarif, die dringendste Frist zuerst; verpasste
+sind rot markiert, mit Ermäßigung steht dabei, dass der günstige Preis ruht.
+Danach die Konten ohne Tarif nach Namen, mit grauem Status „Ohne Tarif".
+
+Mitglieder sehen ihre Frist in „Mein Konto" bei den Stammdaten (lime, bei
+verpasster Frist rot) und nach der ersten Tarifwahl in der Meldung auf der
+Tarifseite.
 
 ## Beteiligte Dateien
 
@@ -100,7 +111,7 @@ und sind rot markiert. Sortiert wird nach Frist, dann nach Namen.
 | 3 Service | `assets/js/services/empfang.js` |
 | 4 Endpunkt | `api/empfang.php` |
 | Infrastruktur | `src/Auth.php` (`istPersonal()`, `nurFuerPersonal()`) |
-| 5 Repository | `src/Repositories/NachweisRepository.php` (Liste, Gültigkeit), `src/Repositories/MitgliedRepository.php` (bestätigen, Frist) |
+| 5 Repository | `src/Repositories/MitgliedRepository.php` (Liste, bestätigen, Frist), `src/Repositories/NachweisRepository.php` (Gültigkeit für den Preis) |
 | 6 Tabelle | Spalten `bestaetigt_am` und `vorzeigen_bis` in `mitglieder`, Rolle in `users.roles_mask` |
 | CSS | `assets/css/components/empfang.css` |
 
@@ -112,17 +123,20 @@ Ein Eintrag der Liste:
 
 ```json
 { "mitgliedId": 12, "vorname": "Maximilian", "nachname": "Testmann",
-  "email": "max@beispiel.de", "art": "student", "gueltigBis": "2027-03-31", "geprueftAm": "2026-10-16 10:02:11",
-  "vorzeigenBis": "2026-10-30", "fristVerpasst": false }
+  "email": "max@beispiel.de", "registriertAm": "2026-10-02",
+  "ermaessigung": "student", "vorzeigenBis": "2026-10-30", "fristVerpasst": false }
 ```
+
+`vorzeigenBis` ist `null`, solange kein Tarif gewählt ist — dann gibt es keine
+Frist, und `fristVerpasst` ist `false`. `ermaessigung` ist `null` ohne
+gültigen Ermäßigungsnachweis; es steht nur zur Anzeige da.
 
 ## Endpunkte
 
 | Methode | Pfad | Zweck | Antwort |
 |---|---|---|---|
-| GET | `api/empfang.php` | alle offenen Nachweise | `{ "offen": [...] }` · 401 · 403 |
-| PUT | `api/empfang.php` | Person bestätigen, `{ mitgliedId }` | `{ "offen": [...] }` · 400 · 403 eigenes Konto · 409 nichts mehr offen |
-| DELETE | `api/empfang.php` | Nachweis ablehnen und entfernen, `{ mitgliedId }` | `{ "offen": [...] }` · 400 · 403 · 409 |
+| GET | `api/empfang.php` | alle unbestätigten Konten | `{ "offen": [...] }` · 401 · 403 |
+| PUT | `api/empfang.php` | Konto bestätigen, `{ mitgliedId }` | `{ "offen": [...] }` · 400 · 403 eigenes Konto · 409 schon bestätigt |
 
 **409** heißt meist: Jemand anderes am Empfang hat gerade schneller
 geklickt. Die Seite zeigt die Meldung, die Liste lädt man neu.
@@ -132,7 +146,9 @@ geklickt. Die Seite zeigt die Meldung, die Liste lädt man neu.
 Aus PostgreSQL bei Supabase, Tabellen `mitglieder`, `nachweise` und `users`.
 Neue Tabellen gibt es nicht. Die zwei Spalten kommen über den Abschnitt
 „NACHTRÄGE" am Ende von `database/schema.sql` in vorhandene Datenbanken;
-wer dort schon einen Nachweis hat, bekommt seine 14 Tage ab dem Einspielen.
+wer dort schon einen Tarif hat, bekommt seine 14 Tage ab dem Einspielen.
+Fristen, die nach der alten Regel ohne Tarif entstanden sind, setzt der
+Nachtrag zurück.
 
 ## Was fehlt noch
 
@@ -141,7 +157,13 @@ wer dort schon einen Nachweis hat, bekommt seine 14 Tage ab dem Einspielen.
   Dashboard (`bestaetigt_am` auf `NULL`). Mit Absicht kein Knopf dafür.
 - **Rollen vergibt man noch im Dashboard.** Eine Rolle „Admin", die
   Personal auf der Website ernennen kann, ist der nächste Schritt.
-- **Im Demo-Modus prüft niemand spätere Nachweise.** Wer bestätigt ist, kann
-  sich ohne Schlüssel jedes Ablaufdatum eintippen — der Name bleibt aber fest.
+- **Im Demo-Modus prüft niemand den Studentenstatus.** Ohne Schlüssel läuft
+  keine Ausweisprüfung, und der Empfang sieht die Nachweise nicht. Der Name
+  bleibt nach der Bestätigung aber fest.
+- **Einen falschen Ermäßigungsnachweis kann der Empfang nicht entfernen.** Er
+  bestätigt das Konto dann nicht, nach 14 Tagen ruht der Preis von selbst.
+- **Ohne Ermäßigung hat eine verpasste Frist keine Folge** — bewusst die
+  lockere Variante. Strenger wäre, Kursbuchungen bis zur Bestätigung zu
+  sperren.
 - **Die Tarifseite sagt bei verpasster Frist „Nachweis fehlt".** Den genauen
   Grund nennt nur „Mein Konto".

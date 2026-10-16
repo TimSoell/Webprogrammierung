@@ -3,10 +3,14 @@
  * @file        empfang.php
  * @layer       1 – Seite
  * @description Die Seite für das Personal am Empfang. Eine Tabelle mit
- *              allen Mitgliedern, die ihren Ausweis noch einmal zeigen
- *              müssen, je Zeile Bestätigen und Ablehnen. Darüber eine Suche
- *              nach Name oder E-Mail und ein Filter nach Frist, damit man
- *              auch bei vielen Einträgen die Person vor sich schnell findet.
+ *              allen Konten, die noch nicht mit dem Personalausweis bestätigt
+ *              sind, je Zeile ein Knopf "Bestätigen". Darüber eine Suche nach
+ *              Name oder E-Mail und ein Filter, damit man auch bei vielen
+ *              Einträgen die Person vor sich schnell findet.
+ *
+ *              Schüler-, Studierenden- und Seniorennachweise prüft der
+ *              Empfang nicht - das macht die Ausweisprüfung online. Siehe
+ *              docs/decisions/ADR-0024-empfang-bestaetigt-konto-mit-personalausweis.md
  *
  *              NUR FUER DAS PERSONAL: Auth::nurFuerPersonal() schickt alle
  *              anderen weg, bevor etwas ausgegeben wird.
@@ -40,31 +44,22 @@ require ROOT_PATH . '/partials/header.php';
   <main class="auth" id="empfang-seite" data-login="<?= e(BASE_URL) ?>anmelden.php">
     <div class="wrap empfang-inner">
 
-      <div class="empfang-kopf">
-        <div>
-          <p class="eyebrow">Nur für das Personal</p>
-          <h1 class="display auth-title">Empfang.</h1>
-        </div>
-        <p class="auth-lead">
-          Hier steht, wer einen Nachweis für einen ermäßigten Preis hochgeladen
-          hat und den Ausweis noch einmal zeigen muss. Vergleiche Foto und Name
-          auf dem Ausweis mit der Person vor dir und mit dem Namen in der Liste.
-        </p>
+      <div>
+        <p class="eyebrow">Nur für das Personal</p>
+        <h1 class="display auth-title">Empfang.</h1>
       </div>
 
       <section class="auth-card empfang-karte" aria-labelledby="empfang-titel">
         <div class="empfang-titelzeile">
-          <h2 class="auth-heading" id="empfang-titel">Ausweis zeigen</h2>
+          <h2 class="auth-heading" id="empfang-titel">Konten bestätigen</h2>
           <p class="empfang-anzahl" id="empfang-anzahl" aria-live="polite"></p>
         </div>
-        <p class="auth-hint">
-          Eine Zeile je Person. Bestätigen heißt: Die Person ist die, auf die
-          das Konto läuft — ihr Name ist danach für immer fest. Ablehnen
-          entfernt den Nachweis.
-        </p>
+
+        <!-- Was Bestätigen bewirkt, sagt die Rückfrage beim Klick
+             (assets/js/pages/empfang.page.js). -->
 
         <!-- Suchen und Filtern geschieht im Browser über die geladene Liste:
-             Der Server liefert ohnehin alle offenen Einträge. -->
+             Der Server liefert ohnehin alle unbestätigten Konten. -->
         <div class="empfang-werkzeuge">
           <label class="empfang-suche">
             <span class="konto-visually-hidden">Suchen</span>
@@ -72,10 +67,10 @@ require ROOT_PATH . '/partials/header.php';
             <input id="empfang-suche" type="search" placeholder="Name oder E-Mail-Adresse" autocomplete="off">
           </label>
 
-          <label class="konto-visually-hidden" for="empfang-filter">Nach Frist filtern</label>
+          <label class="konto-visually-hidden" for="empfang-filter">Filtern</label>
           <select class="empfang-filter" id="empfang-filter">
             <option value="alle">Alle</option>
-            <option value="offen">Frist läuft</option>
+            <option value="tarif">Mit Tarif</option>
             <option value="verpasst">Frist verpasst</option>
           </select>
 
@@ -89,7 +84,7 @@ require ROOT_PATH . '/partials/header.php';
           <thead>
             <tr>
               <th scope="col">Person</th>
-              <th scope="col">Nachweis</th>
+              <th scope="col">Registriert</th>
               <th scope="col">Status</th>
               <th scope="col"><span class="konto-visually-hidden">Aktionen</span></th>
             </tr>
@@ -98,7 +93,7 @@ require ROOT_PATH . '/partials/header.php';
           <tbody id="empfang-liste"></tbody>
         </table>
 
-        <!-- Text setzt das Seitenskript: niemand offen oder niemand gefunden. -->
+        <!-- Text setzt das Seitenskript: alle bestätigt oder niemand gefunden. -->
         <p class="auth-hint empfang-leer" id="empfang-leer" hidden></p>
 
         <p class="auth-message" id="empfang-meldung" role="alert"></p>

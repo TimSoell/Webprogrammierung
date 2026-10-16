@@ -7,10 +7,12 @@
  *              über den Button "Abmelden" ab.
  *
  *              Zwei Dinge hängen am Empfang: Der Name lässt sich nur ändern,
- *              bis das Personal ihn bestätigt hat (und davor nicht, solange
- *              ein Nachweis gilt), und die Nachweisliste zeigt, bis wann der
- *              Ausweis gezeigt werden muss. Beides ist hier nur Anzeige -
- *              verbindlich sind api/mitglieder.php und api/nachweise.php.
+ *              bis das Personal das Konto bestätigt hat (und davor nicht,
+ *              solange ein Nachweis gilt), und die Stammdaten sagen, bis wann
+ *              der Personalausweis gezeigt werden muss - die Frist beginnt mit
+ *              dem ersten Tarif. Beides ist hier nur Anzeige - verbindlich
+ *              sind api/mitglieder.php, api/mitgliedschaften.php und
+ *              api/nachweise.php.
  * @see         mein-konto.php
  * @see         assets/js/services/mitglieder.js
  * @see         assets/js/services/auswahl.js
@@ -204,22 +206,25 @@ if (seite) {
   let empfang = { bestaetigt: false, vorzeigenBis: null, fristVerpasst: false };
 
   /**
-   * Was beim gültigen Nachweis zum Empfang dasteht.
+   * Sagt in den Stammdaten, ob das Konto noch am Empfang bestätigt werden
+   * muss und bis wann. Die Frist gibt es erst mit dem ersten Tarif; ohne
+   * Tarif und nach der Bestätigung bleibt der Hinweis weg.
    *
-   * @returns {{stand: 'bestaetigt'|'verpasst'|'offen', text: string}}
+   * @returns {void}
    */
-  const empfangStand = () => {
-    if (empfang.bestaetigt) {
-      return { stand: 'bestaetigt', text: 'Am Empfang bestätigt' };
-    }
-    if (empfang.fristVerpasst) {
-      return {
-        stand: 'verpasst',
-        text: 'Frist für den Empfang verpasst — der ermäßigte Preis gilt erst wieder, wenn das Personal deinen Ausweis gesehen hat',
-      };
+  const empfangHinweisZeigen = () => {
+    const hinweis = $('#konto-empfang-hinweis');
+
+    hinweis.hidden = empfang.bestaetigt || empfang.vorzeigenBis === null;
+
+    if (hinweis.hidden) {
+      return;
     }
 
-    return { stand: 'offen', text: `Zeig deinen Ausweis bis ${datumAnzeigen(empfang.vorzeigenBis)} einmal am Empfang` };
+    hinweis.dataset.stand = empfang.fristVerpasst ? 'verpasst' : 'offen';
+    hinweis.textContent = empfang.fristVerpasst
+      ? 'Deine 14 Tage für den Empfang sind vorbei. Zeig beim nächsten Training bitte einmal deinen Personalausweis am Empfang, damit wir dein Konto bestätigen.'
+      : `Zeig bis ${datumAnzeigen(empfang.vorzeigenBis)} einmal deinen Personalausweis am Empfang, damit wir dein Konto bestätigen.`;
   };
 
   /**
@@ -250,14 +255,14 @@ if (seite) {
       + (abgelaufen ? ' (abgelaufen)' : '')
       + (nachweis.quelle === 'demo' ? ' · im Demo-Modus eingetragen' : '');
 
-    // Nur beim gültigen Nachweis: Steht der Empfang noch aus, und bis wann?
-    if (!abgelaufen) {
-      const { stand, text: standText } = empfangStand();
-
+    // Nur beim gültigen Nachweis und verpasster Frist: Dann ruht der
+    // ermäßigte Preis, das muss hier stehen. Die Frist selbst nennt der
+    // Hinweis oben in den Stammdaten.
+    if (!abgelaufen && empfang.fristVerpasst) {
       const status = document.createElement('span');
       status.className = 'nachweis-status';
-      status.dataset.stand = stand;
-      status.textContent = standText;
+      status.dataset.stand = 'verpasst';
+      status.textContent = 'Der ermäßigte Preis ruht, bis dein Konto am Empfang bestätigt ist.';
 
       text.append(status);
     }
@@ -338,6 +343,7 @@ if (seite) {
       $('#name-bestaetigt').hidden = false;
     }
 
+    empfangHinweisZeigen();
     vorhandenenHinweisZeigen();
   }
 
@@ -434,26 +440,21 @@ if (seite) {
       // Frist verpasst: Gespeichert ist der Nachweis, für den Preis zählt er
       // aber erst nach dem Empfang - das muss die Meldung sagen.
       if (stand.fristVerpasst) {
-        meldungZeigen(nachweisMeldung, 'Nachweis gespeichert. Deine 14 Tage für den Empfang sind aber vorbei: Der ermäßigte Preis gilt erst wieder, wenn das Personal deinen Ausweis gesehen hat.', true);
+        meldungZeigen(nachweisMeldung, 'Nachweis gespeichert. Der ermäßigte Preis gilt aber erst wieder, wenn dein Konto am Empfang bestätigt ist.', true);
 
         return;
       }
-
-      // Noch nicht bestätigt: an den Empfang erinnern, mit dem Datum.
-      const empfangHinweis = stand.bestaetigt
-        ? ''
-        : ` Zeig deinen Ausweis bis ${datumAnzeigen(stand.vorzeigenBis)} einmal am Empfang.`;
 
       if (stand.herabstufungZurueckgenommen) {
         // Oben auf der Seite steht noch der vorgemerkte Wechsel auf den
         // Standardpreis. Den gibt es nicht mehr, also neu laden.
         mitgliedschaftZeigen(await standLaden());
-        meldungZeigen(nachweisMeldung, `Nachweis gespeichert. Der vorgemerkte Wechsel auf den Standardpreis entfällt, dein Preis bleibt wie bisher.${empfangHinweis}`, true);
+        meldungZeigen(nachweisMeldung, 'Nachweis gespeichert. Der vorgemerkte Wechsel auf den Standardpreis entfällt, dein Preis bleibt wie bisher.', true);
 
         return;
       }
 
-      meldungZeigen(nachweisMeldung, `Nachweis gespeichert. Der Preis steht dir ab sofort offen.${empfangHinweis}`, true);
+      meldungZeigen(nachweisMeldung, 'Nachweis gespeichert. Der Preis steht dir ab sofort offen.', true);
     });
 
     // formularAbsenden() gibt den Button am Ende immer wieder frei. Wo er

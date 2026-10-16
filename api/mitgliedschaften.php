@@ -34,6 +34,10 @@
  *
  *              Kündigen gibt es bewusst nicht - siehe
  *              docs/features/mitgliedschaften.md, Abschnitt "Was fehlt noch".
+ *
+ *              DIE ERSTWAHL STARTET DIE FRIST FUER DEN EMPFANG: Binnen
+ *              VORZEIGEFRIST_TAGE zeigt jedes Mitglied einmal seinen
+ *              Personalausweis, siehe docs/features/empfang.md.
  * @see         assets/js/services/mitgliedschaften.js
  * @see         src/Repositories/MitgliedschaftRepository.php
  * @see         src/Repositories/KursbuchungRepository.php
@@ -56,6 +60,16 @@ header('Content-Type: application/json; charset=utf-8');
 
 /** Die drei Preisgruppen. Muss zur CHECK-Liste in database/schema.sql passen. */
 const PREISGRUPPEN = ['standard', 'ermaessigt', 'senior'];
+
+/**
+ * So viele Tage nach der ersten Tarifwahl hat ein Mitglied Zeit, sein Konto
+ * am Empfang mit dem Personalausweis bestätigen zu lassen. Verpasst es die
+ * Frist, ruht ein ermäßigter Preis, bis das nachgeholt ist - siehe
+ * docs/decisions/ADR-0024-empfang-bestaetigt-konto-mit-personalausweis.md.
+ * Der Nachtrag in database/schema.sql gibt vorhandenen Mitgliedern mit
+ * Tarif dieselben 14 Tage.
+ */
+const VORZEIGEFRIST_TAGE = 14;
 
 try {
     $auth = Auth::instanz();
@@ -258,6 +272,15 @@ try {
             // Erster Tarif überhaupt: gilt sofort, niemand soll auf den
             // Monatsersten warten, um trainieren zu dürfen.
             $mitgliedschaften->erstwahlSpeichern($mitgliedId, (int) $tarif['id'], $preisgruppe, (float) $preis);
+
+            // Mit dem ersten Tarif beginnt die Frist für den Empfang: Wer
+            // trainiert, zeigt dort einmal seinen Personalausweis. Ist das
+            // Konto schon bestätigt oder eine Frist gesetzt, ändert das
+            // nichts - siehe MitgliedRepository::fristSetzen().
+            (new MitgliedRepository())->fristSetzen(
+                $mitgliedId,
+                (new DateTimeImmutable('today'))->modify('+' . VORZEIGEFRIST_TAGE . ' days')->format('Y-m-d')
+            );
 
             $standAntworten(201);
         }
