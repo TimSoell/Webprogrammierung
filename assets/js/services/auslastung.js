@@ -17,8 +17,8 @@ import { getJson, sendJson } from './api.js';
  * @typedef  {object} Stundenwert
  * @property {number} stunde   0 bis 23
  * @property {number} basis    Typische Auslastung aus der Datenbank
- * @property {number} gebucht  Aufschlag durch angekündigte Besuche
- * @property {number} gesamt   basis + gebucht
+ * @property {number} gebucht  Angekündigte Besuche und Check-ins
+ * @property {number} gesamt   Größerer Wert aus basis und gebucht
  */
 
 /**

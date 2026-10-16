@@ -7,14 +7,9 @@
  *              bibliothek - die Aufgabenstellung gibt HTML, CSS und
  *              JavaScript vor, und für 24 Balken lohnt sich keine.
  *
- *              Jeder Balken besteht aus zwei Teilen:
- *
- *                unten  die typische Auslastung aus der Datenbank (gedeckt)
- *                oben   der Aufschlag durch angekündigte Besuche (lime)
- *
- *              Diese Teilung ist der Kern der Vorführung: checkt jemand ein,
- *              wächst nur der obere Teil, und man sieht sofort, welcher Anteil
- *              aus echten Anmeldungen stammt.
+ *              Die typische Auslastung bildet den grauen Hintergrund.
+ *              Angekündigte Besuche und Check-ins füllen ihn von unten grün.
+ *              Sind mehr Besuche erfasst als üblich, wächst Grün darüber hinaus.
  *
  *              Die Farben stehen im CSS, nicht hier - siehe
  *              assets/css/components/auslastung.css.
@@ -90,7 +85,7 @@ export function diagrammZeichnen(container, daten) {
     viewBox: `0 0 ${BREITE} ${HOEHE}`,
     class: 'auslastung-svg',
     role: 'img',
-    'aria-label': `Auslastung im Tagesverlauf, aktuell ${verlauf[jetzt.stunde]?.gesamt ?? 0} von ${kapazitaet} Personen`,
+    'aria-label': `Auslastung im Tagesverlauf, aktuell ${jetzt.personen ?? verlauf[jetzt.stunde]?.gesamt ?? 0} von ${kapazitaet} Personen`,
   });
 
   // --- Kapazitätslinie -------------------------------------------------------
@@ -122,7 +117,7 @@ export function diagrammZeichnen(container, daten) {
     const basisHoehe = hoeheFuer(wert.basis);
     const gebuchtHoehe = hoeheFuer(wert.gebucht);
 
-    // Unterer Teil: die typische Kurve.
+    // Hintergrund: die typische Kurve.
     if (basisHoehe > 0) {
       svg.append(element('rect', {
         x,
@@ -134,17 +129,13 @@ export function diagrammZeichnen(container, daten) {
       }));
     }
 
-    // Oberer Teil: der Aufschlag aus angekündigten Besuchen. Mindestens
-    // zwei Pixel hoch, sonst wäre der erste Check-in unsichtbar - und genau
-    // der soll bei der Vorführung auffallen.
+    // Besuche füllen von derselben Grundlinie aus; jeder Check-in zählt mit.
     if (wert.gebucht > 0) {
-      const sichtbareHoehe = Math.max(gebuchtHoehe, 2);
-
       svg.append(element('rect', {
         x,
-        y: unten - basisHoehe - sichtbareHoehe,
+        y: unten - gebuchtHoehe,
         width: balkenBreite,
-        height: sichtbareHoehe,
+        height: gebuchtHoehe,
         rx: 2,
         class: 'auslastung-balken-gebucht',
       }));
@@ -158,7 +149,7 @@ export function diagrammZeichnen(container, daten) {
         class: istJetzt ? 'auslastung-stunde auslastung-stunde--jetzt' : 'auslastung-stunde',
         'text-anchor': 'middle',
       });
-      beschriftung.textContent = `${wert.stunde}`;
+      beschriftung.textContent = `${wert.stunde}:00`;
       svg.append(beschriftung);
     }
   });

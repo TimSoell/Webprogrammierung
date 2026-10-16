@@ -95,12 +95,12 @@ try {
                 'stunde'  => $stunde,
                 'basis'   => $basiswert,
                 'gebucht' => $gebucht,
-                'gesamt'  => $basiswert + $gebucht,
+                'gesamt'  => max($basiswert, $gebucht),
             ];
         }
 
         $aktuelleStunde = (int) $jetzt->format('G');
-        $jetztPersonen  = ($basis[$aktuelleStunde] ?? 0) + $auslastung->besucheZaehlen($jetzt);
+        $jetztPersonen  = max($basis[$aktuelleStunde] ?? 0, $auslastung->besucheZaehlen($jetzt));
 
         $antwort = [
             'kapazitaet' => AuslastungRepository::KAPAZITAET,

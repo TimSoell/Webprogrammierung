@@ -30,6 +30,11 @@ Beide Dateien sind UTF-8, Umlaute kommen so ohne Umweg richtig an.
 In die Produktionsdatenbank kommt `seed.sql` genau **einmal** beim
 Einrichten – danach nie wieder, siehe unten.
 
+Für das Auslastungsdiagramm gibt es einen separaten CLI-Aufruf, der nur
+Demo-Mitglieder und heutige Besuche in `schwitzkasten-dev` ergänzt, ohne
+`seed.sql` erneut einzuspielen. Anleitung:
+[Auslastung – Demo-Daten](../docs/features/auslastung.md#demo-daten-für-die-entwicklungsdatenbank).
+
 ## Ansehen und von Hand ändern
 
 Im Supabase-Dashboard unter **Table Editor**. Das ersetzt phpMyAdmin.
