@@ -62,6 +62,7 @@ try {
                 'mitgliedId'   => (int) $zeile['mitglied_id'],
                 'vorname'      => $zeile['vorname'],
                 'nachname'     => $zeile['nachname'],
+                'email'        => $zeile['email'],
                 'art'          => $zeile['art'],
                 'gueltigBis'   => $zeile['gueltig_bis'],
                 'geprueftAm'   => $zeile['geprueft_am'],

@@ -12,6 +12,14 @@ zeigen muss. Steht die Person vor ihm, vergleicht es Foto und Name auf dem
 Ausweis mit ihr und mit dem Namen in der Liste und klickt **„Bestätigen"**
 oder **„Ablehnen"**.
 
+Die Liste ist eine Tabelle mit den Spalten Person (Name und E-Mail),
+Nachweis, Status und den beiden Knöpfen. Darüber stehen eine **Suche nach
+Name oder E-Mail**, ein Filter (alle, Frist läuft, Frist verpasst) und ein
+Knopf zum Neuladen — falls am zweiten Tresen gerade jemand bestätigt hat.
+Suche und Filter arbeiten im Browser auf der geladenen Liste;
+Groß- und Kleinschreibung und Akzente zählen nicht („muller" findet
+„Müller"). Auf dem Handy wird aus jeder Zeile ein Block.
+
 Bestätigt wird jede Person **einmal**. Danach ist ihr Name für immer fest,
 und spätere Nachweise — etwa der Ausweis fürs nächste Semester — prüft
 allein die Ausweisprüfung. Warum: [ADR-0023](../decisions/ADR-0023-name-aendern-und-ausweis-am-empfang.md).
@@ -104,7 +112,7 @@ Ein Eintrag der Liste:
 
 ```json
 { "mitgliedId": 12, "vorname": "Maximilian", "nachname": "Testmann",
-  "art": "student", "gueltigBis": "2027-03-31", "geprueftAm": "2026-10-16 10:02:11",
+  "email": "max@beispiel.de", "art": "student", "gueltigBis": "2027-03-31", "geprueftAm": "2026-10-16 10:02:11",
   "vorzeigenBis": "2026-10-30", "fristVerpasst": false }
 ```
 
@@ -131,8 +139,8 @@ wer dort schon einen Nachweis hat, bekommt seine 14 Tage ab dem Einspielen.
 - **Gespeichert wird nur, wann bestätigt wurde, nicht von wem.**
 - **Eine Bestätigung lässt sich nicht zurücknehmen** — nur von Hand im
   Dashboard (`bestaetigt_am` auf `NULL`). Mit Absicht kein Knopf dafür.
-- **Keine Suche in der Liste.** Bei vielen offenen Einträgen müsste man
-  scrollen.
+- **Rollen vergibt man noch im Dashboard.** Eine Rolle „Admin", die
+  Personal auf der Website ernennen kann, ist der nächste Schritt.
 - **Im Demo-Modus prüft niemand spätere Nachweise.** Wer bestätigt ist, kann
   sich ohne Schlüssel jedes Ablaufdatum eintippen — der Name bleibt aber fest.
 - **Die Tarifseite sagt bei verpasster Frist „Nachweis fehlt".** Den genauen
