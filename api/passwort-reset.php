@@ -9,17 +9,18 @@
  *                PUT   { selector, token, passwort, passwortWiederholung }
  *                      -> neues Passwort mit dem Link aus Schritt 1 setzen
  *
- *              DEMO-MODUS: Das Projekt verschickt (noch) keine E-Mails.
- *              Statt einer E-Mail landet der Link im Server-Log (lokal im
- *              Terminal von start.sh, auf Vercel in den Runtime Logs).
+ *              Der Link geht per Mail über src/Mailversand.php raus.
+ *
+ *              DEMO-MODUS: Ohne Mail-Schlüssel landet der Link stattdessen
+ *              im Server-Log (lokal im Terminal von start.sh, auf Vercel in
+ *              den Runtime Logs).
  *              Solange 'demo_reset_link' => true gesetzt ist, schickt der
  *              Endpunkt ihn zusätzlich als "demoLink" mit, damit die Seite
  *              ihn anzeigen kann. In Produktion ist das aus - sonst könnte
  *              jeder, der eine E-Mail-Adresse kennt, das Konto übernehmen.
- *              Echter Mailversand wird später genau an der markierten
- *              Stelle unten eingebaut.
  * @see         assets/js/services/mitglieder.js
  * @see         passwort-zuruecksetzen.php
+ * @see         src/Mailversand.php
  * @see         docs/features/mitglieder-login.md
  */
 
@@ -64,12 +65,36 @@ try {
             Api::fehler(429, 'Du hast schon mehrere Links angefordert. Bitte warte etwas.');
         }
 
-        if ($link !== null) {
-            // ---------------------------------------------------------------
-            // HIER WIRD SPÄTER DIE E-MAIL VERSCHICKT.
-            // Bis dahin steht der Link im Server-Log.
-            // ---------------------------------------------------------------
+        if ($link !== null && !Mailversand::verfuegbar()) {
+            // Demo-Modus: kein Mail-Schlüssel eingetragen.
             error_log('[Demo-Mail] Passwort-Reset für ' . $email . ': ' . $link);
+        }
+
+        if ($link !== null && Mailversand::verfuegbar()) {
+            // In der Mail braucht der Link die Domain davor. Den Host aus der
+            // Anfrage zu nehmen ist auf Vercel sicher: Dort kommen nur
+            // Anfragen an, deren Host zu diesem Projekt gehört. Ein
+            // gefälschter Host würde sonst den Link auf eine fremde Seite
+            // lenken.
+            $schema = getenv('VERCEL') === '1' || ($_SERVER['HTTPS'] ?? '') === 'on' ? 'https://' : 'http://';
+
+            try {
+                Mailversand::senden(
+                    $email,
+                    'Dein Link zum Zurücksetzen des Passworts',
+                    "Hallo,\n\n"
+                    . "du hast einen neuen Zugang für dein Konto beim SCHWITZKASTEN Athletic Club angefordert.\n"
+                    . "Mit diesem Link legst du ein neues Passwort fest. Er ist 60 Minuten gültig und funktioniert nur einmal:\n\n"
+                    . $schema . $_SERVER['HTTP_HOST'] . $link . "\n\n"
+                    . "Wenn du das nicht warst, ignoriere diese Mail einfach. Dein Passwort bleibt dann unverändert.\n\n"
+                    . "Dein SCHWITZKASTEN Athletic Club\n"
+                    . "(Studienprojekt der DHBW Stuttgart, kein echtes Fitnessstudio)\n"
+                );
+            } catch (RuntimeException $fehler) {
+                // Nach außen dieselbe Antwort wie im Erfolgsfall - eine
+                // Fehlermeldung verriete, dass es das Konto gibt.
+                error_log((string) $fehler);
+            }
         }
 
         $antwort = [

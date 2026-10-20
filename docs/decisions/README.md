@@ -51,3 +51,4 @@ Kein ADR für: Farbwerte, Textänderungen, das Anlegen einer einzelnen Datei.
 | [0024](ADR-0024-empfang-bestaetigt-konto-mit-personalausweis.md) | Jedes Mitglied mit Tarif bestätigt sein Konto einmal mit dem Personalausweis am Empfang | angenommen, „nur Bestätigen" ersetzt durch 0026 |
 | [0025](ADR-0025-admin-verwaltet-personal.md) | Ein Admin vergibt die Rolle Personal auf der Website | angenommen |
 | [0026](ADR-0026-schutz-vor-falschen-konten.md) | Falsche Konten: Das Personal meldet, ein Admin löscht, und Gutscheine warten auf die Bestätigung | angenommen |
+| [0027](ADR-0027-mailversand-ueber-resend.md) | Mails gehen über Resend raus | angenommen |
