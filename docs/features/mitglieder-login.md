@@ -99,13 +99,14 @@ Passwörter enthalten.
 auf Vercel wäre der Login sonst beim nächsten Klick weg. Siehe
 [ADR-0017](../decisions/ADR-0017-postgresql-auf-supabase.md).
 
-## Demo-Modus für „Passwort vergessen“
+## „Passwort vergessen“ und Demo-Modus
 
-Das Projekt verschickt keine E-Mails. Der Link zum Zurücksetzen landet
-deshalb
+Der Link zum Zurücksetzen geht per Mail raus, siehe
+[`mailversand.md`](mailversand.md). Außerdem landet er
 
-1. immer im Server-Log (Zeile beginnt mit `[Demo-Mail]`) – lokal im
-   Terminal von `./start.sh`, auf Vercel unter *Logs*,
+1. im Server-Log (Zeile beginnt mit `[Demo-Mail]`), aber nur, wenn kein
+   Mail-Schlüssel eingetragen ist – lokal im Terminal von `./start.sh`, auf
+   Vercel unter *Logs*,
 2. zusätzlich auf der Seite, solange `'demo_reset_link' => true` gesetzt ist
    (auf Vercel: `DEMO_RESET_LINK=1`).
 
@@ -113,8 +114,7 @@ deshalb
 E-Mail-Adresse kennt, das Passwort dieses Kontos ändern. Lokal und in der
 Preview ist er an.
 
-Der Link ist 60 Minuten gültig und funktioniert nur einmal. Echten Mailversand
-baut man in `api/passwort-reset.php` an der markierten Stelle ein.
+Der Link ist 60 Minuten gültig und funktioniert nur einmal.
 
 ## Gut zu wissen
 

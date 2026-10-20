@@ -34,6 +34,10 @@ return [
         'modell'  => (string) getenv('GEMINI_MODELL'),
     ],
 
+    'mail' => [
+        'api_key' => (string) getenv('RESEND_API_KEY'),
+    ],
+
     // Nur der Wert '1' schaltet ein. Fehlt die Variable, gilt die sichere
     // Einstellung: keine Fehler im Browser, kein Reset-Link auf der Seite.
     'debug'           => getenv('APP_DEBUG') === '1',

@@ -34,6 +34,7 @@ Vercel-Projekts liest:
 |---|---|
 | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | `db` |
 | `GEMINI_API_KEY`, `GEMINI_MODELL` | `ki` |
+| `RESEND_API_KEY` | `mail` |
 | `APP_DEBUG` (`1` = an) | `debug` |
 | `DEMO_RESET_LINK` (`1` = an) | `demo_reset_link` |
 

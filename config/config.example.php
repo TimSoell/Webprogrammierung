@@ -63,15 +63,29 @@ return [
         'modell' => '',
     ],
 
+    // Mailversand über Resend, z. B. für "Passwort vergessen". Schlüssel gibt
+    // es im Resend-Konto des Teams unter "API Keys" - nur mit "Sending
+    // access" für schwitzkasten-gym.de anlegen.
+    //
+    // LEER LASSEN IST EIN GÜLTIGER ZUSTAND. Ohne Schlüssel läuft der
+    // Demo-Modus: Die Mail wird nicht verschickt, ihr Link steht stattdessen
+    // im Server-Log. Siehe docs/features/mailversand.md
+    //
+    // Der Schlüssel gehört NIE ins Repository. config/config.php steht in
+    // .gitignore, diese Vorlage bleibt leer.
+    'mail' => [
+        'api_key' => '',
+    ],
+
     // true  = Entwicklung:
     //         - PHP-Fehler werden im Browser angezeigt
     //         - Login-Drosselung aus (sonst sperrt man sich beim Testen aus)
     // false = Fehler werden nur geloggt, Drosselung an. So läuft Produktion.
     'debug' => true,
 
-    // true  = "Passwort vergessen" zeigt den Link direkt auf der Seite an,
-    //         weil das Projekt (noch) keine E-Mails verschickt.
-    // false = Link nur im Server-Log.
+    // true  = "Passwort vergessen" zeigt den Link zusätzlich direkt auf der
+    //         Seite an. Praktisch zum Testen, auch mit Mailversand.
+    // false = Link nur per Mail (bzw. ohne Mail-Schlüssel im Server-Log).
     //
     // In Produktion IMMER false: Sonst kann jeder, der eine E-Mail-Adresse
     // kennt, das Passwort dieses Kontos ändern.

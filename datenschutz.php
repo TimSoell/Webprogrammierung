@@ -79,7 +79,7 @@ require ROOT_PATH . '/partials/header.php';
         <h2>8. Konto und Anmeldung</h2>
         <p>Für ein Konto speichern wir deine E-Mail-Adresse, deinen Vor- und Nachnamen und dein Passwort. Das Passwort wird nur als Hashwert gespeichert, den niemand zurückrechnen kann. Dazu kommen der Zeitpunkt der Registrierung und der letzten Anmeldung.</p>
         <p>Zum Schutz vor Missbrauch protokolliert die Seite Ereignisse wie Anmeldungen oder Passwortänderungen. Dabei werden eine gekürzte IP-Adresse und ein Hashwert deiner Browserkennung gespeichert. Damit niemand Passwörter durchprobieren kann, zählt die Seite außerdem Anmeldeversuche pro Anschluss.</p>
-        <p><strong>Passwort vergessen.</strong> Die Seite verschickt derzeit keine E-Mails. Der Link zum Zurücksetzen wird stattdessen zusammen mit deiner E-Mail-Adresse im Server-Protokoll vermerkt und ist 60 Minuten gültig.</p>
+        <p><strong>Passwort vergessen.</strong> Den Link zum Zurücksetzen schicken wir dir per E-Mail. Er ist 60 Minuten gültig. Für den Versand nutzen wir den Dienst Resend (USA), mit Versand über Server in Irland. Resend erhält dafür deine E-Mail-Adresse und den Inhalt der Mail und verarbeitet sie nur in unserem Auftrag (Art. 28 DSGVO). Die Mails enthalten keine Zählpixel und keine umgeleiteten Links.</p>
         <p>Rechtsgrundlage ist die Bereitstellung des Kontos nach Art. 6 Abs. 1 lit. b DSGVO. Für den Schutz vor Missbrauch ist es unser berechtigtes Interesse nach Art. 6 Abs. 1 lit. f DSGVO.</p>
       </section>
 

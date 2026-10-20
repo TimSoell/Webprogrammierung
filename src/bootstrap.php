@@ -46,7 +46,7 @@ if (!is_file($configFile)) {
     );
 }
 
-/** @var array{db: array{host: string, port: int, name: string, user: string, password: string}, ki: array{api_key: string, modell: string}, debug: bool, demo_reset_link: bool} $config */
+/** @var array{db: array{host: string, port: int, name: string, user: string, password: string}, ki: array{api_key: string, modell: string}, mail: array{api_key: string}, debug: bool, demo_reset_link: bool} $config */
 $config = require $configFile;
 
 // config.php liegt nicht in Git. Kommt in der Vorlage ein Wert dazu, bekommt
