@@ -17,6 +17,8 @@
  * @see         config/README.md
  */
 
+declare(strict_types=1);
+
 return [
     // Zugang zur Entwicklungsdatenbank schwitzkasten-dev bei Supabase
     // (PostgreSQL). Lokal wird NIE die Produktionsdatenbank benutzt.
