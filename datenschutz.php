@@ -92,10 +92,10 @@ require ROOT_PATH . '/partials/header.php';
 
       <section class="legal-section">
         <h2>10. Nachweise für ermäßigte Tarife</h2>
-        <p>Für einen Schüler-, Studenten- oder Seniorentarif kannst du ein Foto deines Nachweises hochladen. Das Foto wird an die Gemini-API von Google geschickt. Gemini liest daraus die Art des Nachweises, den Namen, das Ablaufdatum und bei Senioren das Geburtsdatum aus.</p>
+        <p>Für einen Schüler-, Studenten- oder Seniorentarif kannst du ein Foto deines Nachweises hochladen. Das Foto wird an die Gemini-API von Google geschickt. Gemini liest daraus die Art des Nachweises, den Namen, das Ablaufdatum und das Geburtsdatum aus. Das Geburtsdatum nutzen wir nur für den Seniorentarif.</p>
         <p><strong>Wichtig:</strong> Das Projekt nutzt die kostenlose Stufe von Gemini. Dort darf Google die Eingaben zur Verbesserung seiner Dienste verwenden, und Menschen dürfen sie lesen. <strong>Lade deshalb nie einen echten Ausweis hoch.</strong></p>
         <p>Das Foto selbst speichern wir nicht. Gespeichert werden die Art des Nachweises, das Datum, bis zu dem er gilt, und wie und wann er geprüft wurde.</p>
-        <p>Ob du den ermäßigten Tarif bekommst, entscheidet zunächst die automatische Prüfung (Art. 22 DSGVO). Du kannst verlangen, dass eine Person die Entscheidung überprüft, und deinen Standpunkt darlegen. Spätestens 14 Tage nach dem ersten Nachweis zeigst du deinen Ausweis ohnehin am Empfang vor.</p>
+        <p>Ob du den ermäßigten Tarif bekommst, entscheidet zunächst die automatische Prüfung (Art. 22 DSGVO). Du kannst verlangen, dass eine Person die Entscheidung überprüft, und deinen Standpunkt darlegen. Spätestens 14 Tage nach deiner ersten Tarifwahl zeigst du außerdem einmal deinen Personalausweis am Empfang. Das Personal bestätigt damit dein Konto, gespeichert wird nur der Zeitpunkt.</p>
         <p>Rechtsgrundlage ist deine Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO, die du mit dem Hochladen erteilst. Du kannst sie jederzeit widerrufen.</p>
       </section>
 

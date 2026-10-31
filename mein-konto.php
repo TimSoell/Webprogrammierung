@@ -257,6 +257,10 @@ require ROOT_PATH . '/partials/header.php';
             <div id="nachweis-bild-feld" hidden>
               <label for="nachweis-bild">Foto des Ausweises</label>
               <input id="nachweis-bild" name="bild" type="file" accept="image/jpeg,image/png,image/webp">
+              <p class="auth-hint nachweis-demo-hinweis">
+                Das ist ein Studienprojekt: Lade bitte <strong>keinen echten
+                Ausweis</strong> hoch, die Prüfung läuft über Google.
+              </p>
             </div>
 
             <div id="nachweis-datum-feld" hidden>
