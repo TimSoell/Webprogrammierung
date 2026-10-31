@@ -134,10 +134,9 @@ Der Link ist 60 Minuten gültig und funktioniert nur einmal.
 
 ## Was fehlt noch
 
-- Echter E-Mail-Versand (SMTP), dafür braucht es Zugangsdaten und eine weitere
-  Bibliothek oder einen Mailserver.
-- E-Mail-Adresse ändern, Buchungen, Zahlungen: eigene Issues, die auf
-  `mitglieder.id` aufbauen. Gebaut sind die Tarife und Verträge
-  ([Mitgliedschaften](mitgliedschaften.md)) und das Ändern des Namens.
+- E-Mail-Adresse ändern und Zahlungen: eigene Issues, die auf `mitglieder.id`
+  aufbauen. Gebaut sind die Tarife und Verträge
+  ([Mitgliedschaften](mitgliedschaften.md)), die Buchungen
+  ([Terminkalender](terminkalender.md)) und das Ändern des Namens.
 - Die Kopfzeile ist zwischen 801 und etwa 880 px Breite sehr voll. Dort bricht
   „Probetraining buchen“ auf zwei Zeilen um.

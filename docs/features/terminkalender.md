@@ -82,7 +82,7 @@ In der Datenbank stehen **Wochenmuster**, keine Einzeltermine — Begründung in
 | `verfuegbarkeiten` | Sofia Lindqvist · Wochentag 1 · 10:00–13:00 | Montag 10, 11, 12 Uhr, je 60 Min., in den nächsten 14 Tagen |
 
 `wochentag` zählt **1 = Montag bis 7 = Sonntag**, wie PHPs `date('N')`. Nicht
-MySQLs `DAYOFWEEK()` nehmen — das beginnt mit 1 = Sonntag.
+PostgreSQLs `EXTRACT(DOW ...)` nehmen — das beginnt mit 0 = Sonntag.
 
 Das Ausrechnen macht `src/Terminplan.php`. Dieselben Methoden prüfen beim
 Buchen, ob der Termin existiert. Termine, die schon begonnen haben, fallen
@@ -179,14 +179,10 @@ antwortet ohne Anmeldung mit 401.
 
 ## Woher kommen die Daten aktuell
 
-**MySQL.** Nach dem Pull einmal einspielen:
-
-```bash
-mysql --default-character-set=utf8mb4 -u root < database/schema.sql
-mysql --default-character-set=utf8mb4 -u root < database/seed.sql
-```
-
-Unter Windows mit vollem Pfad, siehe `README.md`.
+**PostgreSQL bei Supabase**, siehe
+[ADR-0017](../decisions/ADR-0017-postgresql-auf-supabase.md). Nach dem Pull
+einmal `database/schema.sql` und dann `database/seed.sql` im SQL Editor des
+Dashboards einspielen.
 
 > **`seed.sql` neu einspielen löscht alle Buchungen** — und die gemerkten
 > Auswahlen. Vor einer Vorführung nicht tun.

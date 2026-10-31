@@ -132,8 +132,9 @@ und in der Produktion (`schwitzkasten`) eingespielt.
 
 ## Gut zu wissen
 
-- **Es wird keine E-Mail verschickt.** Das Projekt hat keinen Mail-Dienst.
-  Der Freund erfährt von der Einladung nur über den Werber.
+- **Der Freund bekommt keine E-Mail.** Der [Mailversand](mailversand.md) ist
+  nur für „Passwort vergessen“ angebunden. Der Freund erfährt von der Einladung
+  nur über den Werber.
 - **Der Link führt auf den Reiter „Registrierung".** `anmelden.page.js`
   schaltet bei `#registrierung` um; ohne den Zusatz bleibt es beim Login.
 - **Die Gratiszeit ist an Tage gebunden, nicht an den Vertrag.** Wechselt
@@ -151,7 +152,8 @@ und in der Produktion (`schwitzkasten`) eingespielt.
 
 ## Was fehlt noch
 
-- Eine echte E-Mail an den Freund. Bräuchte einen Mail-Dienst.
+- Eine echte E-Mail an den Freund. Der Dienst dafür wäre da, siehe
+  [Mailversand](mailversand.md).
 - Ein persönlicher Link je Einladung, der zählt, auch wenn sich der Freund mit
   einer anderen E-Mail registriert.
 - Eine Einladung zurücknehmen. Offene Einladungen bleiben, bis sich jemand

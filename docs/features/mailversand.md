@@ -1,8 +1,8 @@
 # Feature: Mailversand
 
-**Status:** in Arbeit
+**Status:** fertig
 **Verantwortlich:** Giani
-**Zuletzt geprüft:** 2026-10-19
+**Zuletzt geprüft:** 2026-10-31
 
 ## Was kann man damit
 
@@ -58,7 +58,7 @@ wird nichts zusätzlich.
 
 ## Was fehlt noch
 
-- `RESEND_API_KEY` auf Vercel eintragen (Production und Preview, Sensitive).
-- Versand in der Preview und in Produktion einmal ausprobieren.
+- Versand in der Preview ausprobieren. In Produktion kommt die Mail an, geprüft
+  am 2026-10-31.
 - Weitere Mails, z. B. Bestätigung nach Registrierung oder Buchung - noch
   nicht entschieden.

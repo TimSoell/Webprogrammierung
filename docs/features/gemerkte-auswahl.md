@@ -105,7 +105,9 @@ Ergebnis ist dasselbe.
 
 ## Woher kommen die Daten aktuell
 
-**MySQL.** `database/schema.sql` einspielen, dann `seed.sql`. Die Tabelle
+**PostgreSQL bei Supabase**, siehe
+[ADR-0017](../decisions/ADR-0017-postgresql-auf-supabase.md). `database/schema.sql`
+einspielen, dann `seed.sql`, beides im SQL Editor des Dashboards. Die Tabelle
 `mitglied_auswahl` füllt sich nur über die Oberfläche, in `seed.sql` stehen
 dazu keine Zeilen (sie bräuchten ein Konto).
 

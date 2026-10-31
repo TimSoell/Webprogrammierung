@@ -2,7 +2,7 @@
 
 **Status:** in Arbeit
 **Verantwortlich:** Felix
-**Zuletzt geprüft:** 2026-09-21
+**Zuletzt geprüft:** 2026-10-31
 
 ## Was kann man damit
 

@@ -76,22 +76,20 @@ Schaltflächen. Es gibt keinen zusätzlichen Schalter in der Datenbank.
 |---|---|---|---|
 | GET | `api/programme.php?slug=move` | Merkmale und Coaches eines Programms | siehe oben · 400 ohne `slug` · 404 unbekannt |
 
-Nur Lesen. Inhalte pflegt das Team über `seed.sql` oder phpMyAdmin, deshalb
-gibt es kein POST und keine CSRF-Prüfung über `Api::eingabe()`.
+Nur Lesen. Inhalte pflegt das Team über `seed.sql` oder den Table Editor bei
+Supabase, deshalb gibt es kein POST und keine CSRF-Prüfung über `Api::eingabe()`.
 
 ## Woher kommen die Daten aktuell
 
-**MySQL.** Vor dem ersten Aufruf beides einspielen:
-
-```bash
-mysql -u root < database/schema.sql
-mysql -u root < database/seed.sql
-```
+**PostgreSQL bei Supabase**, siehe
+[ADR-0017](../decisions/ADR-0017-postgresql-auf-supabase.md). Vor dem ersten
+Aufruf `database/schema.sql` und dann `database/seed.sql` im SQL Editor des
+Dashboards einspielen.
 
 `seed.sql` darf beliebig oft laufen — es löscht die Programmdaten vorher und
 legt sie neu an. Konten und Mitglieder bleiben unangetastet.
 
-**Ohne MySQL zeigen die Programmseiten unter dem Einleitungstext eine
+**Ohne Datenbank zeigen die Programmseiten unter dem Einleitungstext eine
 Fehlermeldung statt der Blöcke.** Vor diesem Feature liefen sie ohne
 Datenbank — siehe [ADR-0007](../decisions/ADR-0007-programm-details-aus-der-datenbank.md).
 
@@ -141,6 +139,6 @@ Das ist ein eigenes Feature: [Gemerkte Auswahl](gemerkte-auswahl.md). Beim
 
 - Die Fotos in `assets/img/coaches/`. Bis dahin zeigen die Karten Initialen.
 - Ein Pflegebereich im Browser. Aktuell geht Ändern nur über `seed.sql` oder
-  phpMyAdmin — für die Studienarbeit bewusst nicht gebaut.
+  den Table Editor bei Supabase — für die Studienarbeit bewusst nicht gebaut.
 - Der Einleitungstext und das Hero-Bild stehen weiterhin fest im PHP der
   jeweiligen Seite. Nur der untere Teil kommt aus der Datenbank.

@@ -93,6 +93,8 @@ sie nur über die Bibliothek in `src/Auth.php`, gelesen für die Liste in
 
 - **Gespeichert wird nicht, wer wann jemanden zum Personal gemacht hat.**
 - **Admin lässt sich nur im Dashboard vergeben.** Mit Absicht.
+- **Keine Kennzahlen.** Die Admin-Seite zeigt keine Zahlen zu Mitgliedern,
+  Buchungen oder Besuchen.
 
 Auf derselben Seite steht die zweite Karte für Admins:
 [Unstimmigkeiten und Konto löschen](unstimmigkeiten.md).
