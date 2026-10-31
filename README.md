@@ -144,12 +144,29 @@ in der Architektur nennt:
 
 ## Aktueller Stand
 
-Umgesetzt sind die **Startseite** und die drei **Programmseiten**
-(Strength, Move, Fight), inklusive mobiler Navigation.
+Die Seite ist veröffentlicht unter
+**[schwitzkasten-gym.de](https://schwitzkasten-gym.de/)**. Umgesetzt sind:
 
-Dazu kommt das erste datenbankgestützte Feature: der **Mitglieder-Login**
-mit Registrierung, Login, Mein Konto und „Passwort vergessen“ — siehe
-[`docs/features/mitglieder-login.md`](docs/features/mitglieder-login.md).
+| Bereich | Was dazugehört |
+|---|---|
+| Studio | Startseite mit Scroll-Video, Studiotour, Auslastung und Bewertungen, Programmseiten Strength, Move und Fight, Standorte |
+| Buchen | Kurskalender, Probetraining, gemerkte Auswahl |
+| Konto | Registrierung, Login, Passwort per Mail zurücksetzen, Mein Konto mit Profilbild |
+| Mitgliedschaft | Vier Tarife, drei Preisgruppen, Wechsel zum Monatsersten, Freunde werben mit Gutschein |
+| Rabatt | Ausweisprüfung per KI, das Bild wird nicht gespeichert |
+| Team | Empfang bestätigt Konten mit dem Personalausweis, Admin verwaltet das Personal und löscht gemeldete Konten |
+
+Jedes Feature ist in [`docs/features/`](docs/features/README.md) beschrieben,
+dort steht auch, was noch fehlt.
+
+Empfang und Admin erreicht man nur über ihre Adresse (`/empfang.php`,
+`/admin.php`), kein Link auf der Seite führt dorthin. Beide brauchen die
+passende Rolle. Zugangsdaten stehen bewusst nicht in diesem öffentlichen
+Repository.
+
+Zum Ausprobieren der Ausweisprüfung liegt unter
+[`docs/testdaten/`](docs/testdaten/muster-studierendenausweis.html) ein
+erfundener Ausweis. Bitte nie einen echten Ausweis hochladen.
 
 Als Vorlage für weitere Features dient das **Beispiel-Feature**: sechs Dateien, eine pro Schicht, die absichtlich keinen
 Code enthalten, sondern beschreiben, was in die jeweilige Schicht gehört.
@@ -162,6 +179,3 @@ api/beispiel-feature.php
 src/Repositories/BeispielFeatureRepository.php
 database/schema.sql
 ```
-
-Geplant: Kursplan mit Terminanfrage, Kontaktformular und ein kleiner
-Produktbereich.

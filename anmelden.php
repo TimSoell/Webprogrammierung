@@ -36,7 +36,7 @@ require ROOT_PATH . '/partials/header.php';
       <div class="auth-intro">
         <p class="eyebrow">Mitgliederbereich</p>
         <h1 class="display auth-title">Dein<br>Zugang.</h1>
-        <p class="auth-lead">Deine Stammdaten, Verträge, Buchungen und Zahlungen – sicher hinter deinem persönlichen Login.</p>
+        <p class="auth-lead">Deine Stammdaten, Verträge und Buchungen – sicher hinter deinem persönlichen Login.</p>
       </div>
 
       <div class="auth-card">

@@ -39,7 +39,7 @@ import { verkleinern } from '../lib/bild.js';
  * @property {boolean} bestaetigt         true, sobald das Personal die Person
  *                                        am Empfang bestätigt hat - für immer
  * @property {string|null} vorzeigenBis   letzter Tag, um den Ausweis am Empfang
- *                                        zu zeigen; null vor dem ersten Nachweis
+ *                                        zu zeigen; null vor der ersten Tarifwahl
  * @property {boolean} fristVerpasst      true = nicht bestätigt und die Frist
  *                                        ist vorbei, kein Nachweis zählt für
  *                                        den Preis

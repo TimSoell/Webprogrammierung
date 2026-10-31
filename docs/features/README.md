@@ -34,6 +34,11 @@ kommt: „Wo muss ich anfassen, wenn ich am Kursplan etwas ändern will?"
 | [Personal verwalten](personal-verwalten.md) | in Arbeit | Felix |
 | [Unstimmigkeiten und Konto löschen](unstimmigkeiten.md) | in Arbeit | Felix |
 | [Mailversand](mailversand.md) | in Arbeit | Giani |
+| [Empfang](empfang.md) | in Arbeit | Felix |
+| [Auslastungsdiagramm](auslastung.md) | in Arbeit | offen |
+| [Scroll-Video](scroll-video.md) | in Arbeit | offen |
+| [Studiotour](studiotour.md) | in Arbeit | offen |
+| [Animierter Preloader](preloader.md) | fertig | offen |
 
 Der Aufbau eines Features ist am Beispiel-Feature beschrieben — siehe
 [`../ARCHITECTURE.md`](../ARCHITECTURE.md).

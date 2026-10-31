@@ -2,7 +2,7 @@
 
 **Status:** in Arbeit
 **Verantwortlich:** Felix
-**Zuletzt geprüft:** 2026-10-16
+**Zuletzt geprüft:** 2026-10-31
 
 ## Was kann man damit
 
@@ -211,10 +211,16 @@ Geprüft wird über die **Gemini-API von Google** auf der kostenlosen Stufe,
 Modell einstellbar über `ki.modell` in `config/config.php`
 ([ADR-0012](../decisions/ADR-0012-gemini-statt-claude.md)).
 
+Voreingestellt ist `gemini-3.5-flash-lite`. Am 31.10.2026 lehnte
+`gemini-3.5-flash` 3 von 10 Anfragen wegen Überlastung ab und brauchte sonst
+5 bis 22 Sekunden. Die Lite-Fassung las 11 von 11 Musterausweisen richtig, in
+1 bis 3 Sekunden.
+
 > **Nur erfundene Ausweise hochladen.** Auf der kostenlosen Stufe darf Google
 > die Eingaben zur Produktverbesserung verwenden, und menschliche Prüfer
 > dürfen sie lesen. Für Testdokumente ist das unproblematisch, für echte
-> Ausweise nicht — auch nicht für die eigenen.
+> Ausweise nicht — auch nicht für die eigenen. Darauf weist auch der Upload
+> unter „Mein Konto" hin.
 
 Die kostenlose Stufe hat außerdem Kontingente pro Minute und pro Tag. Sind
 sie erschöpft, antwortet die API mit 429 und das Hochladen scheitert mit
@@ -345,12 +351,14 @@ Sicherheit. Alles, was aus dem Browser kommt, ist manipulierbar.
 - **Name und Datum müssen auf derselben Seite des Ausweises stehen.**
   Hochgeladen wird ein Bild.
 - **Im Demo-Modus greift keine der Prüfungen am Bild.** Jede Person tippt ihr
-  Datum selbst ein. Laut Migrationsplan (Entscheidung E5 in
-  [`migration-vercel-supabase.md`](../migration-vercel-supabase.md)) läuft
-  die Produktion bewusst ohne Schlüssel, also im Demo-Modus — damit keine
-  echten Ausweise Fremder bei Google landen. Die Sperre des Namens und die
-  Bestätigung des Kontos am Empfang gelten auch dort — den Studentenstatus
-  prüft dort aber niemand, denn der Empfang sieht nur den Personalausweis.
+  Datum selbst ein. Die Sperre des Namens und die Bestätigung des Kontos am
+  Empfang gelten auch dort — den Studentenstatus prüft dort aber niemand,
+  denn der Empfang sieht nur den Personalausweis.
+- **Die Produktion läuft für die Bewertung mit Schlüssel,** anders als im
+  Migrationsplan vorgesehen (Entscheidung E5 in
+  [`migration-vercel-supabase.md`](../migration-vercel-supabase.md)). Damit
+  keine echten Ausweise Fremder bei Google landen, warnt der Upload davor.
+  Nach der Bewertung kommt der Schlüssel wieder raus.
 - **Eine Herabstufung, die schon gilt, bleibt.** Kommt der neue Nachweis
   erst nach dem Monatsersten, läuft bereits der Vertrag zum Standardpreis.
   Dann muss man den ermäßigten Preis auf der Tarifseite neu wählen, und er
