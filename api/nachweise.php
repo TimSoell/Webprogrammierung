@@ -152,9 +152,9 @@ try {
             ], $nachweise->alleFinden($mitgliedId)),
 
             // Der Stand am Empfang gehört zur Person, nicht zu einem
-            // Nachweis: Bestätigt wird einmal, die Frist beginnt mit dem
-            // ersten Upload. Ist sie verpasst, zählt kein Nachweis für den
-            // Preis, bis das Personal bestätigt.
+            // Nachweis: Bestätigt wird einmal, die Frist beginnt mit der
+            // ersten Tarifwahl. Ist sie verpasst, zählt kein Nachweis für
+            // den Preis, bis das Personal bestätigt.
             'bestaetigt'    => $empfang['bestaetigt_am'] !== null,
             'vorzeigenBis'  => $empfang['vorzeigen_bis'],
             'fristVerpasst' => $empfang['frist_verpasst'],

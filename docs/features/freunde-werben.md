@@ -128,11 +128,7 @@ Alle vier antworten ohne Anmeldung mit 401.
 ## Woher kommen die Daten aktuell
 
 **PostgreSQL bei Supabase.** Die beiden Tabellen sind in `schwitzkasten-dev`
-eingespielt. **In der Produktion (`schwitzkasten`) noch nicht** — vor dem Merge
-dort den Abschnitt „FEATURE FREUNDE WERBEN" aus `database/schema.sql` samt den
-beiden `ENABLE ROW LEVEL SECURITY`-Zeilen im SQL Editor ausführen. Ohne die
-Tabellen scheitern Einladen und Einlösen mit „Interner Serverfehler"; die
-Registrierung läuft trotzdem, weil sie den Fehler abfängt.
+und in der Produktion (`schwitzkasten`) eingespielt.
 
 ## Gut zu wissen
 
