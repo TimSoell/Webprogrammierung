@@ -33,7 +33,7 @@ kommt: „Wo muss ich anfassen, wenn ich am Kursplan etwas ändern will?"
 | [Freunde werben](freunde-werben.md) | fertig | Jonny |
 | [Personal verwalten](personal-verwalten.md) | in Arbeit | Felix |
 | [Unstimmigkeiten und Konto löschen](unstimmigkeiten.md) | in Arbeit | Felix |
-| [Mailversand](mailversand.md) | in Arbeit | Giani |
+| [Mailversand](mailversand.md) | fertig | Giani |
 | [Empfang](empfang.md) | in Arbeit | Felix |
 | [Auslastungsdiagramm](auslastung.md) | in Arbeit | offen |
 | [Scroll-Video](scroll-video.md) | in Arbeit | offen |

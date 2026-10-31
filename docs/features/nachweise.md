@@ -350,6 +350,9 @@ Sicherheit. Alles, was aus dem Browser kommt, ist manipulierbar.
   Nach der Bestätigung geht es gar nicht mehr.
 - **Name und Datum müssen auf derselben Seite des Ausweises stehen.**
   Hochgeladen wird ein Bild.
+- **Ein Umlaut ohne Punkte zählt als anderer Name.** „Müller“ im Konto passt zu
+  „Mueller“ auf dem Ausweis, aber nicht zu „Muller“. Liest das Modell die
+  Punkte nicht, kostet das einen Prüfversuch.
 - **Im Demo-Modus greift keine der Prüfungen am Bild.** Jede Person tippt ihr
   Datum selbst ein. Die Sperre des Namens und die Bestätigung des Kontos am
   Empfang gelten auch dort — den Studentenstatus prüft dort aber niemand,

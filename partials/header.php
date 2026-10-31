@@ -50,9 +50,9 @@ $navItems = [
 
     <div class="nav-links" id="nav-links">
 <?php foreach ($navItems as $key => [$label, $target]): ?>
-      <a href="<?= e(BASE_URL . $target) ?>"<?= ($activeNav ?? '') === $key ? ' aria-current="page"' : '' ?>><?= e($label) ?></a>
+      <a href="<?= e(BASE_URL . $target) ?>"<?php if (($activeNav ?? '') === $key): ?> aria-current="page"<?php endif; ?>><?= e($label) ?></a>
 <?php endforeach; ?>
-      <a class="nav-account" href="<?= e(BASE_URL . $kontoTarget) ?>"<?= ($activeNav ?? '') === 'konto' ? ' aria-current="page"' : '' ?>><?= e($kontoLabel) ?></a>
+      <a class="nav-account" href="<?= e(BASE_URL . $kontoTarget) ?>"<?php if (($activeNav ?? '') === 'konto'): ?> aria-current="page"<?php endif; ?>><?= e($kontoLabel) ?></a>
     </div>
 
     <a class="button" href="<?= e(BASE_URL) ?>mitgliedschaft.php">Mitglied werden</a>

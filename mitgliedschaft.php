@@ -42,7 +42,7 @@ require ROOT_PATH . '/partials/header.php';
 
   <main class="tarife-page"
         id="tarife-seite"
-        data-angemeldet="<?= Auth::instanz()->isLoggedIn() ? '1' : '0' ?>"
+        data-angemeldet="<?= e(Auth::instanz()->isLoggedIn() ? '1' : '0') ?>"
         data-login="<?= e(BASE_URL) ?>anmelden.php">
 
     <section class="tarife-hero">

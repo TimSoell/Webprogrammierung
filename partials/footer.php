@@ -64,7 +64,7 @@ if (!defined('BASE_URL')) {
       <img class="footer-logo" src="<?= e(BASE_URL) ?>assets/img/schwitzkasten-logo.png" alt="Schwitzkasten Athletic Club">
       <span>Venloer Straße 213 · 50823 Köln</span>
       <span>Mo–So · 24/7 für Mitglieder</span>
-      <span>© <?= date('Y') ?> SCHWITZKASTEN Athletic Club</span>
+      <span>© <?= e(date('Y')) ?> SCHWITZKASTEN Athletic Club</span>
     </div>
   </footer>
 <?php require ROOT_PATH . '/partials/cookie-banner.php'; ?>

@@ -76,8 +76,5 @@ als 1024 × 1024 px.
 
 ## Was fehlt noch
 
-- **Vor dem Merge:** Tabelle auch in der Produktionsdatenbank anlegen – den
-  Abschnitt „FEATURE PROFILBILDER" aus `schema.sql` und die Zeile
-  `ALTER TABLE profilbilder ENABLE ROW LEVEL SECURITY;`.
 - Hochgeladene Bilder werden nicht vom Team geprüft, bevor sie bei
   Bewertungen erscheinen.

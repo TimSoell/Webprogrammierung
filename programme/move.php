@@ -44,7 +44,7 @@ require ROOT_PATH . '/partials/header.php';
 
         <!-- Füllt assets/js/pages/move.page.js aus der Datenbank. -->
         <div class="merkmale" id="merkmale">Merkmale werden geladen …</div>
-        <div class="merken" id="merken" data-angemeldet="<?= $angemeldet ? '1' : '' ?>"></div>
+        <div class="merken" id="merken" data-angemeldet="<?= e($angemeldet ? '1' : '') ?>"></div>
 
         <button class="button kurskalender-aufruf" id="kurskalender-oeffnen" type="button">Termin buchen</button>
       </section>
