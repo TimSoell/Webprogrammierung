@@ -51,11 +51,13 @@ final class Ausweispruefung
      *
      * Bewusst NICHT das neueste Modell: gemini-3.8-flash antwortete beim
      * Einrichten am 21.09.2026 dauerhaft mit 503 ("experiencing high
-     * demand"), gemini-3.5-flash dagegen zuverlässig. Auf der kostenlosen
-     * Stufe ist Verfügbarkeit wichtiger als die letzte Modellgeneration -
-     * ein Datum von einem Ausweis abzulesen können beide.
+     * demand"), und am 31.10.2026 lehnte auch gemini-3.5-flash 3 von 10
+     * Anfragen so ab. Die Lite-Fassung las 11 von 11 Musterausweisen richtig,
+     * in 1 bis 3 statt 5 bis 22 Sekunden. Auf der kostenlosen Stufe ist
+     * Verfügbarkeit wichtiger als die letzte Modellgeneration - Angaben von
+     * einem Ausweis abzulesen können alle.
      */
-    private const MODELL_STANDARD = 'gemini-3.5-flash';
+    private const MODELL_STANDARD = 'gemini-3.5-flash-lite';
 
     /** Nach dieser Zeit gilt die Prüfung als gescheitert. */
     private const TIMEOUT_SEKUNDEN = 60;

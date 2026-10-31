@@ -52,14 +52,14 @@ return [
     'ki' => [
         'api_key' => '',
 
-        // Leer = Standardmodell aus src/Ausweispruefung.php (gemini-3.5-flash).
+        // Leer = Standardmodell aus src/Ausweispruefung.php (gemini-3.5-flash-lite).
         // Welche Modelle die kostenlose Stufe abdeckt, ändert Google
         // regelmäßig; die eigenen Grenzen stehen in Google AI Studio.
         //
         // Bei Fehler 503 ist das Modell überlastet, bei 404 gibt es das
         // Modell für diesen Schlüssel nicht. Dann hier ein anderes
-        // eintragen - geprüft am 21.09.2026: 'gemini-3.1-flash-lite' läuft,
-        // 'gemini-3.8-flash' war überlastet, 'gemini-2.5-flash' gab 404.
+        // eintragen - geprüft am 31.10.2026: 'gemini-3.5-flash-lite' läuft,
+        // 'gemini-3.5-flash' war oft überlastet, 'gemini-2.5-flash' gab 404.
         'modell' => '',
     ],
 
