@@ -4,6 +4,7 @@
 |---|---|
 | `schema.sql` | Alle Tabellen. Die einzige Wahrheit über den Aufbau der Datenbank |
 | `seed.sql` | Erfundene Testdaten zum Ausprobieren und Vorführen |
+| `auslastung-demo.sql` | Heutige Demo-Besuche fürs Auslastungsdiagramm, bei Bedarf |
 
 Getrennt, weil sie unterschiedlich oft laufen: Das Schema einmal, die
 Testdaten beim Entwickeln immer wieder.
@@ -30,9 +31,9 @@ Beide Dateien sind UTF-8, Umlaute kommen so ohne Umweg richtig an.
 In die Produktionsdatenbank kommt `seed.sql` genau **einmal** beim
 Einrichten – danach nie wieder, siehe unten.
 
-Für das Auslastungsdiagramm gibt es einen separaten CLI-Aufruf, der nur
-Demo-Mitglieder und heutige Besuche in `schwitzkasten-dev` ergänzt, ohne
-`seed.sql` erneut einzuspielen. Anleitung:
+Für das Auslastungsdiagramm ergänzt `auslastung-demo.sql` nur
+Demo-Mitglieder und heutige Besuche, ohne `seed.sql` erneut einzuspielen.
+Ebenfalls im SQL Editor ausführen. Anleitung:
 [Auslastung – Demo-Daten](../docs/features/auslastung.md#demo-daten-für-die-entwicklungsdatenbank).
 
 ## Ansehen und von Hand ändern
@@ -65,9 +66,13 @@ Im Supabase-Dashboard unter **Table Editor**. Das ersetzt phpMyAdmin.
 |---|---|---|
 | `mitglieder` | Mitglieder-Login | unsere Stammdaten, dazu die Bestätigung am Empfang (Feature [Empfang](../docs/features/empfang.md)) |
 | `users`, `users_*` (8 Tabellen) | Mitglieder-Login | Login-Bibliothek, siehe [ADR-0005](../docs/decisions/ADR-0005-login-bibliothek.md) |
+| `programme`, `merkmale`, `coaches` | Programm-Details | Inhalt aus `seed.sql`, siehe [ADR-0007](../docs/decisions/ADR-0007-programm-details-aus-der-datenbank.md) |
+| `mitglied_auswahl` | Gemerkte Auswahl | gemerktes Level und Format je Programm am Konto, siehe [ADR-0008](../docs/decisions/ADR-0008-gemerkte-auswahl-am-konto.md) |
 | `tarife` | Mitgliedschaften | Katalog, Inhalt aus `seed.sql`, siehe [ADR-0009](../docs/decisions/ADR-0009-mitgliedschaften-datenmodell.md) |
 | `mitgliedschaften` | Mitgliedschaften | abgeschlossene Verträge |
 | `nachweise` | Nachweise | Ergebnis der Ausweisprüfung, **ohne Bild**, siehe [ADR-0011](../docs/decisions/ADR-0011-ausweispruefung-mit-ki.md) |
+| `auslastung_basis` | Auslastung | übliche Besucherzahl je Wochentag und Stunde, Inhalt aus `seed.sql`, siehe [ADR-0022](../docs/decisions/ADR-0022-auslastung-als-fuellung.md) |
+| `besuche` | Auslastung | Check-ins und angekündigte Besuche der Mitglieder |
 | `kurstermine` | Terminkalender | Wochenplan der Kurse, Inhalt aus `seed.sql`, siehe [ADR-0014](../docs/decisions/ADR-0014-terminkalender-wochenplan.md) |
 | `kursbuchungen` | Terminkalender | gebuchte Kurstermine, mit konkretem Datum |
 | `verfuegbarkeiten` | Terminkalender | Wochenfenster der Coaches fürs Probetraining, Inhalt aus `seed.sql` |

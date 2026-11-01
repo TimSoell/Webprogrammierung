@@ -134,8 +134,7 @@ footer {
 
 .footer-app-boxes,
 .footer-social-boxes,
-.footer-legal-links,
-.header-socials {
+.footer-legal-links {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -345,9 +344,5 @@ footer {
 
   .footer-inner {
     flex-direction: column;
-  }
-
-  .header-socials {
-    display: none;
   }
 }

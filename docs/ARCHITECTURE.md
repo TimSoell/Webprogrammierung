@@ -12,7 +12,7 @@ Aufgabe und spricht **nur mit der Schicht direkt darunter**.
 
 ```
    ┌─ 1 ─────────────────────────────────────────────────────────┐
-   │  Seite            index.php · kurse.php · programme/*.php    │
+   │  Seite            *.php · programme/*.php                    │
    │                   HTML und Struktur. Sonst nichts.           │
    └──────────────────────────┬──────────────────────────────────-┘
                               │ ruft auf
@@ -50,13 +50,14 @@ verstehen und ändern.
 
 ## Warum Schicht 3 der Kern ist
 
-Schicht 3 ist der Grund, warum das Projekt heute ohne Datenbank läuft und
-morgen mit einer — **ohne dass Seiten angefasst werden müssen**.
+Schicht 3 ist der Grund, warum ein Feature zuerst ohne Datenbank laufen und
+später an eine angeschlossen werden kann — **ohne dass Seiten angefasst werden
+müssen**.
 
 Ein Service hat einen festen Vertrag nach oben: `alleLaden()` gibt ein Array
 von Kursen zurück. Was darunter passiert, ist seine Sache.
 
-**Heute**, ohne Datenbank:
+**Zuerst**, ohne Datenbank:
 
 ```js
 export async function alleLaden() {
@@ -93,10 +94,12 @@ Unterschied. Genau dafür gibt es diese Schicht.
 | `assets/js/lib/` | Allgemeine Helfer ohne Feature-Bezug | – |
 | `api/` | Endpunkte, geben JSON zurück | 4 |
 | `api/index.php` | Einziger Einstieg auf Vercel, bindet Seiten und Endpunkte ein. Kein Endpunkt | – |
-| `src/` | PHP-Klassen, nicht direkt aufrufbar (`Database`, `Auth`, `Api`, `SitzungsSpeicher`) | 4–5 |
+| `src/` | PHP-Klassen, nicht direkt aufrufbar (`Database`, `Auth`, `Api`, `SitzungsSpeicher`, `Terminplan`, `Ausweispruefung`, `Mailversand`) | 4–5 |
 | `src/Repositories/` | Datenzugriff, der einzige Ort mit SQL | 5 |
 | `database/` | Bauplan und Testdaten | 6 |
 | `config/` | Zugangsdaten (nicht im Repository), auf Vercel aus Umgebungsvariablen | – |
+| `tests/` | Kleine Tests ohne Zusatzpakete, z. B. `node --test tests/*.test.mjs` | – |
+| `router.php` | Nur für den lokalen PHP-Server, liefert Videos stückweise aus, siehe [ADR-0006](decisions/ADR-0006-router-fuer-entwicklungsserver.md) | – |
 | `vercel.json`, `.github/` | Veröffentlichung auf Vercel, siehe [ADR-0016](decisions/ADR-0016-hosting-auf-vercel.md) | – |
 | `vendor/` | Fremde Bibliotheken, aktuell nur der Login. Nie von Hand ändern | – |
 | `docs/` | Diese Dokumentation | – |
@@ -147,7 +150,7 @@ Eine neue Komponente muss dort eingetragen werden, sonst wird sie nicht geladen.
 
 Sechs Dateien, eine pro Schicht, die **nur aus Kommentaren bestehen**. Sie
 beschreiben, was in die jeweilige Schicht gehört und was nicht. Als Vorlage
-gedacht — beim ersten echten Feature kopieren und umbenennen.
+gedacht — für ein neues Feature kopieren und umbenennen.
 
 1. `beispiel-feature.php`
 2. `assets/js/pages/beispiel-feature.page.js`

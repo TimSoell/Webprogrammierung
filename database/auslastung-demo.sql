@@ -1,8 +1,9 @@
 -- =============================================================================
--- @file        src/Repositories/auslastung-demo.sql
--- @layer       5 – Datenzugriff / manuelle Demo-Daten
+-- @file        database/auslastung-demo.sql
+-- @layer       6 - Datenbank (Demo-Daten)
 -- @description Ergänzt heutige Demo-Besuche im ausgewählten Supabase-Projekt.
 --              Ersetzt nur heutige Besuche der gesperrten Demo-Konten.
+--              Im SQL Editor des Supabase-Dashboards ausführen.
 -- @see         docs/features/auslastung.md
 -- =============================================================================
 

@@ -7,6 +7,12 @@ HTML verlinkt. Eigene Dateien liegen bisher nur hier:
 - `favicon.png` — das Logo quadratisch, 192 × 192 px, für den Browser-Tab
 - `apple-touch-icon.png` — das Logo auf Weiß, 180 × 180 px, für den
   Homescreen von iPhone und iPad
+- `apple-store-logo-transparent.png`, `google-store-logo-transparent.png` —
+  die App-Store-Symbole in der Fußzeile
+- `scroll-video.mp4` — das Video, das auf der Startseite beim Scrollen
+  abläuft, siehe [`docs/features/scroll-video.md`](../../docs/features/scroll-video.md)
+- `studio-tour.mp4` — der Rundgang auf `locations.php`, siehe
+  [`docs/features/studiotour.md`](../../docs/features/studiotour.md)
 - `coaches/` — Porträtfotos für die Programmseiten, siehe die
   [README dort](coaches/README.md)
 - `bewertungen/` — KI-generierte Bilder zu den Beispielbewertungen auf der

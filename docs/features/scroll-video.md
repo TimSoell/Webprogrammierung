@@ -1,8 +1,8 @@
 # Feature: Scroll-Video
 
-**Status:** in Arbeit
+**Status:** fertig
 **Verantwortlich:** offen
-**Zuletzt geprueft:** 2026-09-30
+**Zuletzt geprüft:** 2026-11-01
 
 ## Was kann man damit
 

@@ -24,20 +24,20 @@ kommt: „Wo muss ich anfassen, wenn ich am Kursplan etwas ändern will?"
 | [Standortübersicht](locations.md) | fertig | Team |
 | [Programm-Details](programm-details.md) | fertig | Jonny |
 | [Gemerkte Auswahl](gemerkte-auswahl.md) | fertig | Jonny |
-| [Mitgliedschaften](mitgliedschaften.md) | in Arbeit | Felix |
-| [Nachweise](nachweise.md) | in Arbeit | Felix |
+| [Mitgliedschaften](mitgliedschaften.md) | fertig | Felix |
+| [Nachweise](nachweise.md) | fertig | Felix |
 | [Terminkalender](terminkalender.md) | fertig | Jonny |
 | [Bewertungen](bewertungen.md) | fertig | Felix |
 | [Profilbilder](profilbilder.md) | fertig | Felix |
-| [Cookie-Banner](cookie-banner.md) | in Arbeit | Giani |
+| [Cookie-Banner](cookie-banner.md) | fertig | Giani |
 | [Freunde werben](freunde-werben.md) | fertig | Jonny |
-| [Personal verwalten](personal-verwalten.md) | in Arbeit | Felix |
-| [Unstimmigkeiten und Konto löschen](unstimmigkeiten.md) | in Arbeit | Felix |
+| [Personal verwalten](personal-verwalten.md) | fertig | Felix |
+| [Unstimmigkeiten und Konto löschen](unstimmigkeiten.md) | fertig | Felix |
 | [Mailversand](mailversand.md) | fertig | Giani |
-| [Empfang](empfang.md) | in Arbeit | Felix |
-| [Auslastungsdiagramm](auslastung.md) | in Arbeit | offen |
-| [Scroll-Video](scroll-video.md) | in Arbeit | offen |
-| [Studiotour](studiotour.md) | in Arbeit | offen |
+| [Empfang](empfang.md) | fertig | Felix |
+| [Auslastungsdiagramm](auslastung.md) | fertig | offen |
+| [Scroll-Video](scroll-video.md) | fertig | offen |
+| [Studiotour](studiotour.md) | fertig | offen |
 | [Animierter Preloader](preloader.md) | fertig | offen |
 
 Der Aufbau eines Features ist am Beispiel-Feature beschrieben — siehe

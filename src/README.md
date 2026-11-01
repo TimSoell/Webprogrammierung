@@ -10,6 +10,7 @@ Seiten und Endpunkten eingebunden.
 | `SitzungsSpeicher.php` | Legt PHP-Sitzungen in der Datenbank ab statt als Datei – nötig für Vercel, siehe [ADR-0017](../docs/decisions/ADR-0017-postgresql-auf-supabase.md) |
 | `Auth.php` | Die eine Instanz der Login-Bibliothek, Regeln für E-Mail und Passwort |
 | `Api.php` | JSON-Rumpf lesen und antworten, für die Endpunkte in `api/` |
+| `Ausweispruefung.php` | Liest Art, Name und Ablaufdatum eines Ausweisfotos über Gemini, ohne Schlüssel Demo-Modus – siehe [ADR-0012](../docs/decisions/ADR-0012-gemini-statt-claude.md) |
 | `Mailversand.php` | Verschickt Mails über Resend, ohne Schlüssel Demo-Modus – siehe [ADR-0027](../docs/decisions/ADR-0027-mailversand-ueber-resend.md) |
 | `Terminplan.php` | Aus Wochenplänen konkrete Termine rechnen und angefragte Termine prüfen, ohne SQL |
 | `Repositories/` | Datenzugriff. Der einzige Ort mit SQL |

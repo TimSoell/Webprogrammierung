@@ -1,8 +1,8 @@
 # Feature: Cookie-Banner
 
-**Status:** in Arbeit
+**Status:** fertig
 **Verantwortlich:** Giani
-**Zuletzt geprüft:** 2026-09-30
+**Zuletzt geprüft:** 2026-11-01
 
 ## Was kann man damit
 
