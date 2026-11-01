@@ -1,8 +1,8 @@
 # Feature: Auslastungsdiagramm
 
-**Status:** in Arbeit
+**Status:** fertig
 **Verantwortlich:** offen
-**Zuletzt geprueft:** 2026-10-16
+**Zuletzt geprüft:** 2026-11-01
 
 ## Was kann man damit
 
@@ -47,8 +47,7 @@ Siehe [ADR-0022](../decisions/ADR-0022-auslastung-als-fuellung.md).
 | 3 Service | `assets/js/services/auslastung.js` |
 | 4 Endpunkt | `api/auslastung.php` |
 | 5 Repository | `src/Repositories/AuslastungRepository.php` |
-| 5 Demo-Daten | `src/Repositories/AuslastungDemoRepository.php` (nur CLI) |
-| 6 Datenbank | `database/schema.sql`, `database/seed.sql` |
+| 6 Datenbank | `database/schema.sql`, `database/seed.sql`, `database/auslastung-demo.sql` (Demo-Daten) |
 | CSS | `assets/css/components/auslastung.css` |
 
 ## Datenform
@@ -132,7 +131,7 @@ Die Startseite laedt alle 20 Sekunden von selbst nach. Wer beide Seiten in
 zwei Tabs offen hat, sieht die Aenderung also auch ohne Neuladen - das wirkt
 in der Vorfuehrung am besten.
 
-Demo-Daten werden über `AuslastungDemoRepository::heuteEintragen()` ergänzt
+Demo-Daten ergänzt `database/auslastung-demo.sql`
 (siehe unten). Echte Besuche werden dabei weder gelöscht noch ersetzt.
 
 ## Was fehlt noch
@@ -144,38 +143,29 @@ Demo-Daten werden über `AuslastungDemoRepository::heuteEintragen()` ergänzt
 - Ein Mitglied kann beliebig viele Besuche fuer verschiedene Zeiten
   eintragen. Nur Ueberschneidungen sind gesperrt.
 
-## Demo-Daten für die Entwicklungsdatenbank
+## Demo-Daten für die Vorführung
 
-`AuslastungDemoRepository` legt 150 gesperrte Demo-Mitglieder mit Adressen
-`auslastung-demo-…@example.invalid` an. Sie besitzen keine verwendbaren
-Zugangsdaten. Besuche dauern 90 Minuten: 24 ab 8:00, 18 ab 11:00, 120 ab
-16:00, 65 ab 19:00 sowie bis zu 45 ab dem aktuellen Zeitpunkt. Überschneidungen
-je Demo-Mitglied werden vermieden. So sieht man Teilfüllungen und Balken,
-die über den Durchschnitt hinauswachsen.
+`database/auslastung-demo.sql` legt 150 gesperrte Demo-Mitglieder mit
+Adressen `auslastung-demo-…@example.invalid` an. Sie besitzen keine
+verwendbaren Zugangsdaten. Besuche dauern 90 Minuten: 24 ab 8:00, 18 ab
+11:00, 120 ab 16:00, 65 ab 19:00 sowie bis zu 45 ab dem aktuellen Zeitpunkt.
+Überschneidungen je Demo-Mitglied werden vermieden. So sieht man
+Teilfüllungen und Balken, die über den Durchschnitt hinauswachsen.
 
-Aus dem Projektordner ausführen (macOS mit XAMPP; andernfalls `php` verwenden):
+Ausgeführt wird das Skript im **SQL Editor** des Supabase-Dashboards, im
+Normalfall in `schwitzkasten-dev`. Es verwendet Berliner Zeit und ersetzt
+ausschließlich heutige Besuche seiner Demo-Mitglieder. Echte Benutzerkonten
+und ihre Besuche bleiben erhalten und werden gemeinsam mit den Demo-Besuchen
+gezählt. Die Daten sind an den heutigen Tag gebunden; für eine spätere
+Vorführung erneut ausführen.
 
-```sh
-/Applications/XAMPP/xamppfiles/bin/php -r 'define("CONFIG", require "config/config.php"); date_default_timezone_set("Europe/Berlin"); require "src/Database.php"; require "src/Repositories/AuslastungRepository.php"; require "src/Repositories/AuslastungDemoRepository.php"; echo (new Repositories\AuslastungDemoRepository())->heuteEintragen(), " Demo-Besuche eingetragen", PHP_EOL;'
-```
-
-Der Aufruf ist nur in der CLI und mit dem Entwicklungsziel aus der
-Konfigurationsvorlage erlaubt. Er ersetzt ausschließlich heutige Besuche
-der genannten Demo-Konten. Echte Benutzerkonten und ihre Besuche bleiben
-erhalten und werden gemeinsam mit den Demo-Besuchen gezählt. Die Daten
-sind an den heutigen Tag gebunden; für eine spätere Vorführung erneut ausführen.
-
-Für eine ausdrücklich gewünschte Vorführung in Produktion kann der
-Projektinhaber `src/Repositories/auslastung-demo.sql` im SQL Editor des
-entsprechenden Supabase-Projekts ausführen. Das Skript verwendet Berliner
-Zeit und ersetzt ausschließlich heutige Besuche seiner gesperrten
-Demo-Mitglieder. Der CLI-Aufruf oben bleibt auf die Entwicklungsdatenbank
-beschränkt. Die neue Diagrammdarstellung muss zusätzlich auf Vercel
-veröffentlicht sein; das SQL ergänzt nur die Daten.
+In Produktion nur für eine ausdrücklich gewünschte Vorführung, und nur durch
+den Projektinhaber.
 
 ## Prüfung
 
 - Diagrammtests ohne zusätzliche Pakete: `node --test tests/*.test.mjs`.
+- Zähllogik des Repositorys ohne Datenbank: `php tests/auslastung-repository.test.php`.
 - API: `gesamt = max(basis, gebucht)` in allen 24 Stunden.
 - Über ein angemeldetes Testkonto einen Besuch eintragen und entfernen:
   Die grüne Füllung wächst und kehrt anschließend zum vorherigen Wert zurück.

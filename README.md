@@ -74,6 +74,16 @@ Testdaten einspielen: siehe [`database/README.md`](database/README.md).
 zeigt jede Seite einen Datenbankfehler. Im Dashboard das Projekt öffnen und
 **Restore** klicken – vor jeder Vorführung einmal prüfen.
 
+### Tests
+
+Für die Rechenlogik des Auslastungsdiagramms gibt es zwei kleine Tests, die
+ohne Datenbank und ohne zusätzliche Pakete laufen:
+
+```bash
+node --test tests/*.test.mjs
+php tests/auslastung-repository.test.php
+```
+
 ### Veröffentlichen
 
 Nichts von Hand. Jeder Pull Request auf `main` bekommt eine Preview auf
@@ -111,6 +121,7 @@ Die ausführliche Erklärung mit Diagramm steht in
 | `src/` | PHP-Klassen und Infrastruktur |
 | `database/` | Bauplan und Testdaten der Datenbank |
 | `config/` | Konfiguration (Zugangsdaten nicht im Repository) |
+| `tests/` | Kleine Tests ohne Zusatzpakete, siehe unten |
 | `docs/` | Dokumentation |
 
 **In jedem Ordner liegt eine `README.md`**, die erklärt, was dort hineingehört
@@ -126,6 +137,7 @@ und was nicht.
 | [`docs/decisions/`](docs/decisions/) | Architekturentscheidungen mit Begründung und verworfenen Alternativen |
 | [`docs/features/`](docs/features/) | Je ein Dokument pro Feature |
 | [`docs/templates/`](docs/templates/) | Vorlagen für Kopfkommentare, Feature-Doku und Entscheidungen |
+| [`docs/migration-vercel-supabase.md`](docs/migration-vercel-supabase.md) | Der abgeschlossene Umzug von XAMPP/MySQL auf Vercel und Supabase |
 | [`CLAUDE.md`](CLAUDE.md) | Das Regelwerk fürs Team |
 
 Zusätzlich beginnt **jede Quelldatei mit einem Kopfkommentar**, der ihren Ort

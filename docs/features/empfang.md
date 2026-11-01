@@ -1,8 +1,8 @@
 # Feature: Empfang
 
-**Status:** in Arbeit
+**Status:** fertig
 **Verantwortlich:** Felix
-**Zuletzt geprüft:** 2026-10-16
+**Zuletzt geprüft:** 2026-11-01
 
 ## Was kann man damit
 

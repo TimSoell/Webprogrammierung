@@ -5,7 +5,7 @@
  * @description Der obere Teil jeder Seite: <head> mit Titel, Schriften,
  *              Stylesheet und Skripten, plus das öffnende <body>.
  *
- *              Eine Seite steuert diesen Baustein über drei Variablen,
+ *              Eine Seite steuert diesen Baustein über diese Variablen,
  *              die sie VOR dem require setzt:
  *
  *                  $pageTitle        Titel im Browser-Tab   (Pflicht)

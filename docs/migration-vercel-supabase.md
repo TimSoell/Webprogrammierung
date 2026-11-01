@@ -1,6 +1,12 @@
 # Migrationsplan: XAMPP → Vercel + Supabase
 
-Stand 30.09.2026 · erstellt mit Claude Code für Jonathan · Status: **in Umsetzung**
+Stand 30.09.2026 · erstellt mit Claude Code für Jonathan · Status: **abgeschlossen**
+
+> Der Umzug ist erledigt: Die Seite läuft auf Vercel unter
+> [schwitzkasten-gym.de](https://schwitzkasten-gym.de/), lokal arbeitet das
+> ganze Team gegen `schwitzkasten-dev`. Der Plan bleibt als Nachweis stehen;
+> was heute gilt, steht in [ADR-0016](decisions/ADR-0016-hosting-auf-vercel.md)
+> und [ADR-0017](decisions/ADR-0017-postgresql-auf-supabase.md).
 
 ## Stand der Umsetzung
 
@@ -11,7 +17,7 @@ Stand 30.09.2026 · erstellt mit Claude Code für Jonathan · Status: **in Umset
 | Supabase | `schwitzkasten-dev` und `schwitzkasten` (Produktion), beide eu-central-1, mit Schema, Seed, RLS, Zeitzone; Zeilenzahlen = MySQL |
 | Code | Branch `feature/vercel-supabase`: Schema/Seed PostgreSQL, 6 Repositories, Sitzungen in der DB, Konfiguration aus Umgebungsvariablen, `api/index.php`, `vercel.json`, Workflow, ADR-0016/0017, Doku |
 | Lokaler Test | bestanden: Login, Sitzungen, Auswahl, Tarifwechsel, Kurse, Probetraining, Auslastung, Nachweis, Passwort-Reset |
-| **Offen** | Preview prüfen · Produktions-Passwort in Vercel (M9) · Merge → Produktion · Team-Umstieg |
+| Abschluss | Preview geprüft · Produktions-Passwort in Vercel (M9) · Merge → Produktion · Team-Umstieg |
 
 Tim ist in der Supabase-Organisation nur noch Developer. Das Limit von zwei
 aktiven Free-Projekten zählt nur für Owner und Admins.
